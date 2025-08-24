@@ -1,0 +1,205 @@
+// src/components/seat-modal/seat-modal.scss
+@import '../../styles/variables';
+// El overlay gris oscuro que cubre toda la pantalla
+.modal-overlay {
+    position: fixed; // Se queda fijo aunque hagas scroll
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); // Fondo semitransparente
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; // Se asegura de que esté por encima de todo
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+
+    // Clase para ocultar el modal con una transición suave
+    &.hidden {
+        opacity: 0;
+        pointer-events: none; // Evita que se pueda hacer clic en él cuando está oculto
+    }
+}
+
+// La ventana de contenido del modal
+.modal-content {
+    background: #2c2c2c;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    width: 90%;
+    max-width: 420px;
+    position: relative;
+    border-top: 4px solid $seat-available-color; // Un toque de color
+    transform: scale(1);
+    transition: transform 0.3s ease-in-out;
+
+    // Animación de entrada para el modal
+    .modal-overlay:not(.hidden) & {
+        transform: scale(1);
+    }
+    .modal-overlay.hidden & {
+        transform: scale(0.95);
+    }
+}
+
+// Título del modal
+#modal-title {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #ffffff;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+// Contenedor de la información del jugador ocupado
+#info-seat-occupied {
+    h3 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: $text-light;
+    }
+    p {
+        text-align: center;
+        font-size: 1.1rem;
+        margin: 0 0 20px 0;
+        strong {
+            color: #aaa;
+        }
+    }
+}
+
+// Estilos para los formularios y grupos de acciones
+form, .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 18px; // Espacio entre elementos
+}
+
+.action-group {
+    display: flex;
+    gap: 10px;
+
+    input {
+        flex-grow: 1; // El input ocupa el espacio sobrante
+    }
+}
+
+// Estilos para labels y inputs
+label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-bottom: -10px;
+}
+
+input[type="text"], input[type="number"] {
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background-color: #1e1e1e;
+    color: #fff;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box; // Asegura que el padding no afecte el ancho
+
+    &:focus {
+        outline: none;
+        border-color: $seat-available-color;
+    }
+}
+
+// Botón de cerrar modal
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+        color: #fff;
+    }
+}
+// ... tus estilos del modal de asientos ...
+
+// Estilos para la galería de avatares
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.gallery img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: $light-gold; // Usando la variable de color dorado
+        transform: scale(1.1);
+    }
+}
+// ... tus estilos del modal de asientos ...
+
+// Dentro de seat-modal.scss
+
+// ... tus otros estilos ...
+
+/* === Avatar picker === */
+.avatar-search-container {
+  position: relative;
+}
+
+#avatar-search-input {
+  width: 100%;
+}
+
+#avatar-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 8px;
+  max-height: 220px;      /* hace scroll si hay muchos */
+  overflow: auto;
+  margin-top: 8px;        /* separa del input */
+  padding: 2px;
+}
+
+#avatar-preview .avatar-item {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+#avatar-preview .avatar-item img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.15) inset;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+#avatar-preview .avatar-item img:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2px rgba(255,214,102,.85);
+}
+
+#avatar-preview .avatar-item.selected img {
+  box-shadow: 0 0 0 3px rgba(255,214,102,.95);
+  transform: scale(1.06);
+}

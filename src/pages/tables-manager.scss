@@ -1,0 +1,336 @@
+/* src/pages/tables-manager.scss */
+@use '../styles/variables' as *;
+
+/* ===== Layout ===== */
+.tables-manager {
+  --glass-bg: rgba(16,19,27,.78);
+  --glass-brd: rgba(255,255,255,.14);
+  --glass-inset: rgba(255,255,255,.08);
+
+  max-width: 1240px;                 /* más ancho para filas largas */
+  margin: 28px auto;
+  padding: 0 16px;
+  color: #e9eef7;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+/* ===== Header ===== */
+.tm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(22px, 3.2vw, 30px);
+    font-weight: 800;
+    letter-spacing: .2px;
+    text-shadow: 0 1px 0 rgba(0,0,0,.45);
+  }
+
+  .tm-btn--primary {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: #111325;
+    border: 1px solid rgba(255,255,255,.22);
+    background: linear-gradient(180deg,#ffd972,#f4c33e);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 18px rgba(244,195,62,.22);
+    transition: transform .12s ease, box-shadow .2s ease;
+    &:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 12px 22px rgba(244,195,62,.28); }
+    &:active { transform: translateY(0); }
+  }
+}
+
+/* ===== Filtros ===== */
+.tm-filters {
+  margin-bottom: 16px;
+  .tm-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-brd);
+    background: rgba(255,255,255,.06);
+    color: #f6f7fb;
+    outline: 0;
+    transition: box-shadow .2s ease, border-color .2s ease;
+    &::placeholder { color: rgba(255,255,255,.55); }
+    &:focus {
+      border-color: rgba(212,175,55,.55);
+      box-shadow: 0 0 0 3px rgba(212,175,55,.18);
+    }
+  }
+}
+
+/* ===== Listado ===== */
+/* Vista por defecto: UNA sola columna (fila completa) */
+.tm-list {
+  display: grid;
+  grid-template-columns: 1fr;   /* fila completa */
+  gap: 14px;
+}
+
+/* Si quisieras volver a varias columnas:
+   .tm-list { grid-template-columns: repeat(auto-fill, minmax(720px, 1fr)); } */
+
+/* ===== Tarjeta glass en formato fila ===== */
+.tm-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;                         /* forma “stadium” suave */
+  padding: 18px 22px;                          /* respiración lateral */
+  min-height: 96px;                            /* altura cómoda */
+
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-brd);
+  box-shadow: -6px 10px 28px rgba(0,0,0,.45), inset 0 1px 1px var(--glass-inset);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;   /* info izquierda | acciones derecha */
+  align-items: center;
+  column-gap: 16px;
+
+  /* animación de entrada + retraso escalonado por --i */
+  opacity: 0;
+  transform: translateY(8px) scale(.985);
+  animation: tm-pop .28s ease forwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+
+  /* brillo diagonal sutil en hover */
+  &::after{
+    content:'';
+    position:absolute; inset:-40%;
+    background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,.16) 50%, transparent 65%);
+    transform: translateX(-60%) rotate(12deg);
+    transition: transform .8s ease;
+    pointer-events:none;
+  }
+  &:hover::after { transform: translateX(20%) rotate(12deg); }
+
+  &:hover { transform: translateY(-2px) scale(1); transition: transform .12s ease; }
+}
+
+@keyframes tm-pop {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== Bloque izquierdo (título + badges en línea con wrap) ===== */
+.tm-card > div:first-child {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0; /* para cortar texto si fuese necesario */
+}
+
+.tm-title {
+  margin: 0 10px 0 0;   /* sin margen inferior */
+  font-size: 1.06rem;
+  font-weight: 800;
+  color: #f6f6f6;
+  white-space: nowrap;
+}
+
+/* ===== Badges ===== */
+.tm-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-brd);
+    background: rgba(255,255,255,.08);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    font-weight: 600;
+    font-size: .92rem;
+    color: rgba(255,255,255,.90);
+    white-space: nowrap;
+  }
+
+  /* Estado por color (si los usas) */
+  .badge[data-status="active"]     { color:#0f1220; background: linear-gradient(180deg,#ffd972,#f4c33e); border-color: rgba(255,255,255,.28); }
+  .badge[data-status="en-espera"]  { background: rgba(255,214,102,.12); border-color: rgba(255,214,102,.45); color:#ffd972; }
+  .badge[data-status="inactive"]   { background: rgba(255,255,255,.05); color: rgba(255,255,255,.65); }
+
+  /* Timer monoespaciado */
+  .badge[data-field="timer"] { font-variant-numeric: tabular-nums; letter-spacing:.02em; }
+}
+
+/* ===== Acciones (icon buttons) ===== */
+.tm-actions {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px;
+
+  .tm-icon-btn {
+    width: 46px;
+    height: 46px;
+    display: grid; place-items: center;
+    border-radius: 14px;
+    border: 1px solid var(--glass-brd);
+    background: rgba(255,255,255,.08);
+    color: #e9eef7;
+    box-shadow: inset 0 1px 1px var(--glass-inset);
+    cursor: pointer;
+    transition: transform .12s ease, background .18s ease, box-shadow .18s ease;
+    &:hover { transform: translateY(-1px); background: rgba(255,255,255,.12); }
+    &.danger { color:#ffd5d5; }
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 560px) {
+  .tm-card {
+    grid-template-columns: 1fr; /* apilamos */
+    row-gap: 12px;
+    min-height: 88px;
+  }
+  .tm-actions { justify-content: flex-end; }
+}
+/* ========== Modal Crear/Editar Mesa — Glass iOS ========== */
+
+/* Overlay borroso con animación */
+.tm-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10,12,18,.45);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  z-index: 5200;
+
+  /* anim state (cuando tiene [hidden] está oculto por HTML) */
+  opacity: 0;
+  transform: scale(.98);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.tm-modal:not([hidden]) {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+/* Tarjeta principal del formulario */
+.tm-modal__card {
+  width: min(720px, 92vw);
+  border-radius: 20px;
+  padding: 22px 22px 18px;
+
+  background: rgba(16,19,27,.82);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.50),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+
+  animation: tm-card-in .22s ease;
+}
+@keyframes tm-card-in { from { opacity:0; transform: translateY(6px) scale(.992); } }
+
+/* Título */
+#tm-modal-title {
+  margin: 0 0 14px;
+  font-weight: 800;
+  font-size: clamp(18px, 2.6vw, 22px);
+  letter-spacing: .2px;
+  color: #f6f6f6;
+  text-shadow: 0 1px 0 rgba(0,0,0,.45);
+}
+
+/* Formulario */
+#tm-form {
+  display: grid;
+  gap: 14px;
+}
+
+/* Filas */
+#tm-form .row {
+  display: grid;
+  gap: 8px;
+}
+#tm-form .row.two {
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Labels */
+#tm-form label {
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: rgba(255,255,255,.85);
+}
+
+/* Inputs / selects (glass) */
+#tm-form input[type="text"],
+#tm-form input[type="number"],
+#tm-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+  color: #f6f7fb;
+  outline: 0;
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+
+  &::placeholder { color: rgba(255,255,255,.55); }
+  &:focus {
+    background: rgba(255,255,255,.08);
+    border-color: rgba(212,175,55,.55);
+    box-shadow: 0 0 0 3px rgba(212,175,55,.18), inset 0 1px 0 rgba(255,255,255,.10);
+  }
+}
+
+/* Quitar flechas a number (webkit) */
+#tm-form input[type="number"]::-webkit-outer-spin-button,
+#tm-form input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* (firefox) */
+#tm-form input[type="number"] { -moz-appearance: textfield; }
+
+/* Acciones del modal */
+#tm-form .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Botones base */
+.tm-btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  color: #e9eef7;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+  transition: transform .12s ease, background .18s ease, box-shadow .18s ease;
+  &:hover { transform: translateY(-1px); background: rgba(255,255,255,.12); }
+}
+
+/* Botón primario (doradito del sistema) */
+.tm-btn--primary {
+  color: #111325;
+  border: 1px solid rgba(255,255,255,.22);
+  background: linear-gradient(180deg,#ffd972,#f4c33e);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 18px rgba(244,195,62,.22);
+  &:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 12px 22px rgba(244,195,62,.28); }
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+  #tm-form .row.two { grid-template-columns: 1fr; }
+}

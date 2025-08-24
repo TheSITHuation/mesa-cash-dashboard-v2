@@ -1,0 +1,37 @@
+@import '../../styles/variables';
+
+.info-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    color: $text-light;
+    border: 1px solid rgba(212, 175, 55, 0.3); /* Borde dorado sutil */
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    z-index: 800;
+}
+
+.banner-item {
+    text-align: center;
+    
+    .label {
+        font-size: 0.8rem;
+        color: $text-dimmed;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .value {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+}

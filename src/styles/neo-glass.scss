@@ -1,0 +1,168 @@
+/* src/styles/neo-glass.scss */
+/* ====== Tokens ====== */
+$neo-bg:            rgba(0,0,0,.50);
+$neo-stroke:        rgba(255,255,255,.14);
+$neo-soft-stroke:   rgba(255,255,255,.10);
+$neo-tint:          rgba(255,255,255,.06);
+$neo-highlight:     rgba(255,255,255,.30);
+$neo-shadow:        rgba(0,0,0,.28);
+$neo-text:          #f3f6fd;
+$neo-text-dim:      #cfd8e3;
+$neo-accent:        #ffc107;
+$neo-accent-2:      #ffd54f;
+
+/* ====== Cards / contenedores ====== */
+.neo-card {
+  position: relative;
+  background: $neo-bg;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid $neo-stroke;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 18px $neo-shadow;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -10px; left: -10px;
+    width: 30px; height: 30px;
+    background: radial-gradient(ellipse at center, #fff, $neo-highlight, rgba(0,0,0,0) 60%);
+    filter: blur(1px);
+    pointer-events: none;
+  }
+}
+
+/* ====== Header/section titles ====== */
+.neo-title {
+  color: $neo-text;
+  font-weight: 800;
+  letter-spacing: .02em;
+  margin: 0 0 12px;
+}
+
+/* ====== Inputs y textareas ====== */
+.neo-input, .neo-textarea, .neo-select {
+  width: 100%;
+  color: $neo-text;
+  background: rgba(0,0,0,.35);
+  border: 1px solid $neo-stroke;
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+
+  &:focus {
+    border-color: $neo-accent;
+    box-shadow: 0 0 0 3px rgba($neo-accent, .18);
+  }
+}
+.neo-textarea { resize: vertical; min-height: 90px; }
+
+/* ====== Botones ====== */
+.neo-btn {
+  appearance: none;
+  border: 0;
+  color: #1a1a1a;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+  background: linear-gradient(135deg, $neo-accent-2, $neo-accent);
+  box-shadow: 0 6px 16px rgba($neo-accent, .35);
+
+  &:hover { transform: translateY(-1px); }
+  &:active { transform: translateY(0); box-shadow: none; }
+}
+.neo-btn-outline {
+  color: $neo-text;
+  background: rgba(255,255,255,.06);
+  border: 1px solid $neo-stroke;
+  box-shadow: none;
+
+  &:hover { background: rgba(255,255,255,.12); }
+}
+
+/* Botón “peligro” */
+.neo-btn-danger {
+  color: #fff;
+  background: linear-gradient(135deg, #ff6b6b, #ff1f5a);
+  box-shadow: 0 6px 16px rgba(255,31,90,.35);
+}
+
+/* ====== Pills / tags ====== */
+.neo-pill {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: $neo-text;
+  border: 1px solid $neo-soft-stroke;
+  background: rgba(255,255,255,.06);
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+/* ====== Lista (espera) ====== */
+.neo-list {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.neo-list-item {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid $neo-soft-stroke;
+}
+.neo-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset;
+}
+.neo-avatar.placeholder {
+  display: grid; place-items: center; font-weight: 800;
+  color: $neo-text; background: rgba(255,255,255,.08);
+}
+
+/* ====== Acciones compactas ====== */
+.neo-actions { display: flex; gap: .5rem; }
+.neo-icon-btn {
+  border: 0; background: transparent; color: #d9d9d9;
+  padding: 6px; border-radius: 10px; cursor: pointer;
+  transition: background .2s ease, transform .12s ease;
+  &:hover { background: rgba(255,255,255,.10); transform: translateY(-1px); }
+}
+
+/* ====== Timer grande ====== */
+.session-timer {
+  font-size: 2.1rem; font-weight: 700; letter-spacing: .08em;
+  text-align: center; padding: 14px 18px;
+  border-radius: 14px; background: rgba(255,255,255,.05);
+  border: 1px solid $neo-stroke; backdrop-filter: blur(12px);
+  box-shadow: 0 2px 6px $neo-shadow;
+}
+
+/* ====== Tabs estado ====== */
+.state-tabs { display: flex; gap: .6rem; }
+.state-tab {
+  flex: 1; text-align: center; padding: 10px 12px; border-radius: 12px;
+  background: rgba(255,255,255,.06); color: $neo-text; font-weight: 700;
+  cursor: pointer; border: 1px solid $neo-stroke; transition: all .2s;
+  &:hover { background: rgba(255,255,255,.12); }
+}
+.state-tab.active {
+  background: linear-gradient(135deg, $neo-accent-2, $neo-accent);
+  color: #1a1a1a; box-shadow: 0 4px 12px rgba($neo-accent, .45);
+}
+
+/* ====== Scrollbar sutil ====== */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: #888; border-radius: 10px; border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: #aaa; border-color: transparent; }

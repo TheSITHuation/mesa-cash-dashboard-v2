@@ -1,0 +1,238 @@
+// src/components/waiting-list/waiting-list.scss
+@import '../../styles/variables';
+
+// ===== Defaults (por si alguna variable no existe) =====
+$primary-dark:         #0e1726 !default;
+$text-light:           #f3f5f7 !default;
+$text-dimmed:          #a7b0bd !default;
+$border-color:         rgba(255,255,255,.12) !default;
+$accent-gold:          #ffd766 !default;
+$seat-available-color: #4ade80 !default; // verde
+$seat-occupied-color:  #ff6961 !default; // rojo
+
+// ===== Tokens iOS-like =====
+$card-bg:          rgba(255,255,255,.06);
+$card-hover-bg:    rgba(255,255,255,.08);
+$card-border:      rgba(255,255,255,.14);
+$card-shadow:      0 8px 24px rgba(0, 0, 0, .28);
+$focus-ring:       0 0 0 3px rgba(255, 215, 102, .25);
+$radius-xl:        16px;
+$radius-lg:        12px;
+$radius-md:        10px;
+$duration-fast:    .18s;
+$ease-std:         cubic-bezier(.2,.8,.2,1);
+
+// ===== Contenedor lista =====
+.waiting-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: .65rem;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 2px; // evita scroll-bar tapando contenido
+
+  // Scrollbar estilo iOS
+  &::-webkit-scrollbar { width: 10px; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.16);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  &::-webkit-scrollbar-track { background: transparent; }
+}
+
+.empty-list {
+  color: $text-dimmed;
+  font-style: italic;
+  text-align: center;
+  padding: 18px 14px;
+  border: 1px dashed $border-color;
+  border-radius: $radius-lg;
+  background: rgba(255,255,255,.03);
+}
+
+// ===== Ítem (tarjeta) =====
+.waiting-list-item {
+  background: $card-bg;
+  border: 1px solid $card-border;
+  border-radius: $radius-xl;
+  box-shadow: $card-shadow;
+  transition: transform $duration-fast $ease-std,
+              background-color $duration-fast $ease-std,
+              border-color $duration-fast $ease-std,
+              box-shadow $duration-fast $ease-std;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: .65rem .7rem;
+
+  &:hover {
+    transform: translateY(-2px);
+    background: $card-hover-bg;
+    border-color: rgba(255,255,255,.22);
+    box-shadow: 0 10px 28px rgba(0,0,0,.32);
+  }
+}
+
+// Layout interno
+.waiting-player {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  column-gap: .7rem;
+  width: 100%;
+}
+
+// Avatar
+.wl-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.15) inset,
+              0 1px 0 rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+}
+
+.wl-avatar.placeholder {
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: $text-light;
+}
+
+// Nombre
+.wl-name {
+  font-weight: 650;
+  color: $text-light;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Acciones (icon buttons)
+.player-actions {
+  display: flex;
+  gap: .35rem;
+}
+
+.wl-action-btn {
+  appearance: none;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  color: $text-light;
+  padding: .42rem;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: transform $duration-fast $ease-std,
+              background-color $duration-fast $ease-std,
+              border-color $duration-fast $ease-std,
+              color $duration-fast $ease-std,
+              box-shadow $duration-fast $ease-std;
+  display: grid;
+  place-items: center;
+
+  svg { width: 18px; height: 18px; }
+
+  &:hover {
+    transform: translateY(-1px);
+    background: rgba(255,255,255,.12);
+    border-color: rgba(255,255,255,.22);
+  }
+  &:active { transform: translateY(0); }
+  &:focus-visible { outline: none; box-shadow: $focus-ring; }
+
+  &.sit-btn:hover    { color: $seat-available-color; }
+  &.delete-btn:hover { color: $seat-occupied-color; }
+}
+
+// ===== Botón “+ Añadir Jugador” =====
+.add-player-btn {
+  width: 100%;
+  padding: .9rem 1rem;
+  border-radius: $radius-xl;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: $accent-gold;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)),
+    rgba(212,175,55,.12);
+  border: 1px dashed rgba(212,175,55,.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform $duration-fast $ease-std,
+              background-color $duration-fast $ease-std,
+              box-shadow $duration-fast $ease-std;
+
+  &:hover {
+    transform: translateY(-1px);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06)),
+      rgba(212,175,55,.18);
+    box-shadow: 0 6px 18px rgba(212,175,55,.18);
+  }
+  &:focus-visible { outline: none; box-shadow: $focus-ring; }
+}
+
+// ===== Form “Añadir Jugador” =====
+.add-player-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .6rem;
+  margin-bottom: .8rem;
+
+  input {
+    padding: .72rem .8rem;
+    border-radius: $radius-lg;
+    border: 1px solid $card-border;
+    background: rgba(255,255,255,.05);
+    color: $text-light;
+    transition: border-color $duration-fast $ease-std, box-shadow $duration-fast $ease-std;
+
+    &::placeholder { color: $text-dimmed; }
+    &:focus {
+      outline: none;
+      border-color: rgba(255,255,255,.25);
+      box-shadow: $focus-ring;
+    }
+  }
+
+  button {
+    padding: 0 1rem;
+    border-radius: $radius-lg;
+    border: 1px solid rgba(255,255,255,.18);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)),
+      rgba(255,255,255,.08);
+    color: $text-light;
+    font-weight: 650;
+    cursor: pointer;
+    transition: transform $duration-fast $ease-std,
+                background-color $duration-fast $ease-std,
+                border-color $duration-fast $ease-std,
+                box-shadow $duration-fast $ease-std;
+
+    &:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.28);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05)),
+        rgba(255,255,255,.12);
+    }
+    &:focus-visible { outline: none; box-shadow: $focus-ring; }
+  }
+
+  &.hidden { display: none; }
+}
+
+// Modo “reduce motion”
+@media (prefers-reduced-motion: reduce) {
+  .waiting-list-item,
+  .wl-action-btn,
+  .add-player-btn,
+  .add-player-form button {
+    transition: none !important;
+  }
+}

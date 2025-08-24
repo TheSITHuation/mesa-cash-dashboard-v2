@@ -1,0 +1,205 @@
+/* ================================
+   iOS-style floating sheets + controls
+   ================================ */
+
+/* Paleta base (ajústala a tu tema) */
+:root {
+  --ios-tint:        #ffd766;   /* dorado de tu tema */
+  --ios-bg:          rgba(18, 22, 30, .40);
+  --ios-sheet:       rgba(24, 28, 36, .35);
+  --ios-stroke:      rgba(255,255,255,.22); /* hairline */
+  --ios-inner:       rgba(255,255,255,.08); /* brillo interior */
+  --ios-shadow:      rgba(0,0,0,.45);
+  --ios-text:        #f3f3f3;
+  --ios-dim:         #c9c9c9;
+}
+
+/* Utilidades */
+.ios-hairline {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    /* Borde exterior difuminado (hairline) */
+    box-shadow: 0 0 0 1px var(--ios-stroke) inset;
+    opacity: .7;
+  }
+}
+
+.ios-sheet {
+  background: var(--ios-sheet);
+  border-radius: 20px;
+  backdrop-filter: blur(24px) saturate(160%) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(160%) brightness(1.1);
+  box-shadow:
+    0 22px 40px -12px var(--ios-shadow),
+    0 4px 12px rgba(0,0,0,.25);
+  position: relative;
+  overflow: hidden;
+
+  /* brillo interno superior, bien sutil */
+  &::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, var(--ios-inner), transparent 26%);
+    pointer-events: none;
+  }
+}
+
+/* Elevación suave al hover (para tarjetas que admitan interacción) */
+.ios-elevate:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 28px 50px -16px var(--ios-shadow),
+    0 6px 16px rgba(0,0,0,.28);
+}
+
+/* Contenedores del panel lateral */
+.side-panel {
+  background: var(--ios-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+.side-panel .panel-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Cada sección como “lámina” */
+.side-panel .panel-section {
+  padding: 16px 14px;
+  color: var(--ios-text);
+}
+.side-panel .panel-section { @extend .ios-sheet; @extend .ios-hairline; }
+
+/* Títulos */
+.side-panel .panel-section h3 {
+  margin: 0 0 10px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+/* Segmented control (Activa / En espera / Inactiva) */
+.glass-radio-group {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 6px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.glass-radio-group input { display: none; }
+.glass-radio-group label {
+  display: grid; place-items: center;
+  height: 40px; border-radius: 12px;
+  background: rgba(255,255,255,.05);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+  color: var(--ios-text);
+  font-weight: 600; cursor: pointer;
+  transition: transform .15s ease, background .2s ease, color .2s ease;
+}
+.glass-radio-group input:checked + label {
+  color: #111;
+  background: linear-gradient(180deg, var(--ios-tint), #ffbf3d);
+  box-shadow:
+    0 10px 24px rgba(255, 208, 98, .35),
+    inset 0 1px 0 rgba(255,255,255,.65);
+  transform: translateY(-1px);
+}
+
+/* Timer pill */
+#session-timer.timer {
+  margin-top: 8px;
+  border-radius: 16px;
+  background: rgba(0,0,0,.35);
+  padding: 18px 20px;
+  font-size: 38px; font-weight: 800; text-align: center;
+  letter-spacing: .06em;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    inset 0 -1px 0 rgba(0,0,0,.3);
+}
+
+/* “Iniciada el…” */
+.created-at-text {
+  margin-top: 10px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+  color: #eee; font-size: .9rem;
+}
+
+/* Lista de espera (sheet dentro de sheet) */
+.waiting-list {
+  list-style: none; padding: 0; margin: 10px 0 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.waiting-list-item {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 14px;
+  background: rgba(255,255,255,.04);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+.wl-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset; }
+.wl-avatar.placeholder { display: grid; place-items: center; font-weight: 700;
+  background: rgba(255,255,255,.08); color: var(--ios-text); }
+.wl-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-actions { display: flex; gap: 6px; }
+.wl-action-btn { background: transparent; border: 0; padding: 6px 8px; border-radius: 10px;
+  color: #d9d9d9; cursor: pointer; transition: background .2s ease, transform .12s ease; }
+.wl-action-btn:hover { background: rgba(255,255,255,.08); transform: translateY(-1px); }
+
+/* Botón “+ Añadir Jugador” */
+.add-player-btn {
+  width: 100%; padding: 12px; border-radius: 12px;
+  background: rgba(212, 175, 55, 0.16);
+  border: 1px dashed var(--ios-tint); color: var(--ios-tint);
+  font-weight: 700; cursor: pointer; transition: background .2s ease;
+}
+.add-player-btn:hover { background: rgba(212, 175, 55, 0.26); }
+
+/* ====== Aplicado a Modales y Player Card sin tocar tu HTML ====== */
+.modal-content,
+.player-card {
+  @extend .ios-sheet;
+  @extend .ios-hairline;
+}
+
+/* Overlay ligeramente más “iOS” */
+.modal-overlay {
+  background: radial-gradient(1200px 600px at 50% 10%, rgba(0,0,0,.50), rgba(0,0,0,.72));
+}
+
+/* Toggle estilo iOS (si lo usas en el futuro) */
+.ios-switch {
+  --w: 52px; --h: 30px;
+  width: var(--w); height: var(--h); border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  position: relative; box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+  transition: background .2s ease;
+}
+.ios-switch__thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: white;
+  box-shadow: 0 6px 14px rgba(0,0,0,.25), 0 1px 0 rgba(0,0,0,.3);
+  transition: transform .2s ease;
+}
+.ios-switch.is-on { background: linear-gradient(180deg, var(--ios-tint), #ffbf3d); }
+.ios-switch.is-on .ios-switch__thumb { transform: translateX(22px); }
+
+/* Fallback para navegadores sin backdrop-filter */
+@supports not ((backdrop-filter: blur(10px))) {
+  .ios-sheet { background: rgba(24, 28, 36, .88); }
+  .side-panel { background: rgba(18,22,30,.92); }
+}

@@ -1,0 +1,118 @@
+@import '../../styles/variables';
+
+.table-settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.table-settings-form label {
+    font-size: 0.9rem;
+    color: $text-dimmed;
+    margin-bottom: -10px;
+}
+
+.table-settings-form input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid $border-color;
+    background-color: $primary-dark;
+    color: $text-light;
+    font-size: 1rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.save-settings-btn {
+    margin-top: 10px;
+    padding: 12px;
+    background-color: $accent-gold;
+    color: $primary-dark;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.9;
+    }
+}
+/* ===== Formulario Crear Mesa (iOS glass) ===== */
+.table-form-overlay {
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,.45);
+  z-index: 1500;
+}
+
+.table-form {
+  width: min(560px, calc(100% - 32px));
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.16);
+  color: #fff;
+
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.table-form__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 8px 10px;
+  h2 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+  .tf-close {
+    width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.08); color: #fff; cursor: pointer;
+  }
+}
+
+.table-form__body { padding: 4px 8px 10px; }
+
+.tf-row { display: grid; gap: 6px; margin-bottom: 12px; }
+.tf-row > label { font-size: .9rem; color: rgba(255,255,255,.85); }
+
+.tf-grid {
+  display: grid; gap: 12px; grid-template-columns: 1fr 1fr;
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+
+.table-form input, .table-form select {
+  height: 40px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.06);
+  color: #fff; padding: 0 12px; outline: none;
+}
+
+.tf-actions {
+  display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px;
+}
+.tf-btn {
+  height: 42px; border-radius: 12px; padding: 0 14px; font-weight: 700;
+  border: 1px solid rgba(255,255,255,.16); color: #0f1220;
+  background: rgba(255,255,255,.9);
+}
+.tf-btn--ghost {
+  color: #fff; background: rgba(255,255,255,.08);
+}
+.tf-btn--primary {
+  background: linear-gradient(180deg, #ffd972, #f4c33e);
+  border-color: rgba(255,255,255,.45);
+}

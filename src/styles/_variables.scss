@@ -1,0 +1,15 @@
+// src/styles/_variables.scss// Paleta de Colores - Tema Azul Oscuro y Dorado
+$primary-dark: #1e293b;       // Azul oscuro primario (fondo principal)
+$secondary-dark: #334155;     // Azul oscuro secundario (fondos de contenedores)
+$accent-gold: #d4af37;       // Dorado acento
+$light-gold: #fdd835;        // Dorado más claro (hover, etc.)
+$text-light: #f8f8f2;        // Texto claro (principal)
+$text-dimmed: #a1a1aa;       // Texto atenuado (subtítulos, etc.)
+$table-color: #104b79;        // Azul oscuro para la mesa
+$table-border-color: #b8860b; // Borde dorado para la mesa
+$seat-available-color: #38b000; // Verde para "Disponible" (puedes cambiar si prefieres un dorado más sutil)
+$seat-occupied-color: #e63946;  // Rojo para "Ocupado" (puedes ajustar)
+$modal-background: $secondary-dark;
+$input-background: $primary-dark;
+$border-color: #475569;// Fuentes
+$font-main: sans-serif;

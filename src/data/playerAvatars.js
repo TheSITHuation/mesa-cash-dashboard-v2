@@ -1,0 +1,27 @@
+// src/constants/playerAvatars.js
+export const playerAvatars = [
+    { name: 'Alice', path: '/avatars/Alice.png' }, { name: 'Art', path: '/avatars/Art.png' },
+    { name: 'Ayra', path: '/avatars/Ayra.png' }, { name: 'Barbie', path: '/avatars/Barbie.png' },
+    { name: 'Batman_90', path: '/avatars/Batman_90.png' }, { name: 'Bender', path: '/avatars/Bender.png' },
+    { name: 'Blue-Demon', path: '/avatars/Blue-Demon.png' },{ name: 'Bugs_Bunny', path: '/avatars/Bugs_Bunny.png' },
+    { name: 'Burns', path: '/avatars/Burns.png' },{ name: 'CH', path: '/avatars/CH.png' },
+    { name: 'Dhaeris', path: '/avatars/Dhaeris.png' },{ name: 'Feliz', path: '/avatars/Feliz.png' }, 
+    { name: 'Franklin', path: '/avatars/Franklin.png' },{ name: 'Freddy_Krueger', path: '/avatars/freddy_krueger.png' },
+    { name: 'Gandalf', path: '/avatars/Gandalf.png' },{ name: 'GFKnife', path: '/avatars/GFKnife.png' }, 
+    { name: 'Ghostface2', path: '/avatars/Ghostface2.png' },{ name: 'Gollum', path: '/avatars/Gollum.png' },
+    { name: 'Goofy', path: '/avatars/Goofy.png' },{ name: 'Itachi', path: '/avatars/Itachi.png' },
+    { name: 'Jason_Hoorvees', path: '/avatars/Jason_hoorvees.png' },{ name: 'Jhon_Wick', path: '/avatars/Jhon_Wick.png' }, 
+    { name: 'Joker', path: '/avatars/Joker.png' },{ name: 'Justice', path: '/avatars/Justice.png' },
+    { name: 'Liberty', path: '/avatars/Liberty.png' },{ name: 'Madara', path: '/avatars/Madara.png' },
+    { name: 'Mcpato', path: '/avatars/Mcpato.png' },{ name: 'Merlina', path: '/avatars/Merlina.png' },
+    { name: 'Mona_Lisa', path: '/avatars/Mona_Lisa.png' },{ name: 'Monopoly', path: '/avatars/Monopoly.png' },
+    { name: 'Neo', path: '/avatars/Neo.png' },{ name: 'Predator', path: '/avatars/Predator.png' },
+    { name: 'Rambo', path: '/avatars/Rambo.png' },{ name: 'Richie-Rich', path: '/avatars/Richie-Rich.png' },
+    { name: 'Rick-S', path: '/avatars/Rick-.S.png' },{ name: 'Robocop', path: '/avatars/Robocop.png' },
+    { name: 'Rogger', path: '/avatars/Rogger.png' },{ name: 'Santo', path: '/avatars/Santo.png' },
+    { name: 'Scooby', path: '/avatars/Scooby.png' },{ name: 'Serena', path: '/avatars/Serena.png' },
+    { name: 'Skeletor', path: '/avatars/skeletor.png' },{ name: 'Stormtrooper', path: '/avatars/Stormtrooper.png' },
+    { name: 'Titan_A', path: '/avatars/Titan_A.png' },{ name: 'Trump_J', path: '/avatars/Trump_J.png' },
+    { name: 'WCDI', path: '/avatars/WCDI.png' },{ name: 'William_Wallace', path: '/avatars/William_Wallace.png' },
+    { name: 'Yamcha', path: '/avatars/Yamcha.png' }
+];

@@ -1,0 +1,57 @@
+/* src/components/table-settings-modal/table-form.scss */
+
+.table-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #111;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  box-shadow: 0 0 20px rgba(255, 204, 0, 0.1);
+  z-index: 1000;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #eee;
+}
+
+.table-form h2 {
+  color: #ffcc00;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.table-form label {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.table-form input,
+.table-form select {
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #1b1b1b;
+  color: #fff;
+  font-size: 15px;
+}
+
+.table-form button {
+  background-color: #ffcc00;
+  color: #111;
+  border: none;
+  padding: 12px;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.table-form button:hover {
+  background-color: #ffd633;
+}

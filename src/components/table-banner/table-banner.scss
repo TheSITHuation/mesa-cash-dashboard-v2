@@ -1,0 +1,149 @@
+/* src/components/table-banner/table-banner.scss */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+@import '../../styles/variables';
+
+.info-banner {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 750px;
+
+  /* glass iOS */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.35),
+    inset 0 1px 1px rgba(255,255,255,0.15);
+
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji';
+  color: $text-light;
+  z-index: 800;
+
+  /* --- Efecto de destello animado --- */
+  overflow: hidden;
+  --shine-duration: 2.8s;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 -55%; /* arranca fuera de la izquierda */
+    width: 55%;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(
+      120deg,
+      transparent,
+      rgba(255,255,255,0.28),
+      rgba(255,255,255,0.18),
+      transparent
+    );
+    transform: skewX(-20deg);
+    animation: bannerShine var(--shine-duration) linear infinite;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(80% 100% at 0% 50%, rgba(255,255,255,.04), transparent 60%);
+    mix-blend-mode: screen;
+  }
+
+  .banner-item {
+    flex: 1;
+    text-align: center;
+    padding: 0 12px;
+    position: relative;
+
+    &:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: 0; top: 28%;
+      height: 44%;
+      width: 1px;
+      background: rgba(255,255,255,0.18);
+    }
+
+    .label {
+      font-size: .78rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: .5px;
+      margin-bottom: 2px;
+      display: block;
+      text-transform: none;
+    }
+
+    .value {
+      font-size: 1.80rem;
+      font-weight: 600;
+      letter-spacing: .3px;
+      color: #FFD700; // dorado elegante
+      text-shadow: 0 1px 0 rgba(0,0,0,.25);
+      white-space: nowrap;
+      transition: color 0.3s ease;
+    }
+
+    &:hover .value {
+      color: #ffe34d; // dorado más brillante
+    }
+  }
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateX(-50%) scale(1.02);
+    box-shadow:
+      0 16px 36px rgba(0,0,0,0.45),
+      inset 0 1px 1px rgba(255,255,255,0.22);
+  }
+}
+
+/* Keyframes del brillo */
+@keyframes bannerShine {
+  0%   { left: -55%; opacity: 0; }
+  5%   { opacity: .6; }
+  40%  { left: 120%; opacity: 0; } /* llega rápido al final */
+  100% { left: 120%; opacity: 0; } /* pausa el resto del ciclo */
+}
+
+
+/* Responsive */
+@media (max-width: 720px) {
+  .info-banner::after {
+    background: linear-gradient(
+      120deg,
+      transparent,
+      rgba(255,255,255,0.18),
+      rgba(255,255,255,0.12),
+      transparent
+    );
+    --shine-duration: 4.5s; // más lento en móvil
+  }
+}
+
+
+@media (max-width: 420px) {
+  .info-banner {
+    width: calc(100% - 24px);
+    bottom: 16px;
+    .banner-item {
+      padding: 0 8px;
+      &:not(:last-child)::after { top: 32%; height: 36%; }
+      .label { font-size: .68rem; }
+      .value { font-size: 1rem; }
+    }
+  }
+}
+

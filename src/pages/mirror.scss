@@ -1,0 +1,18 @@
+/* src/pages/mirror.scss */
+.mirror-mode {
+  /* oculta elementos de administración/controles */
+  .side-panel,
+  .info-banner,
+  .tables-manager,
+  .start-screen__button { display: none !important; }
+
+  /* evita scalings raros del hover en proyección */
+  .player-seat:hover { transform: none !important; }
+  .seat:hover { transform: none !important; }
+
+  /* si quieres que el tooltip NO aparezca en espejo */
+  .seat-tooltip { display: none !important; }
+
+  /* cursor “pantalla” */
+  cursor: none;
+}
