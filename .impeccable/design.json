@@ -1,0 +1,387 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-03T00:00:00Z",
+  "title": "Design System: Experience Poker Room",
+  "extensions": {
+    "colorMeta": {
+      "brand-gold": {
+        "role": "primary",
+        "displayName": "Brand Gold",
+        "canonical": "#d9b66f",
+        "tonalRamp": [
+          "#3a2f15",
+          "#5a4923",
+          "#7a6233",
+          "#9a7b43",
+          "#b89453",
+          "#d9b66f",
+          "#e6cb95",
+          "#f4e0bb"
+        ]
+      },
+      "brand-gold-deep": {
+        "role": "primary-variant",
+        "displayName": "Brand Gold Deep",
+        "canonical": "#d4af37",
+        "tonalRamp": [
+          "#382c0f",
+          "#57421b",
+          "#765928",
+          "#947034",
+          "#b38840",
+          "#d4af37",
+          "#e0c25a",
+          "#ecd57d"
+        ]
+      },
+      "brand-gold-light": {
+        "role": "primary-variant",
+        "displayName": "Brand Gold Light",
+        "canonical": "#fdd835",
+        "tonalRamp": [
+          "#3f370a",
+          "#625516",
+          "#867322",
+          "#a9912e",
+          "#cdaf3a",
+          "#fdd835",
+          "#fde35d",
+          "#feee85"
+        ]
+      },
+      "surface-canvas": {
+        "role": "neutral",
+        "displayName": "Surface Canvas",
+        "canonical": "#0a0a0f",
+        "tonalRamp": [
+          "#000000",
+          "#050508",
+          "#0a0a0f",
+          "#1a1a22",
+          "#2a2a35",
+          "#3a3a48",
+          "#5a5a6a",
+          "#8a8a9a"
+        ]
+      },
+      "surface-panel": {
+        "role": "neutral",
+        "displayName": "Surface Panel",
+        "canonical": "#0d0f12",
+        "tonalRamp": [
+          "#020304",
+          "#0d0f12",
+          "#1a1d22",
+          "#272a30",
+          "#34373e",
+          "#41444c",
+          "#5e6169",
+          "#8a8d95"
+        ]
+      },
+      "state-ok": {
+        "role": "state",
+        "displayName": "State OK",
+        "canonical": "#38b000",
+        "tonalRamp": [
+          "#0a2400",
+          "#163d05",
+          "#225709",
+          "#2e710d",
+          "#388a0f",
+          "#38b000",
+          "#5cc52f",
+          "#80d95f"
+        ]
+      },
+      "state-danger": {
+        "role": "state",
+        "displayName": "State Danger",
+        "canonical": "#e63946",
+        "tonalRamp": [
+          "#330508",
+          "#660b11",
+          "#991519",
+          "#cc2022",
+          "#e63946",
+          "#ec5d68",
+          "#f2818a",
+          "#f8a5ac"
+        ]
+      },
+      "state-warning": {
+        "role": "state",
+        "displayName": "State Warning",
+        "canonical": "#ffd60a",
+        "tonalRamp": [
+          "#332b00",
+          "#665500",
+          "#998000",
+          "#ccaa00",
+          "#ffd60a",
+          "#ffe235",
+          "#ffee60",
+          "#fff78a"
+        ]
+      },
+      "state-money": {
+        "role": "state",
+        "displayName": "State Money",
+        "canonical": "#FFD54F",
+        "tonalRamp": [
+          "#332b00",
+          "#665500",
+          "#998000",
+          "#ccaa00",
+          "#ffd60a",
+          "#FFD54F",
+          "#ffe082",
+          "#ffecb5"
+        ]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Text Primary",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#000000",
+          "#1a1a1a",
+          "#333333",
+          "#666666",
+          "#999999",
+          "#cccccc",
+          "#e6e6e6",
+          "#ffffff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headlines of the public lobby and the player-card modal. Never in the operator register."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles, table names, player-card header. Always in brand-gold."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles, group labels, secondary modal headers."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Panel content, descriptions, waiting-list rows. Max 65-72ch in detail cards."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Input labels, badges, small KPIs. Frequently uppercase-implicit by size."
+      },
+      "timer": {
+        "displayName": "Timer Numeric",
+        "purpose": "Session and table timer. SF Pro Display 800, tabular-nums. The digit IS the component."
+      },
+      "money": {
+        "displayName": "Money Numeric",
+        "purpose": "Stack and transaction figures. Always gold, always bold, always tabular-nums."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-1-subtle-lift",
+        "value": "0 1px 2px rgba(0,0,0,0.35)",
+        "purpose": "Button hover, input focus. Subtle, does not compete with content."
+      },
+      {
+        "name": "shadow-2-modal",
+        "value": "0 8px 24px rgba(0,0,0,0.28)",
+        "purpose": "Modal, drawer, popover. Separates the interaction layer from the background."
+      },
+      {
+        "name": "shadow-3-waiting-hover",
+        "value": "0 10px 28px rgba(0,0,0,0.32)",
+        "purpose": "Waiting-list row on hover. Reinforces clickability."
+      },
+      {
+        "name": "shadow-4-seat-hover",
+        "value": "drop-shadow(0 10px 18px rgba(0,0,0,0.45))",
+        "purpose": "Occupied seat-chip on hover with transform scale(1.08). The strongest shadow in the system."
+      },
+      {
+        "name": "shadow-table-3d",
+        "value": "inset 0 0 26px rgba(0,0,0,0.5), inset 0 20px 42px rgba(0,0,0,0.22), 0 10px 28px rgba(0,0,0,0.38)",
+        "purpose": "Realistic 3D poker table. Not replicated on any other component."
+      },
+      {
+        "name": "shadow-tooltip",
+        "value": "0 8px 20px rgba(0,0,0,0.45)",
+        "purpose": "Seat-chip tooltip over the avatar. Includes inset highlight."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Default easing for state transitions on operator surfaces."
+      },
+      {
+        "name": "ease-lobby",
+        "value": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "purpose": "Spring-y easing for tooltip entry and lobby glass surfaces."
+      },
+      {
+        "name": "duration-fast",
+        "value": "180ms",
+        "purpose": "Hover, focus, color transitions."
+      },
+      {
+        "name": "duration-modal",
+        "value": "300ms",
+        "purpose": "Modal and drawer open/close."
+      },
+      {
+        "name": "duration-pulse-absence",
+        "value": "1.8s",
+        "purpose": "Yellow absence ring pulse on occupied seats."
+      },
+      {
+        "name": "duration-pulse-absence-urgent",
+        "value": "0.8s",
+        "purpose": "Red urgent absence ring pulse. Faster to attract attention."
+      },
+      {
+        "name": "duration-seat-sheen",
+        "value": "8s",
+        "purpose": "Long hold sheen sweep over occupied seat avatars on hover."
+      },
+      {
+        "name": "duration-available-sheen",
+        "value": "2.2s",
+        "purpose": "Single sweep sheen over available empty seat circles on hover."
+      },
+      {
+        "name": "dealer-flip",
+        "value": "700ms cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "purpose": "3D flip of the dealer card on the poker table."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1400px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Poker Table",
+      "kind": "custom",
+      "refersTo": "table-card",
+      "description": "800x450 oval table with charcoal felt, 20px black armrest, and 2px gold inner ring. The signature surface of the operator.",
+      "html": "<div class=\"poker-table-container\"><div class=\"poker-table\"><div class=\"table-logo\"><img src=\"/logo.svg\" alt=\"Club logo watermark\" /></div><div class=\"dealer-seat\"><div class=\"dealer-card\"><div class=\"dealer-card__inner is-flipped\"><div class=\"dealer-card__face dealer-card__front\"><img src=\"/dealers/jp.svg\" alt=\"Dealer JP\" /></div><div class=\"dealer-card__face dealer-card__back\"><div class=\"dealer-card__back-inner\"><img src=\"/logo.svg\" alt=\"Club logo\" /></div></div></div></div></div><div class=\"seat player-seat available\" data-seat=\"1\"><div class=\"available-circle\"></div><span class=\"seat-badge\">1</span></div><div class=\"seat player-seat occupied\" data-seat=\"2\"><div class=\"seat-chip full-avatar\"><img class=\"seat-avatar-full\" src=\"/players/ana.svg\" alt=\"Ana\" /></div><span class=\"seat-badge\">2</span></div></div></div>",
+      "css": ".poker-table-container { display: flex; justify-content: center; align-items: center; padding: 40px; margin-top: 2rem; } .poker-table { position: relative; width: 800px; height: 450px; border-radius: 225px; background: radial-gradient(ellipse at center, #1e2024 0%, #0a0b0d 100%); background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'), radial-gradient(120% 90% at 50% 20%, rgba(212,175,55,0.08), transparent 55%), radial-gradient(120% 120% at 50% 70%, rgba(0,0,0,0.4), transparent 60%); background-repeat: repeat, no-repeat, no-repeat; background-size: auto, cover, cover; background-blend-mode: overlay, screen, normal; border: 20px solid #111; isolation: isolate; box-shadow: inset 0 0 26px rgba(0,0,0,0.5), inset 0 20px 42px rgba(0,0,0,0.22), 0 10px 28px rgba(0,0,0,0.38); display: flex; justify-content: center; align-items: center; } .poker-table::before { content: ''; position: absolute; inset: -20px; border-radius: inherit; pointer-events: none; padding: 20px; background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.4)); -webkit-mask: radial-gradient(closest-side, #000 99.5%, transparent 100%) content-box, radial-gradient(farthest-side, #000 0) padding-box; mask: radial-gradient(closest-side, #000 99.5%, transparent 100%) content-box, radial-gradient(farthest-side, #000 0) padding-box; box-shadow: inset 0 0 0 2px rgba(212,175,55,0.4), 0 4px 12px rgba(0,0,0,0.6); } .table-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; opacity: 0.08; filter: sepia(1) saturate(2) hue-rotate(5deg) brightness(1.2); } .table-logo img { width: 450px; height: auto; display: block; } .seat { position: absolute; width: 100px; height: 100px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 200ms ease; } .seat:hover { transform: scale(1.1); z-index: 5; }"
+    },
+    {
+      "name": "Seat Chip",
+      "kind": "custom",
+      "refersTo": "seat-chip-occupied",
+      "description": "100x100 circular avatar with gold ring, glass number badge, and tooltip. The atomic unit of the operator.",
+      "html": "<div class=\"player-seat occupied\" data-seat=\"3\"><div class=\"seat-chip full-avatar\"><img class=\"seat-avatar-full\" src=\"/players/luis.svg\" alt=\"Luis\" /></div><span class=\"seat-badge\">3</span><div class=\"seat-tooltip\"><strong>Luis P.</strong><span>Stack: $480</span></div></div>",
+      "css": ".player-seat { position: relative; width: 100px; height: 100px; border-radius: 50%; overflow: visible; font-family: 'Inter', system-ui, -apple-system, sans-serif; z-index: 2; } .seat-chip.full-avatar { position: relative; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 16px 14px rgba(0,0,0,0.35); background: #222; transition: transform 350ms ease, filter 350ms ease; will-change: transform; } .seat-avatar-full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; } .player-seat.occupied:hover .seat-chip.full-avatar { transform: translate(2px,-2px) scale(1.08); filter: drop-shadow(0 10px 18px rgba(0,0,0,0.45)); } .seat-badge { position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); padding: 4px 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.2px; color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,0.35); border-radius: 999px; pointer-events: none; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28); backdrop-filter: blur(10px) saturate(160%); -webkit-backdrop-filter: blur(10px) saturate(160%); box-shadow: 0 4px 12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.35); } .seat-tooltip { position: absolute; left: 50%; bottom: calc(100% + 12px); transform: translateX(-50%) translateY(10px) scale(0.9); opacity: 0; visibility: hidden; pointer-events: none; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.3; white-space: nowrap; color: #fff; background: rgba(16,19,27,0.88); border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 8px 20px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06); backdrop-filter: saturate(120%) blur(6px); transition: opacity 300ms ease, transform 300ms cubic-bezier(0.68,-0.55,0.265,1.55); } .player-seat.occupied:hover .seat-tooltip { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0) scale(1); }"
+    },
+    {
+      "name": "Timer Display",
+      "kind": "custom",
+      "refersTo": "timer-display",
+      "description": "Tabular-num SF Pro Display 800 digits. The number is the component. No background, no border.",
+      "html": "<div class=\"timer-flow\"><span>02</span><span class=\"timer-sep\">:</span><span>35</span><span class=\"timer-sep\">:</span><span>12</span></div>",
+      "css": ".timer-flow { font-family: 'SF Pro Display', system-ui, -apple-system, sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 0; font-size: 2rem; color: #ffffff; transition: opacity 300ms ease; } .timer-flow.paused { opacity: 0.5; } .timer-sep { display: inline-block; padding: 0 4px; color: rgba(255,255,255,0.5); }"
+    },
+    {
+      "name": "Waiting Row",
+      "kind": "card",
+      "refersTo": "waiting-row",
+      "description": "Glass card row for a player in the waiting list. Avatar + name + action group, hover lifts with stronger shadow.",
+      "html": "<li class=\"waiting-list-item\"><div class=\"waiting-player\"><img class=\"wl-avatar\" src=\"/players/marta.svg\" alt=\"Marta\" /><span class=\"wl-name\">Marta R.</span><div class=\"player-actions\"><button class=\"wl-action-btn sit-btn\" aria-label=\"Sentar a Marta\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M12 5l7 7-7 7\"/></svg></button><button class=\"wl-action-btn delete-btn\" aria-label=\"Eliminar a Marta\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6\"/></svg></button></div></div></li>",
+      "css": ".waiting-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.65rem; max-height: 320px; overflow: auto; } .waiting-list-item { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.28); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 0.65rem 0.7rem; transition: transform 180ms cubic-bezier(0.2,0.8,0.2,1), background-color 180ms, border-color 180ms, box-shadow 180ms; } .waiting-list-item:hover { transform: translateY(-2px); background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); box-shadow: 0 10px 28px rgba(0,0,0,0.32); } .waiting-player { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; column-gap: 0.7rem; width: 100%; } .wl-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset, 0 1px 0 rgba(255,255,255,0.12); } .wl-name { font-weight: 650; color: #f3f5f7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .player-actions { display: flex; gap: 0.35rem; } .wl-action-btn { appearance: none; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #f3f5f7; padding: 0.42rem; border-radius: 10px; cursor: pointer; display: grid; place-items: center; transition: transform 180ms, background-color 180ms, border-color 180ms, color 180ms, box-shadow 180ms; } .wl-action-btn svg { width: 18px; height: 18px; } .wl-action-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); } .wl-action-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,215,102,0.25); } .wl-action-btn.sit-btn:hover { color: #38b000; } .wl-action-btn.delete-btn:hover { color: #e63946; } @media (prefers-reduced-motion: reduce) { .waiting-list-item, .wl-action-btn { transition: none !important; } }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge-ok",
+      "description": "Pill-shaped status with icon + text + color redundancy. Used for table state, seat availability, and operator feedback.",
+      "html": "<span class=\"ds-status-badge ds-status-ok\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" width=\"12\" height=\"12\"><polyline points=\"20 6 9 17 4 12\"/></svg>En juego</span>",
+      "css": ".ds-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.2px; border-radius: 999px; color: #ffffff; text-shadow: 0 1px 0 rgba(0,0,0,0.35); border: 1px solid transparent; } .ds-status-ok { background: #38b000; border-color: rgba(255,255,255,0.18); } .ds-status-danger { background: #e63946; border-color: rgba(255,255,255,0.18); } .ds-status-warning { background: #ffd60a; color: #0a0a0f; border-color: rgba(0,0,0,0.18); text-shadow: none; } .ds-status-gold { background: #d9b66f; color: #0a0a0f; border-color: rgba(0,0,0,0.18); text-shadow: none; } .ds-status-muted { background: rgba(255,255,255,0.16); color: #ffffff; border-color: rgba(255,255,255,0.28); }"
+    },
+    {
+      "name": "Primary Action Button",
+      "kind": "button",
+      "refersTo": "button-primary-action",
+      "description": "Green gradient action button (Rebuy, Confirm seat). Only used for safe, non-destructive confirmations.",
+      "html": "<button class=\"ds-btn-primary-action\" type=\"button\">Confirmar rebuy</button>",
+      "css": ".ds-btn-primary-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border-radius: 12px; font-weight: 700; font-family: inherit; font-size: 15px; color: #ffffff; background: linear-gradient(180deg, #57c34a, #34a038); border: 1px solid rgba(255,255,255,0.14); cursor: pointer; transition: filter 180ms, transform 180ms, box-shadow 180ms; } .ds-btn-primary-action:hover { filter: brightness(1.05); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(87,195,74,0.25); } .ds-btn-primary-action:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,215,102,0.4); } .ds-btn-primary-action:active { transform: translateY(0); } .ds-btn-primary-action:disabled { opacity: 0.65; cursor: not-allowed; } @media (prefers-reduced-motion: reduce) { .ds-btn-primary-action { transition: none !important; } }"
+    },
+    {
+      "name": "Ghost / Cancel Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Subtle glass button for secondary actions: Cancel, Close, Back. Never destructive.",
+      "html": "<button class=\"ds-btn-ghost\" type=\"button\">Cancelar</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border-radius: 12px; font-weight: 700; font-family: inherit; font-size: 15px; color: #e9e9e9; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); cursor: pointer; transition: background 180ms, border-color 180ms, transform 180ms; } .ds-btn-ghost:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); transform: translateY(-1px); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,215,102,0.4); } .ds-btn-ghost:active { transform: translateY(0); } @media (prefers-reduced-motion: reduce) { .ds-btn-ghost { transition: none !important; } }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Glass input with gold focus ring. Used for player names, stack amounts, table settings.",
+      "html": "<label class=\"ds-input-wrap\"><span class=\"ds-input-label\">Nombre del jugador</span><input class=\"ds-input\" type=\"text\" placeholder=\"Buscar o crear...\" /></label>",
+      "css": ".ds-input-wrap { display: grid; gap: 6px; } .ds-input-label { font-size: 12px; font-weight: 650; letter-spacing: 0.2px; color: rgba(255,255,255,0.78); } .ds-input { padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.92); font-family: inherit; font-size: 15px; outline: none; transition: border-color 180ms, box-shadow 180ms; } .ds-input::placeholder { color: rgba(255,255,255,0.45); } .ds-input:focus { border-color: rgba(212,175,55,0.55); box-shadow: 0 0 0 3px rgba(212,175,55,0.18); } .ds-input:disabled { opacity: 0.65; cursor: not-allowed; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Pit Counter",
+    "overview": "Dos registros visuales conviven, no se mezclan. El gestor de mesas (registro operativo) es un terminal sobrio: paneles planos, contraste alto, tipografía que manda, oro reservado para confirmación y CTA. La operación nunca compite con la acción; la densidad es legible pero no maximalista, construida con peso tipográfico y acento lateral, no con color. El lobby público (registro público) admite glass translúcido, gradientes suaves y gold-on-glass para que el jugador perciba marca y disponibilidad de mesa en menos de un segundo. El gold es el único puente entre ambos registros: aparece como acento, nunca como relleno.\n\nLo que este sistema rechaza explícitamente: glassmorphism decorativo en zonas operativas (inutilizable bajo luz fluorescente de sala), hero-metric templates reservados para marketing, grids de cards idénticas cuando los datos son naturalmente heterogéneos (mesa activa vs en espera vs cerrada), marketing buzzwords, skeleton loaders perpetuos, modales bloqueantes para acciones no-críticas.",
+    "keyCharacteristics": [
+      "Split register: gestor = plano, lobby = glass. Sin transiciones híbridas.",
+      "Gold como acento, nunca como fondo. Máximo ~10% de cualquier superficie operativa.",
+      "Densidad legible sobre el maximalismo. Tipografía y peso hacen el trabajo del color.",
+      "Estado siempre redundante: icono + texto + color. Cero dependencia exclusiva de color.",
+      "Animación al servicio de la confirmación de estado, no de la decoración.",
+      "Touch y desktop con el mismo flujo. Targets ≥ 44×44px en zonas críticas."
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "El gold aparece en ≤ 10% de cualquier superficie operativa. En el lobby puede llegar a 30% (titulares, acentos, CTA), pero nunca como fill de paneles enteros. Su rareza es el punto.", "section": "colors" },
+      { "name": "The Status Triad Rule", "body": "Cada estado (OK, Danger, Warning) lleva icono + texto + color. Nunca solo color. Badge 'Disponible' en seat-chip usa verde + texto 'Libre'. Ausencia usa amarillo/rojo + icono de reloj + texto 'Ausente 5:32'.", "section": "colors" },
+      { "name": "The Canvas Always Anchors Rule", "body": "Ningún elemento flota sobre fondo transparente fuera del canvas. El lobby usa glass sobre canvas, el gestor usa paneles sólidos sobre canvas. Nunca glass sobre glass sobre glass.", "section": "colors" },
+      { "name": "The Two-Font Rule", "body": "Máximo dos familias activas por superficie. Gestor: system-ui + system-mono. Lobby: Inter + system-ui. Nunca tres.", "section": "typography" },
+      { "name": "The Tabular Number Rule", "body": "Cualquier cifra que cambia con el tiempo (timer, stack, contador de jugadores) usa font-variant-numeric: tabular-nums. Sin esto, los dígitos saltan al actualizar y se pierde la sensación de control operativo.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Toda superficie arranca plana. La sombra aparece como respuesta a hover, focus-visible, o un cambio de estado explícito. Si algo tiene sombra en reposo, está mal.", "section": "elevation" },
+      { "name": "The Lateral Accent Rule", "body": "En el gestor, la diferenciación de estado se hace con borde lateral coloreado (4px) o badge de status en la esquina superior-izquierda, no con sombra. La mesa activa lleva un acento lateral dorado de 3-4px; la mesa en espera, ninguno. La mesa cerrada, borde rojo 2px.", "section": "elevation" },
+      { "name": "The 3D-Exception Rule", "body": "Mesa de poker y seat-chips son los únicos elementos con elevación 3D. Cualquier otro componente que intente parecer 3D rompe el lenguaje operativo y se confunde con decoración.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do mantener el gold en ≤ 10% de cualquier superficie operativa. Si un panel tiene más de un acento dorado activo, simplificar.",
+      "Do usar borde lateral de 3-4px para indicar estado de mesa (activa = gold, en espera = transparente, cerrada = rojo).",
+      "Do usar font-variant-numeric: tabular-nums en timer, stack, contadores de jugadores, y cualquier cifra que cambie.",
+      "Do combinar icono + texto + color en badges de estado. La redundancia es la accesibilidad.",
+      "Do respetar prefers-reduced-motion: reduce desactivando animaciones de sheen, pulse, y transforms decorativos. Mantener solo cambios de estado.",
+      "Do usar border-radius consistente dentro de cada registro: gestor en 12px/16px, lobby en 18px/22px. Mezclar radios en la misma vista rompe el lenguaje.",
+      "Do aplicar focus visible 2px outline brand-gold en todo control interactivo. Sin focus, sin WCAG AA.",
+      "Do anunciar errores críticos con aria-live='assertive' además del color. La sala es ruidosa.",
+      "Do usar el glass del lobby para superficies flotantes (modal, drawer, popover). En el gestor, paneles sólidos #0d0f12 siempre."
+    ],
+    "donts": [
+      "Don't usar glassmorphism decorativo en zonas operativas. Blur de fondo, paneles translúcidos, gradientes constantes — inutilizable bajo luz fluorescente de sala.",
+      "Don't aplicar hero-metric templates (número grande + label pequeño). Reservado para marketing, no para operación.",
+      "Don't crear grids de cards idénticas cuando los datos son heterogéneos. La mesa activa, en espera, y cerrada deben verse distintas, no idénticas con un color.",
+      "Don't usar marketing buzzwords en copy: 'empower', 'seamless', 'world-class', 'next-generation'. Cero tolerancia.",
+      "Don't dejar skeleton loaders corriendo perpetuamente. Si algo tarda > 3s, mostrar mensaje de error explícito.",
+      "Don't abrir modales bloqueantes para acciones no-críticas. 'Sentar jugador' muestra feedback inline en la fila, no un modal.",
+      "Don't depender exclusivamente del color para comunicar estado. Agrega siempre icono + texto.",
+      "Don't aplicar hover-only affordances en zonas críticas. Touch y desktop comparten el mismo flujo.",
+      "Don't usar sombra en superficies en reposo. Las sombras entran solo con hover, focus, o cambio de estado.",
+      "Don't animar la decoración. Animación para confirmar/rechazar acción, no para brillar.",
+      "Don't duplicar el oro. Hay un solo brand-gold canónico; las variantes deep y light son semánticas, no alias opcionales."
+    ]
+  }
+}
