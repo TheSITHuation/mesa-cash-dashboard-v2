@@ -853,7 +853,15 @@ export default function Lobby() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap');
 
-        body { margin: 0; background: #0a0a0f; }
+        /* Emil Kowalski design tokens — strong custom easings (built-in curves are too weak) */
+        :root {
+          --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+          --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+          --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+          --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body { margin: 0; background: #0a0a14; }
 
         .lobby-new {
           min-height: 100vh;
@@ -1219,6 +1227,7 @@ export default function Lobby() {
         .so-logo-container {
           position: relative;
           margin-bottom: 24px;
+          perspective: 800px;
         }
 
         .so-logo-premium {
@@ -1359,6 +1368,294 @@ export default function Lobby() {
           border: 1.5px solid rgba(212, 175, 55, 0.5);
         }
 
+        /* ─── AVANT-GARDE STAGE (replaces single ambient glow) ─── */
+        .so-stage {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          overflow: hidden;
+        }
+        .so-stage-glow {
+          position: absolute;
+          width: 220%;
+          height: 220%;
+          top: -60%;
+          left: -60%;
+          background:
+            radial-gradient(ellipse 38% 30% at 50% 32%, rgba(212,175,55,0.18), transparent 60%),
+            radial-gradient(ellipse 30% 26% at 78% 78%, rgba(74,127,255,0.10), transparent 65%),
+            radial-gradient(ellipse 28% 24% at 22% 76%, rgba(255,140,66,0.08), transparent 65%);
+          animation: soStageBreathe 12s var(--ease-in-out) infinite;
+          will-change: transform, opacity;
+        }
+        @keyframes soStageBreathe {
+          0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+          50%      { transform: scale(1.06) rotate(2deg); opacity: 1; }
+        }
+
+        /* Film grain — SVG noise, 4% opacity, overlay blend */
+        .so-grain {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.05;
+          mix-blend-mode: overlay;
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.85  0 0 0 0 0.75  0 0 0 0 0.5  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+          background-size: 240px 240px;
+        }
+
+        /* 3 concentric halo rings around the logo — staggered breathing */
+        .so-halo-stack {
+          position: absolute;
+          top: 50%; left: 50%;
+          width: 200px; height: 200px;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+        }
+        .so-halo {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(212,175,55,0.55), transparent 70%);
+          filter: blur(28px);
+          will-change: transform, opacity;
+          animation: soHaloBreathe 4s var(--ease-in-out) infinite;
+        }
+        .so-halo--1 { opacity: 0.45; animation-delay: 0s; }
+        .so-halo--2 { top: -25%; left: -25%; width: 150%; height: 150%; opacity: 0.28; animation-delay: 1.3s; animation-duration: 5s; }
+        .so-halo--3 { top: -50%; left: -50%; width: 200%; height: 200%; opacity: 0.15; animation-delay: 2.6s; animation-duration: 6s; }
+        @keyframes soHaloBreathe {
+          0%, 100% { transform: scale(0.95); }
+          50%      { transform: scale(1.18); }
+        }
+
+        /* Logo idle: subtle 3D Y-axis rotation + float (Apple Dynamic Island feel) */
+        .so-logo-premium {
+          position: relative;
+          z-index: 2;
+          transform-style: preserve-3d;
+          animation: soLogoIdle 9s var(--ease-in-out) infinite;
+        }
+        @keyframes soLogoIdle {
+          0%, 100% { transform: translateY(0) rotateY(0deg); }
+          25%      { transform: translateY(-6px) rotateY(2deg); }
+          50%      { transform: translateY(0) rotateY(0deg); }
+          75%      { transform: translateY(-6px) rotateY(-2deg); }
+        }
+
+        /* Title — animated gradient (subtle hue shift) */
+        .so-brand-name {
+          display: block;
+          font-size: 36px;
+          font-weight: 700;
+          background: linear-gradient(135deg, #fff 0%, #d4af37 40%, #f4d77a 50%, #d4af37 60%, #fff 100%);
+          background-size: 200% 200%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: soGradientShift 8s var(--ease-in-out) infinite;
+        }
+        @keyframes soGradientShift {
+          0%, 100% { background-position: 0% 50%; }
+          50%      { background-position: 100% 50%; }
+        }
+
+        /* Loading bar — shimmer that travels + pulsing progress */
+        .so-loading-bar {
+          position: relative;
+          width: 160px;
+          height: 3px;
+          background: rgba(255,255,255,0.05);
+          border-radius: 99px;
+          overflow: hidden;
+        }
+        .so-loading-fill {
+          position: absolute;
+          inset: 0;
+          border-radius: 99px;
+          background: linear-gradient(90deg, transparent 0%, rgba(212,175,55,0.95) 50%, transparent 100%);
+          background-size: 200% 100%;
+          animation: soShimmer 2.4s var(--ease-in-out) infinite;
+        }
+        .so-loading-fill::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 99px;
+          background: rgba(212,175,55,0.15);
+          transform-origin: left;
+          animation: soProgress 3.2s var(--ease-in-out) infinite;
+        }
+        @keyframes soShimmer {
+          0%   { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        @keyframes soProgress {
+          0%, 100% { transform: scaleX(0.15); }
+          50%      { transform: scaleX(0.85); }
+        }
+
+        /* Bottom status row — 3 cycling dots, offset breathing */
+        .so-status-row {
+          display: flex; align-items: center; gap: 10px;
+          margin-top: 18px;
+          font-size: 11px;
+          letter-spacing: 2.5px;
+          text-transform: uppercase;
+          color: rgba(212,175,55,0.55);
+          font-weight: 600;
+        }
+        .so-status-dot {
+          width: 5px; height: 5px; border-radius: 50%;
+          background: rgba(212,175,55,0.6);
+          animation: soDotBreathe 1.8s var(--ease-in-out) infinite;
+        }
+        .so-status-dot:nth-child(2) { animation-delay: 0.3s; }
+        .so-status-dot:nth-child(3) { animation-delay: 0.6s; }
+        @keyframes soDotBreathe {
+          0%, 100% { opacity: 0.3; transform: scale(0.85); }
+          50%      { opacity: 1; transform: scale(1.15); }
+        }
+
+        /* WhatsApp CTA — alternating dual pulse rings (refined) */
+        .so-wa-premium {
+          position: absolute;
+          bottom: 120px;
+          display: inline-flex; align-items: center; gap: 10px;
+          padding: 14px 26px;
+          background: linear-gradient(135deg, rgba(37,211,102,0.16), rgba(37,211,102,0.08));
+          border: 1px solid rgba(37,211,102,0.28);
+          border-radius: 99px;
+          color: #25d366;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 15px;
+          font-family: inherit;
+          box-shadow: 0 10px 30px rgba(37,211,102,0.15), inset 0 1px 0 rgba(255,255,255,0.06);
+          cursor: pointer;
+          transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+        }
+        .so-wa-premium::before,
+        .so-wa-premium::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 99px;
+          border: 1.5px solid rgba(37,211,102,0.55);
+          animation: soWaRipple 2.2s var(--ease-out) infinite;
+          pointer-events: none;
+        }
+        .so-wa-premium::after { animation-delay: 1.1s; }
+        @keyframes soWaRipple {
+          0%   { transform: scale(1); opacity: 0.55; }
+          100% { transform: scale(1.4); opacity: 0; }
+        }
+        .so-wa-premium:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 14px 36px rgba(37,211,102,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .so-wa-premium:active { transform: scale(0.97); }
+        .so-wa-premium:focus-visible {
+          outline: 2px solid rgba(37,211,102,0.7);
+          outline-offset: 3px;
+        }
+
+        /* ─── EMPTY STATES (cash + tourney) ─── */
+        .lobby-empty {
+          padding: 64px 20px;
+          text-align: center;
+          color: rgba(255,255,255,0.35);
+          min-height: 220px;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .lobby-empty-stack {
+          position: relative;
+          width: 96px; height: 72px;
+          margin-bottom: 18px;
+          perspective: 600px;
+        }
+        .lobby-empty-card {
+          position: absolute;
+          inset: 0;
+          border-radius: 10px;
+          background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.06));
+          border: 1px solid rgba(212,175,55,0.28);
+          box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+          transform-style: preserve-3d;
+        }
+        .lobby-empty-card--1 {
+          animation: soEmptyCard1 5s var(--ease-in-out) infinite;
+        }
+        .lobby-empty-card--2 {
+          animation: soEmptyCard2 5s var(--ease-in-out) infinite;
+          animation-delay: 0.2s;
+        }
+        .lobby-empty-card--3 {
+          animation: soEmptyCard3 5s var(--ease-in-out) infinite;
+          animation-delay: 0.4s;
+        }
+        @keyframes soEmptyCard1 {
+          0%, 100% { transform: translate(-32px, 0) rotate(-8deg); opacity: 0.6; }
+          50%      { transform: translate(-32px, -4px) rotate(-12deg); opacity: 0.8; }
+        }
+        @keyframes soEmptyCard2 {
+          0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          50%      { transform: translate(0, -8px) rotate(0deg); opacity: 1; }
+        }
+        @keyframes soEmptyCard3 {
+          0%, 100% { transform: translate(32px, 0) rotate(8deg); opacity: 0.6; }
+          50%      { transform: translate(32px, -4px) rotate(12deg); opacity: 0.8; }
+        }
+        .lobby-empty-trophy {
+          width: 56px; height: 56px;
+          margin-bottom: 14px;
+          position: relative;
+        }
+        .lobby-empty-trophy::after {
+          content: '';
+          position: absolute;
+          inset: -16px;
+          background: radial-gradient(circle, rgba(212,175,55,0.35), transparent 70%);
+          filter: blur(16px);
+          animation: soTrophyGlow 2.6s var(--ease-in-out) infinite;
+          z-index: -1;
+        }
+        @keyframes soTrophyGlow {
+          0%, 100% { transform: scale(0.9); opacity: 0.5; }
+          50%      { transform: scale(1.15); opacity: 0.9; }
+        }
+        .lobby-empty-label {
+          font-size: 13px;
+          color: rgba(255,255,255,0.5);
+          letter-spacing: 0.4px;
+          font-weight: 500;
+        }
+        .lobby-empty-hint {
+          font-size: 11px;
+          color: rgba(255,255,255,0.25);
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
+          margin-top: 6px;
+        }
+
+        /* ─── Reduced motion — keep opacity, drop all transforms ─── */
+        @media (prefers-reduced-motion: reduce) {
+          .so-stage-glow,
+          .so-halo,
+          .so-logo-premium,
+          .so-brand-name,
+          .so-loading-fill,
+          .so-loading-fill::after,
+          .so-status-dot,
+          .so-wa-premium::before,
+          .so-wa-premium::after,
+          .lobby-empty-card,
+          .lobby-empty-trophy::after {
+            animation: none !important;
+          }
+          .lobby-empty-card { opacity: 0.7; }
+        }
+
       `}</style>
 
       <div className="lobby-new">
@@ -1382,19 +1679,14 @@ export default function Lobby() {
               className="lobby-list-new"
               aria-live="polite"
               style={{ minHeight: '400px' }}
-              initial={{ opacity: 0, x: -60, filter: 'blur(6px)' }}
+              initial={{ opacity: 0, transform: 'translateX(-48px)', filter: 'blur(6px)' }}
               animate={{
                 opacity: 1,
-                x: 0,
+                transform: 'translateX(0)',
                 filter: 'blur(0px)',
-                transition: {
-                  type: 'spring',
-                  stiffness: 160,
-                  damping: 28,
-                  duration: 0.5,
-                },
+                transition: { type: 'spring', duration: 0.5, bounce: 0.18 },
               }}
-              exit={{ opacity: 0, x: 60, transition: { duration: 0.3 } }}
+              exit={{ opacity: 0, transform: 'translateX(48px)', filter: 'blur(4px)', transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } }}
             >
               {/* Filtros por tipo de juego */}
               <GameFilters
@@ -1420,13 +1712,14 @@ export default function Lobby() {
                 )}
 
                 {!loading && tables.length === 0 && (
-                  <div className="lobby-empty" style={{ minHeight: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg viewBox="0 0 24 24" style={{ width: 36, height: 36, margin: '0 auto 12px', opacity: 0.3, display: 'block', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }}>
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="12" r="6" strokeDasharray="3 3" />
-                      <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
-                    </svg>
-                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>Sin mesas activas</span>
+                  <div className="lobby-empty">
+                    <div className="lobby-empty-stack" aria-hidden="true">
+                      <div className="lobby-empty-card lobby-empty-card--1" />
+                      <div className="lobby-empty-card lobby-empty-card--2" />
+                      <div className="lobby-empty-card lobby-empty-card--3" />
+                    </div>
+                    <div className="lobby-empty-label">Sin mesas activas ahora</div>
+                    <div className="lobby-empty-hint">Mantente atento</div>
                   </div>
                 )}
 
@@ -1469,19 +1762,14 @@ export default function Lobby() {
               className="lobby-list-new"
               aria-live="polite"
               style={{ minHeight: '400px' }}
-              initial={{ opacity: 0, x: 60, filter: 'blur(6px)' }}
+              initial={{ opacity: 0, transform: 'translateX(48px)', filter: 'blur(6px)' }}
               animate={{
                 opacity: 1,
-                x: 0,
+                transform: 'translateX(0)',
                 filter: 'blur(0px)',
-                transition: {
-                  type: 'spring',
-                  stiffness: 160,
-                  damping: 28,
-                  duration: 0.5,
-                },
+                transition: { type: 'spring', duration: 0.5, bounce: 0.18 },
               }}
-              exit={{ opacity: 0, x: -60, transition: { duration: 0.3 } }}
+              exit={{ opacity: 0, transform: 'translateX(-48px)', filter: 'blur(4px)', transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } }}
             >
               <CollapsibleSection
                 title="Torneos"
@@ -1497,18 +1785,21 @@ export default function Lobby() {
               >
                 {!showTd3 ? (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, transform: 'translateY(10px)' }}
+                    animate={{ opacity: 1, transform: 'translateY(0)' }}
+                    exit={{ opacity: 0, transform: 'scale(0.95)', transition: { duration: 0.25 } }}
+                    transition={{ type: 'spring', duration: 0.5, bounce: 0.15 }}
                     className="lobby-empty"
-                    style={{ minHeight: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <svg viewBox="0 0 24 24" style={{ width: 36, height: 36, margin: '0 auto 12px', opacity: 0.3, display: 'block', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }}>
-                      <circle cx="12" cy="12" r="10" />
-                      <circle cx="12" cy="12" r="6" strokeDasharray="3 3" />
-                      <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
-                    </svg>
-                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>Sin torneos activos</span>
+                    <div className="lobby-empty-trophy" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="#d4af37" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6V2h12v2h1.5a2.5 2.5 0 0 1 0 5H18a6 6 0 0 1-12 0Z" />
+                        <path d="M12 15v4M9 22h6" />
+                        <path d="M8 22h8" />
+                      </svg>
+                    </div>
+                    <div className="lobby-empty-label">Sin torneos activos</div>
+                    <div className="lobby-empty-hint">Próximamente</div>
                   </motion.div>
                 ) : (
                   <>
