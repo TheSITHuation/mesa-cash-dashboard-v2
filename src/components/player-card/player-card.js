@@ -126,101 +126,6 @@ function ensureModal() {
     found.id = 'player-card-modal';
     found.className = 'player-card-modal';
     found.innerHTML = `
-  <style>
-    .pc-modal-glass {
-      width: min(340px, 92vw);
-      position: relative;
-      border-radius: 28px;
-      overflow: hidden;
-      background: rgba(255,255,255,.07);
-      backdrop-filter: blur(28px) saturate(180%) brightness(1.08);
-      -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.08);
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 32px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.22);
-    }
-    .pc-modal-glass::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(160deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.04) 35%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-      border-radius: inherit;
-    }
-    .pc-modal-shine {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent 5%, rgba(255,255,255,.55) 40%, rgba(212,175,55,.6) 55%, rgba(255,255,255,.55) 70%, transparent 95%);
-      z-index: 2;
-    }
-    .pc-modal-inner { position: relative; z-index: 1; }
-    .pc-modal-header { padding: 22px 20px 16px; display: flex; gap: 16px; align-items: center; }
-    .pc-modal-avatar-wrap { position: relative; flex-shrink: 0; }
-    #card-player-avatar {
-      width: 150px; height: 150px;
-      border-radius: 50%;
-      object-fit: cover;
-      display: block;
-      border: 2.5px solid rgba(212,175,55,.5);
-      box-shadow: 0 0 0 4px rgba(212,175,55,.1), 0 8px 24px rgba(0,0,0,.4);
-    }
-    .pc-modal-dot {
-      position: absolute; bottom: 2px; right: 2px;
-      width: 13px; height: 13px;
-      border-radius: 50%;
-      border: 2.5px solid rgba(10,14,22,.9);
-      background: #30d158;
-      box-shadow: 0 0 6px #30d158;
-      transition: background .3s, box-shadow .3s;
-    }
-    .pc-modal-info { flex: 1; min-width: 0; }
-    .pc-modal-seat { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(212,175,55,.65); margin-bottom: 3px; font-weight: 500; }
-    #card-player-name { font-size: 21px; font-weight: 700; color: #fff; margin: 0 0 7px; font-family: system-ui,sans-serif; letter-spacing: -.3px; }
-    .pc-modal-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 10px; font-weight: 700; letter-spacing: .8px;
-      padding: 3px 10px 3px 7px; border-radius: 99px; text-transform: uppercase;
-      transition: all .3s;
-      background: rgba(48,209,88,.15); color: #30d158; border: 1px solid rgba(48,209,88,.3);
-    }
-    .pc-modal-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #30d158; box-shadow: 0 0 5px #30d158; flex-shrink: 0; }
-    .pc-modal-sep { height: 1px; margin: 0 16px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent); }
-    .pc-modal-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,.05); border-top: 1px solid rgba(255,255,255,.06); border-bottom: 1px solid rgba(255,255,255,.06); }
-    .pc-modal-stat { padding: 13px 20px; background: rgba(255,255,255,.03); position: relative; }
-    .pc-modal-stat:nth-child(odd)::after { content: ''; position: absolute; right: 0; top: 20%; bottom: 20%; width: 1px; background: rgba(255,255,255,.07); }
-    .pc-modal-stat-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.28); margin-bottom: 4px; }
-    .pc-modal-stat-value { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; font-family: system-ui,sans-serif; }
-    .sv-gold { color: #d4af37; text-shadow: 0 0 12px rgba(212,175,55,.3); }
-    .sv-blue { color: #5ac8fa; }
-    .sv-white { color: rgba(255,255,255,.9); }
-    .pc-modal-absence {
-      margin: 12px 16px 0; padding: 10px 14px; border-radius: 12px;
-      background: rgba(255,214,10,.07); border: 1px solid rgba(255,214,10,.2);
-      display: none; align-items: center; gap: 10px;
-    }
-    .pc-modal-absence.show { display: flex; }
-    .pc-modal-absence-label { flex: 1; font-size: 12px; font-weight: 600; color: #ffd60a; }
-    #card-absence-timer { font-size: 16px; font-weight: 700; color: #ffd60a; font-variant-numeric: tabular-nums; font-family: monospace; }
-    .pc-modal-actions { padding: 12px 16px 18px; display: flex; flex-direction: column; gap: 8px; }
-    .pc-modal-row { display: flex; gap: 8px; }
-    #card-rebuy-amount {
-      flex: 1; height: 42px; border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
-      color: #fff; padding: 0 14px; font-size: 13px; outline: none; font-family: inherit;
-    }
-    #card-rebuy-amount::placeholder { color: rgba(255,255,255,.2); }
-    .pc-modal-btn {
-      height: 42px; border-radius: 12px; border: 1px solid;
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      font-family: inherit; transition: all .15s; letter-spacing: .2px;
-    }
-    .pc-modal-btn:active { transform: scale(.97); }
-    #card-btn-rebuy { padding: 0 16px; background: rgba(212,175,55,.14); border-color: rgba(212,175,55,.35); color: #d4af37; white-space: nowrap; }
-    #card-btn-absent { width: 100%; background: rgba(255,214,10,.07); border-color: rgba(255,214,10,.22); color: #ffd60a; }
-    #card-btn-cashout { width: 100%; background: rgba(255,69,58,.07); border-color: rgba(255,69,58,.22); color: #ff453a; }
-    #card-btn-cancel { width: 100%; background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); color: rgba(255,255,255,.35); font-weight: 400; }
-  </style>
   <div class="pc-modal-glass">
     <div class="pc-modal-shine"></div>
     <div class="pc-modal-inner">
@@ -250,7 +155,7 @@ function ensureModal() {
         </div>
         <div class="pc-modal-stat">
           <div class="pc-modal-stat-label">Tiempo</div>
-          <div class="pc-modal-stat-value sv-blue" id="card-player-session-live">00:00</div>
+          <div class="pc-modal-stat-value sv-time" id="card-player-session-live">00:00</div>
         </div>
         <div class="pc-modal-stat">
           <div class="pc-modal-stat-label">Ingreso total</div>
@@ -258,7 +163,7 @@ function ensureModal() {
         </div>
       </div>
       <div class="pc-modal-absence" id="card-absence-bar">
-        <span style="font-size:15px">⏱</span>
+        <span class="pc-modal-absence-icon" aria-hidden="true">⏱</span>
         <span class="pc-modal-absence-label">Jugador ausente</span>
         <span id="card-absence-timer">00:00</span>
       </div>
@@ -571,29 +476,65 @@ function startAbsenceCounter(absentSince, maxMinutes) {
   if (!absenceTimerEl) return;
   if (absenceBarEl) absenceBarEl.classList.add('show');
 
+  // Cache DOM lookups (called every 1s) — match design system tokens
+  const badge = modal?.querySelector('#card-status-badge');
+  const badgeText = modal?.querySelector('#card-badge-text');
+  const dot = modal?.querySelector('#card-status-dot');
+  const absenceBar = absenceBarEl;
+  const absenceTimer = absenceTimerEl;
+  const absentActionBtn = absentBtn;
+  const urgent = {
+    textColor: '#ff453a',                              /* state-danger-urgent */
+    barBg: 'rgba(255, 69, 58, 0.08)',
+    barBorder: 'rgba(255, 69, 58, 0.25)',
+    badgeBg: 'rgba(255, 69, 58, 0.15)',
+    badgeBorder: 'rgba(255, 69, 58, 0.3)',
+    dotShadow: '0 0 8px #ff453a',
+  };
+  const warning = {
+    textColor: '#ffd60a',                              /* state-warning */
+    barBg: 'rgba(255, 214, 10, 0.07)',
+    barBorder: 'rgba(255, 214, 10, 0.2)',
+    badgeBg: 'rgba(255, 214, 10, 0.15)',
+    badgeBorder: 'rgba(255, 214, 10, 0.3)',
+    dotShadow: '0 0 8px #ffd60a',
+  };
+
   const maxMs = (maxMinutes || 15) * 60 * 1000;
   const tick = () => {
     const elapsed = Date.now() - absentSince;
     const isUrgent = elapsed >= maxMs;
-    absenceTimerEl.textContent = msToHMS(elapsed);
-    absenceTimerEl.style.color = isUrgent ? '#ff453a' : '#ffd60a';
-    if (absenceBarEl) {
-      absenceBarEl.style.background = isUrgent ? 'rgba(255,69,58,.08)' : 'rgba(255,214,10,.07)';
-      absenceBarEl.style.borderColor = isUrgent ? 'rgba(255,69,58,.25)' : 'rgba(255,214,10,.2)';
+    const palette = isUrgent ? urgent : warning;
+    absenceTimer.textContent = msToHMS(elapsed);
+    absenceTimer.style.color = palette.textColor;
+    if (absenceBar) {
+      absenceBar.style.background = palette.barBg;
+      absenceBar.style.borderColor = palette.barBorder;
     }
-    const badge = modal?.querySelector('#card-status-badge');
-    const badgeText = modal?.querySelector('#card-badge-text');
-    const dot = modal?.querySelector('#card-status-dot');
     if (isUrgent) {
-      if (absentBtn) absentBtn.textContent = '⚠ De vuelta — URGENTE';
-      if (badge) { badge.style.background = 'rgba(255,69,58,.15)'; badge.style.color = '#ff453a'; badge.style.borderColor = 'rgba(255,69,58,.3)'; }
+      if (absentActionBtn) absentActionBtn.textContent = '⚠ De vuelta — URGENTE';
+      if (badge) {
+        badge.style.background = palette.badgeBg;
+        badge.style.color = palette.textColor;
+        badge.style.borderColor = palette.badgeBorder;
+      }
       if (badgeText) badgeText.textContent = 'Ausente URGENTE';
-      if (dot) { dot.style.background = '#ff453a'; dot.style.boxShadow = '0 0 8px #ff453a'; }
+      if (dot) {
+        dot.style.background = palette.textColor;
+        dot.style.boxShadow = palette.dotShadow;
+      }
     } else {
-      if (absentBtn) absentBtn.textContent = 'De vuelta';
-      if (badge) { badge.style.background = 'rgba(255,214,10,.15)'; badge.style.color = '#ffd60a'; badge.style.borderColor = 'rgba(255,214,10,.3)'; }
+      if (absentActionBtn) absentActionBtn.textContent = 'De vuelta';
+      if (badge) {
+        badge.style.background = palette.badgeBg;
+        badge.style.color = palette.textColor;
+        badge.style.borderColor = palette.badgeBorder;
+      }
       if (badgeText) badgeText.textContent = 'Ausente';
-      if (dot) { dot.style.background = '#ffd60a'; dot.style.boxShadow = '0 0 8px #ffd60a'; }
+      if (dot) {
+        dot.style.background = palette.textColor;
+        dot.style.boxShadow = palette.dotShadow;
+      }
     }
   };
   tick();
@@ -604,13 +545,27 @@ function stopAbsenceCounter() {
   if (_absenceTimer) { clearInterval(_absenceTimer); _absenceTimer = null; }
   if (absenceTimerEl) absenceTimerEl.textContent = '00:00';
   if (absenceBarEl) absenceBarEl.classList.remove('show');
+  // state-ok tokens (replaces iOS #30d158 / rgba(48,209,88,.X))
+  const ok = { color: '#38b000', bg: 'rgba(56, 176, 0, 0.15)', border: 'rgba(56, 176, 0, 0.3)', dotShadow: '0 0 8px #38b000' };
   const badge = modal?.querySelector('#card-status-badge');
   const badgeText = modal?.querySelector('#card-badge-text');
   const dot = modal?.querySelector('#card-status-dot');
-  if (badge) { badge.style.background = 'rgba(48,209,88,.15)'; badge.style.color = '#30d158'; badge.style.borderColor = 'rgba(48,209,88,.3)'; }
+  if (badge) {
+    badge.style.background = ok.bg;
+    badge.style.color = ok.color;
+    badge.style.borderColor = ok.border;
+  }
   if (badgeText) badgeText.textContent = 'En mesa';
-  if (dot) { dot.style.background = '#30d158'; dot.style.boxShadow = '0 0 8px #30d158'; }
-  if (absentBtn) { absentBtn.textContent = 'Marcar ausente'; absentBtn.style.background = ''; absentBtn.style.borderColor = ''; absentBtn.style.color = ''; }
+  if (dot) {
+    dot.style.background = ok.color;
+    dot.style.boxShadow = ok.dotShadow;
+  }
+  if (absentBtn) {
+    absentBtn.textContent = 'Marcar ausente';
+    absentBtn.style.background = '';
+    absentBtn.style.borderColor = '';
+    absentBtn.style.color = '';
+  }
 }
 
 async function onToggleAbsent(e) {
