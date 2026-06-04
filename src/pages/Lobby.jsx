@@ -1,6 +1,6 @@
 // src/pages/Lobby.jsx
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
+import { motion, AnimatePresence, useAnimate } from 'framer-motion';
 import useAuthAnon from '../hooks/useAuthAnon.js';
 import useTd3 from '../hooks/useTd3.js';
 import useTournamentList from '../hooks/useTournamentList.js';
@@ -21,7 +21,7 @@ const GAME_TYPES = ['NLHE', 'PLO', 'MAA', 'DCH', 'V&V'];
 // Material standard easing — gentle in, gentle out, zero overshoot.
 // Used for the bottom-dock pill so the indicator moves once and stops,
 // without the visual aggression of iOS drawer's fast-start curve.
-const EASE_DRAWER = [0.4, 0, 0.2, 1];
+const EASE_MATERIAL = [0.4, 0, 0.2, 1];
 
 // ─── helpers ────────────────────────────────────────────────────
 const fmtInt = (n) => Number(n || 0).toLocaleString('es-MX');
@@ -802,6 +802,56 @@ export default function Lobby() {
   const { promotions } = usePromotions();
 
   const [activeTab, setActiveTab] = useState('cash'); // 'cash' | 'tourney'
+
+  // ─── Bottom-dock sliding pill ─────────────────────────────────
+  // A single persistent pill (no `layoutId`) animated imperatively via
+  // `useAnimate`. This replaces framer-motion's shared layout, which was
+  // leaving the pill in a residual state that buried the icons and
+  // intercepted pointer events. The pill is `pointer-events: none` and
+  // always lives below the buttons in the stacking order, so it can
+  // never block clicks or hide its own content.
+  const dockRef = useRef(null);
+  const pillRef = useRef(null);
+  const [, animatePill] = useAnimate();
+  const pillPosInit = useRef(false);
+
+  const updatePillPosition = useCallback((animate = true) => {
+    if (!dockRef.current || !pillRef.current) return;
+    const items = dockRef.current.querySelectorAll('.dock-item');
+    const activeIdx = activeTab === 'cash' ? 0 : 1;
+    const target = items[activeIdx];
+    if (!target) return;
+    const dockRect = dockRef.current.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    // 4px dock padding + 4px pill inset = 8px from the dock's outer edge.
+    const x = targetRect.left - dockRect.left - 4;
+    const width = targetRect.width - 8;
+    // Width is set instantly (changing width triggers layout reflow).
+    pillRef.current.style.width = `${width}px`;
+    if (!animate) {
+      pillRef.current.style.transform = `translate3d(${x}px, 0, 0)`;
+    } else {
+      animatePill(pillRef.current, { x }, { duration: 0.22, ease: EASE_MATERIAL });
+    }
+  }, [activeTab, animatePill]);
+
+  useLayoutEffect(() => {
+    if (!pillPosInit.current) {
+      updatePillPosition(false);
+      pillPosInit.current = true;
+    } else {
+      updatePillPosition(true);
+    }
+  }, [activeTab, updatePillPosition]);
+
+  // Re-measure on window resize (dock is `width: min(90vw, 380px)`).
+  useEffect(() => {
+    if (!dockRef.current) return;
+    const handleResize = () => updatePillPosition(false);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [updatePillPosition]);
+
   const [cashExpanded, setCashExpanded] = useState(true);
   const [tourneyExpanded, setTourneyExpanded] = useState(true);
   const [openPlayersFor, setOpenPlayersFor] = React.useState(null);
@@ -1784,19 +1834,17 @@ export default function Lobby() {
 
         {/* FLOATING BOTTOM DOCK (iPhone Style) */}
         <div className="bottom-dock-container">
-          <nav className="bottom-dock">
+          <nav className="bottom-dock" ref={dockRef}>
+            <span
+              ref={pillRef}
+              className="dock-pill"
+              aria-hidden="true"
+            />
             <motion.button
               onClick={() => setActiveTab('cash')}
               className={`dock-item ${activeTab === 'cash' ? 'active' : ''}`}
               whileTap={{ transform: 'scale(0.97)' }}
             >
-              {activeTab === 'cash' && (
-                <motion.span
-                  layoutId="dock-pill"
-                  className="dock-item-pill"
-                  transition={{ type: 'tween', duration: 0.22, ease: EASE_DRAWER }}
-                />
-              )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M12 2v4M12 18v4M2 12h4M18 12h4" strokeLinecap="round" strokeLinejoin="round" />
                 <circle cx="12" cy="12" r="10" />
@@ -1810,13 +1858,6 @@ export default function Lobby() {
               className={`dock-item ${activeTab === 'tourney' ? 'active' : ''}`}
               whileTap={{ transform: 'scale(0.97)' }}
             >
-              {activeTab === 'tourney' && (
-                <motion.span
-                  layoutId="dock-pill"
-                  className="dock-item-pill"
-                  transition={{ type: 'tween', duration: 0.22, ease: EASE_DRAWER }}
-                />
-              )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6V2h12v2h1.5a2.5 2.5 0 0 1 0 5H18a6 6 0 0 1-12 0Z" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M12 15v4M9 22h6" strokeLinecap="round" strokeLinejoin="round" />

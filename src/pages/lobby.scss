@@ -11,6 +11,7 @@
 }
 
 .bottom-dock {
+  position: relative; /* containing block for the absolute .dock-pill */
   pointer-events: auto; /* Reactiva clicks en el dock */
   display: flex;
   align-items: center;
@@ -24,6 +25,28 @@
   box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Sliding pill — single persistent element animated imperatively from
+   Lobby.jsx via useAnimate (replaces the previous framer-motion
+   layoutId pattern, which was leaving the pill in a residual state
+   that buried the icons and intercepted pointer events). */
+.dock-pill {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
+  width: 50%; /* default; JS overrides on first layout */
+  z-index: 1;
+  pointer-events: none; /* CRITICAL: never intercept clicks on the buttons */
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.06));
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  box-shadow:
+    0 4px 12px rgba(212, 175, 55, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  will-change: transform, width;
+  transform: translate3d(0, 0, 0); /* GPU-accelerated composite layer */
 }
 
 .dock-item {
@@ -41,6 +64,7 @@
   border: none;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
+  z-index: 2; /* above the pill (z-index 1) so icon/label/dot are visible */
   transition: color 200ms ease;
   -webkit-tap-highlight-color: transparent;
   isolation: isolate;
@@ -50,37 +74,20 @@
     height: 19px;
     stroke-width: 1.8;
     position: relative;
-    /* z-index 3 keeps the icon above both the pill (z-index 1) and the
-       active gold dot (z-index 2). Without this, the framer-motion
-       transform on the layoutId pill creates a new stacking context
-       that can visually bury the icon mid-transition. */
-    z-index: 3;
+    z-index: 2;
     transition: transform 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
                 filter 200ms ease;
   }
 
   span {
     position: relative;
-    z-index: 3;
+    z-index: 2;
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: transform 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
                 opacity 200ms ease;
-  }
-
-  /* Sliding pill — layoutId="dock-pill" in Lobby.jsx animates between items */
-  .dock-item-pill {
-    position: absolute;
-    inset: 4px;
-    z-index: 1;
-    border-radius: 24px;
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.06));
-    border: 1px solid rgba(212, 175, 55, 0.22);
-    box-shadow:
-      0 4px 12px rgba(212, 175, 55, 0.10),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   &.active {
@@ -108,7 +115,7 @@
       border-radius: 50%;
       box-shadow: 0 0 10px #d4af37;
       animation: dockDotIn 0.3s var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
-      z-index: 3;
+      z-index: 2;
     }
   }
 }
