@@ -1,4 +1,4 @@
-@import '../../styles/variables';
+@use '../../styles/_variables' as *;
 
 .table-settings-form {
     display: flex;
@@ -51,68 +51,189 @@
     }
 }
 /* ===== Formulario Crear Mesa (iOS glass) ===== */
-.table-form-overlay {
-  position: fixed; inset: 0;
-  display: grid; place-items: center;
-  background: rgba(0,0,0,.45);
-  z-index: 1500;
+/* ===== Formulario Premium (Crear/Editar Mesa) ===== */
+.tf-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
 }
 
-.table-form {
-  width: min(560px, calc(100% - 32px));
-  border-radius: 18px;
-  padding: 16px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.16);
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tf-card {
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(15, 18, 25, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.tf-title {
+  margin: 0;
+  font-family: 'SF Pro Display', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
   color: #fff;
-
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-
-  box-shadow:
-    0 16px 40px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.12);
+  letter-spacing: -0.5px;
 }
 
-.table-form__header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 8px 10px;
-  h2 { margin: 0; font-size: 1.25rem; font-weight: 700; }
-  .tf-close {
-    width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18);
-    background: rgba(255,255,255,.08); color: #fff; cursor: pointer;
+.tf-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  &:hover { background: rgba(255, 255, 255, 0.12); transform: rotate(90deg); }
+}
+
+.tf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 32px;
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.tf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  &.full { grid-column: span 2; @media (max-width: 480px) { grid-column: auto; } }
+}
+
+.tf-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-left: 4px;
+}
+
+.tf-input {
+  width: 100%;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0 16px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+  &:focus {
+    border-color: #d4af37;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(212, 175, 87, 0.1);
   }
 }
 
-.table-form__body { padding: 4px 8px 10px; }
+select.tf-input { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
 
-.tf-row { display: grid; gap: 6px; margin-bottom: 12px; }
-.tf-row > label { font-size: .9rem; color: rgba(255,255,255,.85); }
-
-.tf-grid {
-  display: grid; gap: 12px; grid-template-columns: 1fr 1fr;
-  @media (max-width: 560px) { grid-template-columns: 1fr; }
+.tf-row {
+  display: flex;
+  gap: 12px;
 }
 
-.table-form input, .table-form select {
-  height: 40px; border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(255,255,255,.06);
-  color: #fff; padding: 0 12px; outline: none;
+.tf-help {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 4px;
+  margin-left: 4px;
+}
+
+.tf-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  &:hover { background: rgba(255, 255, 255, 0.06); }
+  input { display: none; }
+  input:checked + span::before { background: #d4af37; content: '✓'; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #000; }
+  span { display: flex; align-items: center; gap: 10px; }
+  span::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    transition: all 0.2s ease;
+  }
 }
 
 .tf-actions {
-  display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px;
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
 }
-.tf-btn {
-  height: 42px; border-radius: 12px; padding: 0 14px; font-weight: 700;
-  border: 1px solid rgba(255,255,255,.16); color: #0f1220;
-  background: rgba(255,255,255,.9);
+
+.tf-actions .btn {
+  flex: 1;
+  height: 52px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
-.tf-btn--ghost {
-  color: #fff; background: rgba(255,255,255,.08);
+
+.tf-cancel {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  &:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
 }
-.tf-btn--primary {
-  background: linear-gradient(180deg, #ffd972, #f4c33e);
-  border-color: rgba(255,255,255,.45);
+
+.btn-primary {
+  background: linear-gradient(135deg, #d4af37, #fdd835);
+  border: none;
+  color: #000;
+  box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+  &:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(212, 175, 55, 0.3); }
+  &:active { transform: translateY(0); }
 }

@@ -1,31 +1,44 @@
+/* src/styles/main.scss */
+/* 1) TODOS los @use primero (solo .scss) */
+@use "./variables" as *;
+@use "./tokens" as *;
+@use "./base";
+@use "./neo-glass.scss";
+@use "./ios-sheets.scss";
+@use "./overrides";
+@use "./glass.scss";
+@use "../components/poker-table/poker-table";
+@use "../components/seat-modal/seat-modal";
+@use "../components/dealer-modal/dealer-modal";
+@use "../components/player-card/player-card";
+@use "../components/side-panel/side-panel";
+@use "../components/waiting-list/waiting-list";
+@use "../components/table-settings-modal/table-settings-modal";
+@use "../components/info-banner/info-banner";
+@use "../components/start-screen/start-screen";
+@use "./theme-matte.scss";
+@use "../components/table-banner/table-banner";
+@use "../components/ui/AnimatedModal.css";
+@use "../components/ui/AnimatedOverlay.css";
+@use "../components/ui/ParticleEffect.css";
 
-@import 'variables';
-@import 'base';
+/* 2) Luego, CSS puro (si lo hay) */
+@import url("../styles/login.css");
 
-@import '../components/poker-table/poker-table';
-@import '../components/seat-modal/seat-modal';
-@import '../components/dealer-modal/dealer-modal';
-@import '../components/player-card/player-card';
-@import '../components/side-panel/side-panel';
-@import '../components/waiting-list/waiting-list';
-@import '../components/table-settings-modal/table-settings-modal';
-@import '../components/info-banner/info-banner';
-@import './neo-glass.scss';  /* al inicio o tras variables */
-@import './ios-sheets.scss';
 
+/* Altos */
 html, body, #app { height: 100%; }
 
 /* ===== Botón flotante: Volver al Gestor (iOS glass) ===== */
+/* (déjalo aquí si quieres mantener este bloque en main.scss) */
 .back-to-manager {
   position: fixed;
   left: 20px;
   bottom: 20px;
   z-index: 1200;
-
   display: inline-flex;
   align-items: center;
   gap: 10px;
-
   padding: 10px 14px;
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.18);
@@ -33,13 +46,9 @@ html, body, #app { height: 100%; }
   color: #fff;
   font-weight: 600;
   letter-spacing: .2px;
-
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
-
-  box-shadow:
-    0 10px 24px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.12);
+  box-shadow: 0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
   transition: transform .15s ease, background .25s ease;
 
   .back-to-manager__icon {
@@ -58,5 +67,55 @@ html, body, #app { height: 100%; }
   }
 }
 
+/* Modo display */
+body.is-display button,
+body.is-display [data-action],
+body.is-display input,
+body.is-display select,
+body.is-display textarea { pointer-events: none !important; }
+body.is-display #panel-fab { display: none !important; }
 
+/* Session pill */
+#session-pill,
+.session-pill {
+  position: fixed;
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  z-index: 9000;
+  transition: opacity .2s ease, transform .2s ease;
+}
+body.auto-hide-session #session-pill,
+body.auto-hide-session .session-pill {
+  opacity: .15;
+  transform: translateY(6px);
+}
+body.auto-hide-session #session-pill:hover,
+body.auto-hide-session .session-pill:hover,
+body.auto-hide-session #session-pill:focus-within,
+body.auto-hide-session .session-pill:focus-within {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (max-width: 640px) {
+  body.auto-hide-session #session-pill,
+  body.auto-hide-session .session-pill {
+    opacity: 0;
+    pointer-events: none;
+  }
+  body.auto-hide-session #session-pill:focus-within,
+  body.auto-hide-session .session-pill:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+#session-pill.compact,
+.session-pill.compact {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
 
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}

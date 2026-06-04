@@ -1,5 +1,5 @@
-// src/components/waiting-list/waiting-list.scss
-@import '../../styles/variables';
+@use '../../styles/_variables' as *;
+@use '../../styles/variables' as *;
 
 // ===== Defaults (por si alguna variable no existe) =====
 $primary-dark:         #0e1726 !default;

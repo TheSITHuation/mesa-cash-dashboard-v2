@@ -15,5 +15,5 @@ export async function initSeatsForTable(tableId, totalSeats = 9) {
     });
   }
 
-  console.log(`✅ Asientos inicializados correctamente para mesa ${tableId}`);
+
 }

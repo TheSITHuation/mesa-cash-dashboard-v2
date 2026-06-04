@@ -1,428 +1,715 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-@import '../../styles/variables';
+@use '../../styles/_variables' as *;
+/* src/components/side-panel/side-panel.scss */
+@use '../../styles/variables' as *;
 
 /* ===========================
-   Panel lateral — estilo glass
-   Alineado con .info-banner
+   Side Panel — Glass Liquid
    =========================== */
 
-.side-panel {
+/* — Visibilidad por vista — */
+body.is-table   .side-panel,
+body.is-table   #panel-fab { display: block; }
+
+body.is-manager .side-panel,
+body.is-manager #panel-fab,
+body.is-lobby   .side-panel,
+body.is-lobby   #panel-fab,
+body.is-display .side-panel,
+body.is-display #panel-fab { display: none !important; }
+
+/* —— Tokens de glass (ajústalos a tu gusto) —— */
+:root{
+  --sp-blur: 8px;
+  --sp-alpha: .26;          /* transparencia del panel */
+  --sp-saturate: 1.05;
+  --sp-contrast: 1.02;
+  --sp-border: .10;
+
+  --sp-card-alpha: .20;     /* tarjetas internas */
+  --sp-card-border: .10;
+}
+
+/* — Panel off-canvas (cerrado por defecto) — */
+.side-panel{
   position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  width: 320px;
-  transform: translateX(100%);           /* oculto por defecto */
-  transition: transform .32s ease;
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  top: 14px;
+  right: 10px;
+  bottom: 14px;
+  width: min(380px, calc(100vw - 28px));
+  z-index: 2200;
 
-  &.is-open { transform: translateX(0); }
+  padding: 8px;
+  border-radius: 22px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+
+  /* Glass mate (sin destellos) */
+  background: rgba(12,16,22,var(--sp-alpha));
+  border: 1px solid rgba(255,255,255,var(--sp-border));
+  box-shadow: 0 24px 50px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(var(--sp-blur)) saturate(var(--sp-saturate)) contrast(var(--sp-contrast));
+  -webkit-backdrop-filter: blur(var(--sp-blur)) saturate(var(--sp-saturate)) contrast(var(--sp-contrast));
+
+  /* Off-canvas cerrado */
+  transform: translateX(calc(100% + 28px));
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform .28s ease, opacity .18s ease, visibility .18s ease;
+
+  /* sin brillos/pseudo-elementos */
+  &::before, &::after { content:none; }
 }
 
-/* —— Skin glass que matchea el banner —— */
-.side-panel--glass {
-  background: rgba(16,19,27,0.88);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-left: 1px solid rgba(255,255,255,0.18);
-  box-shadow:
-    -8px 0 24px rgba(0,0,0,0.40),
-    inset 0 1px 1px rgba(255,255,255,0.12);
+/* — Apertura robusta — */
+.side-panel.is-open,
+.side-panel.open,
+.side-panel[open],
+.side-panel[data-open="true"] {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
-/* Contenido */
-.panel-content {
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  height: 100%;
-  overflow-y: auto;
-  scrollbar-width: thin;
+/* — Secciones / tarjetas internas — */
+.panel-section{
+  padding: 12px;
+  border-radius: 16px;
+  margin-bottom: 12px;
 
-  &::-webkit-scrollbar { width: 8px; }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,.14);
-    border-radius: 8px;
-  }
-}
+  background: rgba(12,16,22,var(--sp-card-alpha));
+  border: 1px solid rgba(255,255,255,var(--sp-card-border));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 
-/* Título de cada bloque (igual jerarquía que banner) */
-.panel-section {
-  position: relative;
-  padding: 12px 0 16px;
-
-  &:not(:last-child)::after {
-    content:'';
-    position:absolute;
-    left:-6px; right:-6px; bottom:0;
-    height:1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
-  }
-
-  h3 {
-    margin: 0 0 10px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #f5d665;                 /* dorado del banner */
-    letter-spacing: .2px;
-    text-shadow: 0 1px 0 rgba(0,0,0,.45);
-  }
-}
-
-/* Chips de estado (mismo look pill del banner) */
-.glass-radio-group {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 8px;
-  padding: 6px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(255,255,255,.08);
-  box-shadow: inset 0 1px 1px rgba(255,255,255,.10);
-  overflow: hidden;
-
-  input { display: none; }
-
-  label {
-    text-align: center;
-    padding: 10px 8px;
-    border-radius: 10px;
+  h3, .section-title{
+    margin: 0 0 8px;
     font-weight: 600;
-    font-size: .95rem;
-    color: rgba(255,255,255,.85);
-    background: rgba(0,0,0,.18);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
-    cursor: pointer;
-    transition: transform .12s ease, background .2s ease, color .2s ease;
-
-    &:hover { transform: translateY(-1px); }
-  }
-
-  input:checked + label {
-    color: #111325;
-    background: linear-gradient(180deg, #ffd972, #f4c33e);
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.7),
-      0 6px 12px rgba(244,195,62,.18);
+    letter-spacing: .2px;
+    color: #f5d665; /* dorado */
+    text-shadow: 0 1px 0 rgba(0,0,0,.35);
   }
 }
 
-/* Timer con la misma “pastilla” que el banner */
-.timer, .session-timer, #session-timer {
-  display: grid;
-  place-items: center;
+/* — Timer (“pastilla”) — */
+#session-timer, .session-timer, .timer{
+  display: grid; place-items: center;
   height: 86px;
-  margin-top: 6px;
-  border-radius: 14px;
-  font-size: 2.3rem;
-  font-weight: 600;
+  border-radius: 16px;
+  font-size: 2.2rem;
+  font-weight: 700;
   letter-spacing: .06em;
   color: #f7f7f7;
-  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(0,0,0,0.18));
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow:
-    inset 0 1px 1px rgba(255,255,255,0.12),
-    0 10px 26px rgba(0,0,0,0.30);
-  transition: box-shadow .25s ease, transform .25s ease;
 
-  &:hover {
-    transform: translateZ(0) scale(1.01);
-    box-shadow:
-      inset 0 1px 1px rgba(255,255,255,0.16),
-      0 16px 36px rgba(0,0,0,0.38);
-  }
+  background: rgba(12,16,22,.22);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.08);
 }
 
-.created-at-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  color: rgba(255,255,255,.78);
-  font-size: .92rem;
-
-  &::before { content: '◦'; color: rgba(255,255,255,.35); }
-}
-
-.icon-toggle {
-  width: 40px; height: 40px;
-  display: grid; place-items: center;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 10px;
-  color: rgba(255,255,255,.85);
-  background: rgba(0,0,0,.18);
-  cursor: pointer;
-  transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
-
-  &:hover { transform: translateY(-1px); }
-  &.active {
-    color: #111325;
-    background: linear-gradient(180deg, #ffd972, #f4c33e);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 6px 12px rgba(244,195,62,.18);
-  }
-}
-
-/* lista con más altura (sensación de “nota”) */
-.waiting-list--tall { max-height: 50vh; }
-.waiting-list-item {
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin: 10px 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
-}
-
-/* Botones (primario / outline / peligro) compatibles con banner */
-.neo-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: .5rem; padding: .7rem 1rem; border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(255,255,255,.10);
-  color: #f2f2f2; font-weight: 600;
-  transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
-
-  &:hover { transform: translateY(-1px); background: rgba(255,255,255,.16); }
-  &:active { transform: translateY(0); }
-}
-.neo-btn-outline { background: rgba(0,0,0,.18); }
-.neo-btn-danger  {
-  background: linear-gradient(180deg,#ff6b6b,#e84141);
-  border-color: rgba(255,255,255,.22);
-}
-
-/* Btn “Añadir jugador” tipo dashed, acorde */
-.add-player-btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(255,214,102,.10);
-  border: 1px dashed rgba(255,214,102,.55);
-  color: #f5d665; font-weight: 700;
-  transition: background .2s ease, transform .12s ease;
-
-  &:hover { background: rgba(255,214,102,.18); transform: translateY(-1px); }
-}
-
-/* ===========================
-   FAB GLASS (abre/cierra panel)
-   =========================== */
-
-/* alias por si usas .panel-handle en el HTML */
-.panel-handle { @extend .panel-fab; }
-.panel-fab {
-  --size: 64px;
-  --radius: 999px;
-
-  position: fixed;
-  right: 20px; bottom: 20px;
-  z-index: 3000;
-
-  width: var(--size);
-  height: var(--size);
-  border-radius: var(--radius);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  outline: none;
-  border: 1px solid rgba(255, 255, 255, .22);
-
-  /* glass */
-  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
-  -webkit-backdrop-filter: saturate(180%) blur(18px);
-  backdrop-filter: saturate(180%) blur(18px);
-
-  /* sombras iOS */
-  box-shadow:
-    0 8px 30px rgba(0,0,0,.35),
-    inset 0 1px .5px rgba(255,255,255,.35);
-
-  transition:
-    transform .18s ease,
-    box-shadow .18s ease,
-    background .18s ease,
-    border-color .18s ease;
-}
-
-/* borde perlado */
-.panel-fab::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg,
-    rgba(255,255,255,.45),
-    rgba(255,255,255,.10) 28%,
-    rgba(255,255,255,.06) 60%,
-    rgba(255,255,255,.22));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-}
-
-/* brillo superior */
-.panel-fab::after {
-  content: "";
-  position: absolute;
-  inset: 1px 1px 50% 1px;
-  border-radius: inherit;
-  background: radial-gradient(120% 120% at 50% 0%,
-    rgba(255,255,255,.35), transparent 60%);
-  pointer-events: none;
-}
-
-/* icono dentro del botón */
-.panel-fab__icon {
-  width: 26px;
-  height: 26px;
-  display: block;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,.35));
-  opacity: .95;
-  transition: transform .2s ease, opacity .2s ease;
-}
-
-/* hover/active */
-.panel-fab:hover {
-  box-shadow:
-    0 12px 40px rgba(0,0,0,.45),
-    inset 0 1px .5px rgba(255,255,255,.45);
-  transform: translateY(-1px);
-}
-.panel-fab:active { transform: scale(.96); }
-
-/* estado abierto: rota el ícono si es una flecha */
-.panel-fab[data-open="true"] .panel-fab__icon { transform: rotate(180deg); }
-
-/* tema claro */
-@media (prefers-color-scheme: light) {
-  .panel-fab {
-    background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.45));
-    border-color: rgba(255,255,255,.85);
-    box-shadow: 0 8px 30px rgba(0,0,0,.12), inset 0 1px .5px rgba(255,255,255,.9);
-  }
-}
-
-/* fallback si no hay backdrop-filter */
-@supports not (backdrop-filter: blur(4px)) {
-  .panel-fab {
-    background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
-  }
-}
-
-/* Tinte/estado cuando el panel está abierto (opcional) */
-.side-panel.is-open ~ .panel-fab {
-  border-color: rgba(255,255,255,.28);
-  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.10));
-  box-shadow:
-    0 12px 40px rgba(0,0,0,.5),
-    inset 0 1px .5px rgba(255,255,255,.5);
-}
-
-/* Responsivo */
-@media (max-width: 420px) {
-  .side-panel { width: 86vw; }
-}
-
-/* toolbar inferior de iconos */
-.panel-actions .toolbar {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  padding-top: 6px;
-}
-
-.tool-btn {
-  width: 44px; height: 44px;
-  display: grid; place-items: center;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(255,255,255,.10);
-  color: #f2f2f2;
-  cursor: pointer;
-  box-shadow: inset 0 1px 1px rgba(255,255,255,.12);
-  transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
-
-  &:hover { transform: translateY(-1px); background: rgba(255,255,255,.16); }
-}
-
-/* formulario inline compactado */
-.add-player-form input.neo-input {
-  flex: 1;
-  border-radius: 10px;
-}
-
-/* ====== Estado: controles horizontales con iconos ====== */
-.state-icons {
+/* — Grupo de estado — */
+.state-icons{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
-.state-btn {
-  height: 44px;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 10px;
-  background: rgba(255,255,255,.06);
+.state-btn{
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
   color: #e9e9e9;
   display: grid; place-items: center;
   cursor: pointer;
-  transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
-}
-.state-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.10); }
-.state-btn.active {
-  color: #0f1220;
-  background: linear-gradient(180deg, #ffd972, #f4c33e);
-  border-color: rgba(255,255,255,.35);
-  box-shadow: 0 6px 12px rgba(244,195,62,.22), inset 0 1px 0 rgba(255,255,255,.8);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  transition: transform .12s ease, background .18s ease;
+
+  &:hover{ transform: translateY(-1px); }
+  &.active{
+    color: #0f1220;
+    background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+    border-color: rgba(59,130,246,.28);
+    box-shadow: 0 16px 28px rgba(59,130,246,.22), inset 0 1px 0 rgba(255,255,255,.08);
+  }
 }
 
-/* ====== Lista más alta ====== */
-.waiting-list--tall { max-height: 360px; }
+/* — Lista de espera — */
+.waiting-list--tall{ max-height: 360px; }
+.waiting-list-item{
+  background: rgba(12,16,22,.20);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 8px 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
 
-/* ====== Iconos compactos de acciones ====== */
-.panel-actions {
+/* — Barra de acciones (footer pegado abajo, glass sutil) — */
+.panel-actions{
+  position: sticky;       /* se pega al fondo del contenedor con overflow */
+  bottom: 0;
+  margin-top: 10px;
+  padding: 8px 8px 10px;
+
+  background:
+    linear-gradient(180deg,
+      rgba(12,16,22,0),
+      rgba(12,16,22,.18) 32%,
+      rgba(12,16,22,.24));
+  backdrop-filter: blur(6px) saturate(1.04);
+  -webkit-backdrop-filter: blur(6px) saturate(1.04);
+
+  border-top: 1px solid rgba(255,255,255,.08);
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+/* fila de botones */
+.panel-actions .toolbar{
   display: flex;
+  justify-content: space-between;  /* separa “Lista de espera” y “CSV” */
+  align-items: center;
   gap: 10px;
-  margin-top: 8px;
 }
-.icon-btn.sm {
-  width: 36px; height: 36px;
+
+/* estilo glass sutil de los botones del footer */
+.panel-actions .tool-btn,
+.panel-actions .btn,
+.panel-actions button{
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 12px;
+
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #e9eef7;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  cursor: pointer;
+  transition: transform .12s ease, background .18s ease, border-color .18s ease;
+}
+.panel-actions .tool-btn:hover,
+.panel-actions .btn:hover,
+.panel-actions button:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.16);
+}
+
+/* variante fantasma (más sutil) si alguno tiene clase .btn-ghost */
+.panel-actions .btn-ghost{
+  background: rgba(255,255,255,.04);
+  border-color: rgba(255,255,255,.10);
+}
+.panel-actions .btn-ghost:hover{
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.14);
+}
+
+/* iconitos dentro de los botones (si usas SVG o emojis) */
+.panel-actions .btn svg,
+.panel-actions .tool-btn svg{
+  width: 18px; height: 18px; display: block; opacity: .9;
+}
+
+#waiting-list-section.is-adding #add-player-form { display: flex; }
+
+/* — FAB (abrir/cerrar) — */
+#panel-fab {
+  position: fixed;
+  right: 20px; bottom: 22px;
+  width: 46px; height: 46px; border-radius: 50%;
+  z-index: 2600;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(12,16,22,.28);
+  color: #fff; cursor: pointer;
+  display: grid; place-items: center;
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 10px 25px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.20);
+  transition: right .3s cubic-bezier(.4,0,.2,1);  /* ← agrega esto */
+}
+
+#panel-fab.is-open svg {
+  display: none;
+}
+#panel-fab.is-open::after {
+  content: '✕';
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ← agrega este bloque nuevo */
+.side-panel.is-open + #panel-fab,
+body:has(.side-panel.is-open) #panel-fab {
+  right: calc(320px + 16px);
+}
+body.is-display #panel-fab{ display:none; }
+
+/* — Responsivo — */
+@media (max-width: 480px){
+  .side-panel{
+    top: 10px;
+    right: 10px;
+    width: 92vw;
+    max-height: calc(100vh - 20px);
+  }
+}
+
+/* — Fallback sin blur — */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .side-panel{ background: rgba(21,30,45,.96); }
+}
+#side-panel { position: fixed; }
+
+/* ==== Mirror/display: mostrar panel y hacerlo de solo lectura ==== */
+body.is-display .side-panel {
+  display: block !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important; /* evita interacción en el espejo */
+  z-index: 2000 !important;
+}
+
+/* El FAB no tiene sentido en el espejo */
+body.is-display #panel-fab {
+  display: none !important;
+}
+
+/* ==== Mirror/display: mostrar panel y hacerlo de solo lectura ==== */
+body.is-display .side-panel {
+  display: block !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important; /* evita interacción en el espejo */
+  z-index: 2000 !important;
+}
+
+/* El FAB no tiene sentido en el espejo */
+body.is-display #panel-fab {
+  display: none !important;
+}
+
+// ── Nuevo diseño panel ─────────────────────────────────────────
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.panel-header__title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #d4af37;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.panel-header__actions { display: flex; gap: 6px; }
+
+.panel-icon-btn {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.45);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  &:hover { background: rgba(255,255,255,.12); color: #fff; }
+}
+
+.panel-section__label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.28);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+// Estado radio group (glass)
+.glass-radio-group {
+  --bg: rgba(255, 255, 255, 0.06);
+  --text: rgba(255, 255, 255, 0.45);
+
+  display: flex;
+  position: relative;
+  background: var(--bg);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 3px rgba(255, 255, 255, 0.15),
+    inset -1px -1px 4px rgba(0, 0, 0, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  width: 100%;
+}
+
+.glass-radio-group input {
+  display: none;
+}
+
+.glass-radio-group label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  font-size: 12px;
+  padding: 10px 8px;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--text);
+  position: relative;
+  z-index: 2;
+  transition: color 0.3s ease-in-out;
+  font-family: inherit;
+  border: none;
+  background: none;
+  text-align: center;
+}
+
+.glass-radio-group label:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.glass-glider {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: calc((100% - 6px) / 3);
   border-radius: 10px;
+  z-index: 1;
+  transition:
+    transform 0.45s cubic-bezier(0.37, 1.95, 0.66, 0.56),
+    background 0.4s ease-in-out,
+    box-shadow 0.4s ease-in-out;
+}
+
+/* Activa - Green */
+#state-activa:checked ~ .glass-glider {
+  transform: translateX(0%);
+  background: linear-gradient(135deg, rgba(48,209,88,0.25), rgba(48,209,88,0.6));
+  box-shadow:
+    0 0 14px rgba(48,209,88,0.4),
+    0 0 8px rgba(48,209,88,0.3) inset;
+}
+#state-activa:checked + label {
+  color: #fff;
+}
+
+/* Pausa - Yellow */
+#state-pausa:checked ~ .glass-glider {
+  transform: translateX(100%);
+  background: linear-gradient(135deg, rgba(255,214,10,0.2), rgba(255,214,10,0.55));
+  box-shadow:
+    0 0 14px rgba(255,214,10,0.35),
+    0 0 8px rgba(255,214,10,0.25) inset;
+}
+#state-pausa:checked + label {
+  color: #fff;
+}
+
+/* Stop - Red */
+#state-stop:checked ~ .glass-glider {
+  transform: translateX(200%);
+  background: linear-gradient(135deg, rgba(255,69,58,0.2), rgba(255,69,58,0.55));
+  box-shadow:
+    0 0 14px rgba(255,69,58,0.35),
+    0 0 8px rgba(255,69,58,0.25) inset;
+}
+#state-stop:checked + label {
+  color: #fff;
+}
+
+// Legacy (keep for compatibility)
+.state-btns-new {
+  display: flex;
+  gap: 6px;
+}
+.state-btn-new {
+  flex: 1; height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.35);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  gap: 5px;
+  font-size: 11px; font-weight: 600;
+  transition: all .2s;
+  font-family: inherit;
+  &:hover { background: rgba(255,255,255,.1); color: rgba(255,255,255,.7); }
+  &[data-state="activa"].active,
+  &[data-state="activa"]:has(+ .active) {
+    background: rgba(48,209,88,.15);
+    border-color: rgba(48,209,88,.35);
+    color: #30d158;
+    box-shadow: 0 0 10px rgba(48,209,88,.2);
+  }
+  &[data-state="en espera"].active {
+    background: rgba(255,214,10,.12);
+    border-color: rgba(255,214,10,.3);
+    color: #ffd60a;
+    box-shadow: 0 0 10px rgba(255,214,10,.15);
+  }
+  &[data-state="inactiva"].active {
+    background: rgba(255,69,58,.12);
+    border-color: rgba(255,69,58,.3);
+    color: #ff453a;
+    box-shadow: 0 0 10px rgba(255,69,58,.15);
+  }
+}
+
+// Timer
+.timer-box-new {
+  background: rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 16px;
+  padding: 16px 14px;
+  text-align: center;
+}
+.timer-value-new {
+  font-size: 32px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-family: 'SF Pro Display', system-ui, -apple-system, sans-serif;
+  color: #fff;
+  letter-spacing: 0px;
+  line-height: 1.1;
+}
+.timer-started-new {
+  font-size: 11px;
+  color: rgba(255,255,255,.3);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+// NumberFlow timer
+.timer-flow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-family: 'SF Pro Display', system-ui, -apple-system, sans-serif;
+  color: #fff;
+  letter-spacing: 0px;
+  line-height: 1.1;
+}
+.timer-flow .timer-sep {
+  opacity: 0.7;
+  margin: 0 1px;
+  font-weight: 800;
+}
+.timer-flow-compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-family: inherit;
+  color: #f6f6f6;
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+.timer-flow-compact * {
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  font-size: inherit !important;
+}
+.timer-flow .timer-sep {
+  opacity: 0.6;
+  margin: 0 2px;
+}
+.timer-flow-compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-family: inherit !important;
+  color: #f6f6f6;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.timer-flow-compact > span {
+  display: inline-block;
+  overflow: hidden;
+  line-height: 1;
+  vertical-align: top;
+}
+.timer-flow-compact .timer-sep {
+  opacity: 0.6;
+  margin: 0 1px;
+  font-family: inherit !important;
+  line-height: 1;
+  vertical-align: top;
+}
+.timer-flow-compact .timer-sep {
+  opacity: 0.6;
+  margin: 0 2px;
+}
+
+// Waiting list
+.wl-header-new {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.wl-badge-count {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255,214,10,.12);
+  border: 1px solid rgba(255,214,10,.2);
+  color: #ffd60a;
+  padding: 2px 8px;
+  border-radius: 99px;
+  min-width: 24px;
+  text-align: center;
+}
+.wl-add-btn-new {
+  width: 28px; height: 28px;
+  border-radius: 8px;
   border: 1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.06);
-  color: #e9e9e9;
-  display: grid; place-items: center;
+  color: rgba(255,255,255,.45);
   cursor: pointer;
-  transition: transform .1s ease, background .2s ease;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  &:hover {
+    background: rgba(48,209,88,.12);
+    border-color: rgba(48,209,88,.25);
+    color: #30d158;
+  }
 }
-.icon-btn.sm:hover { background: rgba(255,255,255,.10); transform: translateY(-1px); }
 
-/* ====== Formulario oculto hasta que se pida ====== */
-#waiting-list-section.is-adding #add-player-form { display: flex; }
-#waiting-list-section #add-player-form {
-  display: none;
+.waiting-list-new {
+  list-style: none;
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0;
+  margin: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.15) transparent;
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 99px; }
+}
+
+.wl-item-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  transition: background .15s;
+  &:hover { background: rgba(255,255,255,.07); }
+}
+.wl-item-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,.28);
+  min-width: 18px;
+  text-align: center;
+}
+.wl-item-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #ffd60a;
+  box-shadow: 0 0 5px rgba(255,214,10,.5);
+  flex-shrink: 0;
+}
+.wl-item-name {
+  font-size: 13px;
+  color: rgba(255,255,255,.85);
+  font-weight: 500;
+  flex: 1;
+}
+.wl-item-sit {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(212,175,55,.3);
+  background: rgba(212,175,55,.1);
+  color: #d4af37;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+  white-space: nowrap;
+  &:hover { background: rgba(212,175,55,.2); border-color: rgba(212,175,55,.5); }
+}
+.wl-item-remove {
+  font-size: 15px;
+  color: rgba(255,255,255,.2);
+  cursor: pointer;
+  padding: 0 3px;
+  line-height: 1;
+  &:hover { color: #ff453a; }
+}
+
+.wl-empty-new {
+  text-align: center;
+  padding: 16px;
+  color: rgba(255,255,255,.2);
+  font-size: 13px;
+}
+
+.add-player-form-new {
+  display: flex;
   gap: 8px;
   margin-top: 10px;
+  &.hidden { display: none !important; }
 }
-#waiting-list-section #add-player-form input {
+.wl-input-new {
   flex: 1;
-  padding: 10px 12px;
+  height: 36px;
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.06);
-  color: #f7f7f7;
+  color: #fff;
+  padding: 0 12px;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  &::placeholder { color: rgba(255,255,255,.2); }
+  &:focus { border-color: rgba(212,175,55,.4); }
 }
-#waiting-list-section #add-player-form button {
-  padding: 0 14px;
+.wl-submit-new {
+  height: 36px;
+  padding: 0 12px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.18);
-  background: linear-gradient(180deg, #ffd972, #f4c33e);
-  color: #141414; font-weight: 700;
+  border: 1px solid rgba(48,209,88,.3);
+  background: rgba(48,209,88,.12);
+  color: #30d158;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  &:hover { background: rgba(48,209,88,.2); }
 }

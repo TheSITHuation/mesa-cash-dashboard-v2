@@ -1,13 +1,15 @@
 // src/services/firebase/tableService.js
 import { db } from '../config/firebaseConfig.js';
 import { getTableId } from '../../utils/getTableId.js';
+import { reserveNextSlot, releaseSlot } from './tableSlotsService.js';
+import { initSeatsForTable } from './initSeatsForTable.js';
 import {
   collection,
   doc,
   getDoc,
   getDocs,
   onSnapshot,
-  addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   writeBatch,
@@ -84,25 +86,46 @@ export async function getMesaStatus(tableIdOverride) {
    ESCRITURAS / MUTACIONES
    ========================= */
 
-/** Crea una mesa nueva. */
-export async function createTable(payload = {}) {
+/** Crea una mesa nueva con slot dinámico (Table-1, Table-2, etc.). */
+export async function createTable(payload = {}, slotId = null) {
   const now = serverTimestamp();
+  
+  // Reservar el slot (específico o el siguiente disponible)
+  const { tableId, slotNumber } = await reserveNextSlot(slotId);
+  
+  // Calcular sortOrder automático (último + 1)
+  const existingSnap = await getDocs(collection(db, TABLES));
+  const sortOrder = existingSnap.size + 1;
+
   const data = {
-    name: payload.name || `Mesa ${Math.floor(Math.random() * 900) + 100}`,
-    gameType: payload.gameType || 'NLHE',
-    smallBlind: payload.smallBlind ?? 0,
-    bigBlind: payload.bigBlind ?? 0,
-    minBuyIn: payload.minBuyIn ?? 0,
-    maxBuyIn: payload.maxBuyIn ?? 0,
-    status: payload.status || 'inactive',          // 'active' | 'inactive' | 'en-espera'
-    active: !!payload.active,                      // bandera rápida
+    name:        payload.name || `Table-${slotNumber}`,
+    slotNumber,
+    gameType:    payload.gameType || 'NLHE',
+    smallBlind:  payload.smallBlind ?? 0,
+    bigBlind:    payload.bigBlind ?? 0,
+    minBuyIn:    payload.minBuyIn ?? 0,
+    maxBuyIn:    payload.maxBuyIn ?? 0,
+    maxSeats:    payload.maxSeats ?? 9,
+    status:      payload.status || 'inactive',
+    active:      !!payload.active,
+    publicLobby: payload.publicLobby !== undefined ? !!payload.publicLobby : true,
+    seatsOccupied: payload.seatsOccupied ?? 0,
+    waitingCount:  payload.waitingCount  ?? 0,
     dealerAvatar: payload.dealerAvatar || '/avatars/dealer1.png',
+    sortOrder,
     createdAt: now,
     updatedAt: now,
   };
-  const ref = await addDoc(collection(db, TABLES), data);
-  return { id: ref.id, ...data };
+
+  // Usar setDoc con el ID del slot en lugar de addDoc con ID auto-generado
+  await setDoc(doc(db, TABLES, tableId), data);
+
+  // Inicializar documentos de asientos según maxSeats
+  await initSeatsForTable(tableId, data.maxSeats);
+
+  return tableId;
 }
+
 
 /** Actualiza campos de una mesa. */
 export async function updateTable(id, patch) {
@@ -111,9 +134,25 @@ export async function updateTable(id, patch) {
   return true;
 }
 
-/** Borra una mesa por id. (Si tienes subcolecciones, bórralas primero.) */
+/** Borra una mesa por id, limpia subcolecciones y libera su slot. */
 export async function deleteTable(id) {
+  // 1. Limpiar subcolección de asientos
+  const seatsRef = collection(db, TABLES, id, 'seats');
+  const seatsSnap = await getDocs(seatsRef);
+  const seatDeletions = seatsSnap.docs.map(d => deleteDoc(d.ref));
+  await Promise.all(seatDeletions);
+
+  // 2. Limpiar subcolección de lista de espera
+  const waitingRef = collection(db, TABLES, id, 'waitingList');
+  const waitingSnap = await getDocs(waitingRef);
+  const waitingDeletions = waitingSnap.docs.map(d => deleteDoc(d.ref));
+  await Promise.all(waitingDeletions);
+
+  // 3. Borrar documento principal de la mesa
   await deleteDoc(doc(db, TABLES, id));
+  
+  // 4. Liberar el slot
+  await releaseSlot(id);
   return true;
 }
 
@@ -197,9 +236,10 @@ export async function resumeAllSeatTimers(tableIdOverride) {
 // Sesión a nivel mesa
 export async function startSession(tableIdOverride) {
   const tableId = tableIdOverride || getTableId();
+  // Use local timestamp for immediate UI update, serverTimestamp syncs later
   await updateDoc(doc(db, TABLES, tableId), {
     sessionState: 'running',
-    sessionStartAt: serverTimestamp(),
+    sessionStartAt: Date.now(),
     pauseStartedAt: null,
     pausedTotalMs: 0,
     updatedAt: serverTimestamp(),

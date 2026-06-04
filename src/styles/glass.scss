@@ -1,0 +1,218 @@
+/* src/styles/glass.scss */
+/* ===========================================================
+   Glass Core (sin @extend) — “agüita” / liquid, muy transparente
+   =========================================================== */
+
+/* —— controles globales (tócalos para subir/bajar transparencia) —— */
+:root{
+  --glass-radius: 16px;
+
+  /* “agua” (más bajo = más transparente) */
+  --glass-bg-alpha:      .06;    /* 0.04–0.12 */
+  --glass-brd-alpha:     .16;
+  --glass-inset-alpha:   .08;
+
+  /* FX iOS */
+  --glass-blur:          14px;
+  --glass-saturate:      130%;
+  --glass-bright:        1.05;
+  --glass-contrast:      1;
+
+  /* sombra exterior */
+  --glass-shadow:        0 12px 30px rgba(0,0,0,.32);
+
+  /* capa “líquida” (requiere ensureGlassFilter) */
+  --glass-liquid-opac:   .38;    /* 0 (off) – .6 */
+
+  /* Título / texto */
+  --glass-title-color:   #f6f6f6;
+  --glass-text-muted:    rgba(255,255,255,.72);
+
+  /* Dorados de marca */
+  --brand-gold:   #f4c33e;
+  --brand-gold-2: #ffd972;
+}
+
+/* Preset “Oceanic Liquid” (ondas más vivas) */
+body.liquid--oceanic{
+  --glass-blur:        16px;
+  --glass-liquid-opac: .52;
+  --glass-bg-alpha:    .06;
+}
+@media (max-width:640px){
+  body.liquid--oceanic{
+    --glass-liquid-opac: .40;
+    --glass-blur: 12px;
+  }
+}
+
+/* ===========================================================
+   Base glass (panel, card, btn, pill comparten el mismo ADN)
+   =========================================================== */
+.glass-panel,
+.glass-card,
+.glass-btn,
+.glass-pill{
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--glass-radius);
+  background: rgba(255,255,255, var(--glass-bg-alpha));
+  border: 1px solid rgba(255,255,255, var(--glass-brd-alpha));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-bright)) contrast(var(--glass-contrast));
+  backdrop-filter:         blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-bright)) contrast(var(--glass-contrast));
+  box-shadow: var(--glass-shadow);
+}
+
+/* brillo interno sutil */
+.glass-panel::before,
+.glass-card::before,
+.glass-btn::before,
+.glass-pill::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 15px -6px rgba(0,0,0,.9);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* capa líquida (si no existe el filtro, el navegador ignora sin fallar) */
+.glass-panel::after,
+.glass-card::after,
+.glass-btn::after,
+.glass-pill::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: inherit;
+  pointer-events:none;
+  z-index:0;
+
+  filter: url(#glass-distortion);
+  -webkit-filter: url(#glass-distortion);
+
+  background: radial-gradient(120% 100% at 0% 0%,
+              rgba(255,255,255,.16), rgba(255,255,255,0) 60%);
+  opacity: var(--glass-liquid-opac);
+}
+
+/* contenido por encima del “vidrio” */
+.glass-panel > *,
+.glass-card  > *,
+.glass-btn   > *,
+.glass-pill  > *{ position:relative; z-index:1; }
+
+/* —— variantes por tipo —— */
+
+/* Panel: útil para headers/banners compactos */
+.glass-panel{
+  --glass-radius: 18px;
+  padding: 12px 16px;
+  overflow: hidden;
+}
+
+/* Card: contenedor principal del lobby */
+.glass-card{
+  padding: 14px 16px;
+  overflow: hidden;
+}
+
+/* Pill (badge/estado) — tamaño “cápsula” */
+.glass-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255, .08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+  font-weight: 700;
+  font-size: .92rem;
+  color: rgba(255,255,255,.92);
+  white-space: nowrap;
+}
+
+/* Estados para pill/badge */
+.glass-pill[data-status="active"],
+.badge[data-status="active"]{
+  color:#0f1220;
+  background: linear-gradient(180deg, var(--brand-gold-2), var(--brand-gold));
+  border-color: rgba(255,255,255,.28);
+}
+.glass-pill[data-status="en-espera"],
+.badge[data-status="en-espera"]{
+  background: rgba(255,214,102,.12);
+  border-color: rgba(255,214,102,.45);
+  color:#ffd972;
+}
+.glass-pill[data-status="inactive"],
+.badge[data-status="inactive"]{
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.65);
+}
+
+/* Botón: base “agua” muy transparente */
+.glass-btn{
+  appearance: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: #e9eef7;
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .18s ease, background .18s ease, opacity .18s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.glass-btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+.glass-btn:active{ transform: translateY(0); }
+
+/* Botón “tipo pill” (misma vibra que el estado de mesa) */
+.glass-btn--pill{
+  border-radius: 999px;
+  padding: 8px 14px;
+}
+
+/* Primario dorado (a juego con .badge[data-status=active]) */
+.glass-btn--primary{
+  color:#0f1220;
+  background: linear-gradient(180deg, var(--brand-gold-2), var(--brand-gold));
+  border-color: rgba(255,255,255,.28);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 10px 22px rgba(244,195,62,.22);
+}
+.glass-btn--primary:hover{
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 14px 26px rgba(244,195,62,.28);
+}
+
+/* Fantasma (muy transparente, texto claro) */
+.glass-btn--ghost{
+  background: rgba(255,255,255,.05);
+  border-color: rgba(255,255,255,.12);
+  color: var(--glass-text-muted);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* Peligro */
+.glass-btn--danger{
+  color: #ffd5d5;
+  border-color: rgba(255,130,130,.35);
+  background: rgba(255, 90, 90, .12);
+  box-shadow: 0 6px 18px rgba(255,90,90,.18), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* Títulos dentro de glass */
+.glass-title{
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--glass-title-color);
+  text-shadow: 0 1px 0 rgba(0,0,0,.25);
+}
+
+/* Fallback (sin backdrop-filter) */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .glass-panel,
+  .glass-card,
+  .glass-btn,
+  .glass-pill{ background: rgba(20,22,30,.72); }
+}

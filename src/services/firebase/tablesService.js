@@ -47,7 +47,7 @@ export async function createTable(payload = {}) {
     smallBlind: payload.smallBlind ?? 10,
     bigBlind: payload.bigBlind ?? 20,
     buyinMin: payload.buyinMin ?? 1000,
-    buyinMax: payload.buyinMax ?? 5000,
+    buyinMax: payload.buyinMax ?? 2000,
     status: payload.status || 'waiting',
     active: payload.active ?? false,
     createdAt: serverTimestamp(),

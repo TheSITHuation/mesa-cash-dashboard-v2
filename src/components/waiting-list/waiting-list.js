@@ -1,133 +1,181 @@
 // src/components/waiting-list/waiting-list.js
-import { openModal as openSeatModal } from '../seat-modal/seat-modal.js';
-import {
-  addToWaitingList,
-  removePlayerFromWaitingList,
-  listenToWaitingList
-} from '../../services/firebase/waitingListService.js';
+import { db } from '../../services/config/firebaseConfig.js';
+import { addToWaitingList, removeFromWaitingList } from '../../services/firebase/waitingListService.js';
+import { collection, onSnapshot, orderBy, query, where, doc } from 'firebase/firestore';
 
-// Lucide (vanilla JS)
-import { createIcons, Armchair, Eraser } from 'lucide';
+const qs = (s, r = document) => r.querySelector(s);
 
-export function initWaitingList(tableIdOverride) {
-  const waitingListEl       = document.getElementById('waiting-list');
-  const addToWaitlistBtn    = document.getElementById('add-to-waitlist-btn');
-  const addPlayerForm       = document.getElementById('add-player-form');
-  const newPlayerNameInput  = document.getElementById('player-name-input');
-  const confirmAddPlayerBtn = document.getElementById('confirm-add-player-btn');
+export function initWaitingList(tableId) {
+  const section = document.getElementById('waiting-list-section') || qs('.waiting-list-section');
+  if (!section) return () => {};
 
-  if (addToWaitlistBtn) {
-    addToWaitlistBtn.addEventListener('click', () => {
-      addPlayerForm?.classList.remove('hidden');
-      addToWaitlistBtn?.classList.add('hidden');
-      newPlayerNameInput?.focus();
+  const form       = document.getElementById('add-player-form');
+  const input      = document.getElementById('player-name-input');
+  const btnSubmit  = document.getElementById('confirm-add-player-btn');
+  const wlAddBtn   = document.getElementById('wl-add-btn');
+  const countBadge = document.getElementById('wl-count-badge');
+  const listEl     = document.getElementById('waiting-list');
+
+  // ── Toggle formulario ──────────────────────────────────────
+  if (wlAddBtn && !wlAddBtn._bound) {
+    wlAddBtn._bound = true;
+    wlAddBtn.addEventListener('click', () => {
+      if (!form) return;
+      const hidden = form.classList.contains('hidden');
+      form.classList.toggle('hidden', !hidden);
+      if (hidden && input) input.focus();
     });
   }
 
-  if (confirmAddPlayerBtn) {
-    confirmAddPlayerBtn.addEventListener('click', async () => {
-      const playerName = (newPlayerNameInput?.value || '').trim();
-      if (!playerName) return;
-      await addToWaitingList(playerName, tableIdOverride);
-      if (newPlayerNameInput) newPlayerNameInput.value = '';
-      addPlayerForm?.classList.add('hidden');
-      addToWaitlistBtn?.classList.remove('hidden');
-    });
-  }
+  // ── Submit agregar jugador ─────────────────────────────────
+  if (form && !form.dataset.bound) {
+    form.dataset.bound = '1';
 
-  // Delegación de eventos (sentar / eliminar)
-  if (waitingListEl) {
-    waitingListEl.addEventListener('click', async (e) => {
-      const sitBtn    = e.target.closest?.('.sit-btn');
-      const deleteBtn = e.target.closest?.('.delete-btn');
-      if (!sitBtn && !deleteBtn) return;
-
-      const li = e.target.closest('li');
-      if (!li) return;
-
-      let player = {};
+    const doAdd = async () => {
+      const name = (input?.value || '').trim();
+      if (!name) return;
+      if (form.dataset.busy === '1') return;
+      form.dataset.busy = '1';
+      if (btnSubmit) btnSubmit.disabled = true;
+      if (input)    input.disabled    = true;
       try {
-        player = JSON.parse(li.dataset.player || '{}');
-      } catch {
-        player = {};
+        await addToWaitingList(name, tableId);
+        if (input) input.value = '';
+        form.classList.add('hidden');
+        if (input) input.focus();
+      } catch (err) {
+        console.error('[waiting-list] add error:', err);
+        alert(err?.message || 'No se pudo agregar a la lista');
+      } finally {
+        form.dataset.busy = '0';
+        if (btnSubmit) btnSubmit.disabled = false;
+        if (input)    input.disabled    = false;
       }
-      if (!player || !player.name) return;
+    };
 
-      if (sitBtn) {
-        // Enviamos los datos al modal: al ocupar el asiento, el modal
-        // se encargará de eliminar de la waiting list cuando corresponda.
-        openSeatModal(
-          null,
-          { status: 'available' },
-          {
-            id: player.id || null,
-            name: player.name,
-            avatarUrl: player.avatar || '',
-            chips: Number(player.chips || 0),
+    form.addEventListener('submit', (e) => { e.preventDefault(); doAdd(); });
+    if (btnSubmit) btnSubmit.addEventListener('click', doAdd);
+
+    // Enter en el input
+    if (input) {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); doAdd(); }
+      });
+    }
+  }
+
+  // ── Limpia suscripción previa ──────────────────────────────
+  if (section._unsub) {
+    try { section._unsub(); } catch {}
+    section._unsub = null;
+  }
+
+  if (!listEl) return () => {};
+
+  // Escuchar la mesa para obtener gameType y blinds, y luego filtrar la lista de espera general
+  let wlUnsub = null;
+
+  const tableRef = doc(db, 'tables', tableId);
+  const tableUnsub = onSnapshot(tableRef, (tableSnap) => {
+    if (!tableSnap.exists()) return;
+    const tableData = tableSnap.data();
+    const gt = tableData.gameType || 'NLHE';
+    const sb = Number(tableData.smallBlind || 0);
+    const bb = Number(tableData.bigBlind || 0);
+
+    if (wlUnsub) {
+      wlUnsub();
+      wlUnsub = null;
+    }
+
+    const q = query(
+      collection(db, 'generalWaitingList'),
+      where('gameType', '==', gt),
+      where('smallBlind', '==', sb),
+      where('bigBlind', '==', bb),
+      orderBy('createdAt', 'asc')
+    );
+
+    wlUnsub = onSnapshot(q, (qsnap) => {
+      const items = [];
+      qsnap.forEach((doc) => {
+        const d    = doc.data() || {};
+        const name = d.name || '(Sin nombre)';
+        const id   = doc.id;
+        items.push({ id, name });
+      });
+
+      // Actualizar badge contador
+      if (countBadge) countBadge.textContent = items.length;
+
+      // Renderizar lista
+      if (!items.length) {
+        listEl.innerHTML = `<li class="wl-empty-new">No hay jugadores en espera</li>`;
+        return;
+      }
+
+      listEl.innerHTML = items.map((item, i) => `
+        <li class="wl-item-new" data-id="${item.id}" data-name="${item.name}">
+          <span class="wl-item-num">${i + 1}</span>
+          <span class="wl-item-dot"></span>
+          <span class="wl-item-name">${item.name}</span>
+          <button class="wl-item-sit" data-action="sit" title="Sentar jugador">Sentar</button>
+          <span class="wl-item-remove" data-action="remove" title="Quitar de lista">×</span>
+        </li>
+      `).join('');
+
+      // ── Delegación de eventos ────────────────────────────────
+      listEl.onclick = async (ev) => {
+        const target = ev.target;
+
+        // Quitar de lista
+        if (target.closest('[data-action="remove"]')) {
+          const li  = target.closest('.wl-item-new');
+          const pid = li?.dataset.id;
+          if (!pid) return;
+          try {
+            await removeFromWaitingList(pid);
+          } catch (e) {
+            console.warn('[waiting-list] remove error:', e);
           }
-        );
-      } else if (deleteBtn) {
-        if (confirm(`¿Eliminar a ${player.name} de la lista?`)) {
-          await removePlayerFromWaitingList(player.id, tableIdOverride);
+          return;
         }
-      }
+
+        // Sentar jugador — emite evento para abrir SeatModal con datos pre-llenados
+        if (target.closest('[data-action="sit"]')) {
+          const li   = target.closest('.wl-item-new');
+          const pid  = li?.dataset.id;
+          const name = li?.dataset.name;
+          if (!pid || !name) return;
+
+          // Emitir evento al puente React
+          window.dispatchEvent(new CustomEvent('open-seat-modal', {
+            detail: {
+              seatId: null, // el dealer elige el asiento en el modal
+              seatInfo: {},
+              playerFromWaiting: { id: pid, name },
+            }
+          }));
+          return;
+        }
+      };
     });
-  }
-
-  // Suscripción en tiempo real
-  const unsubscribe = listenToWaitingList((players) => {
-    renderWaitingList(players);
-  }, tableIdOverride);
-
-  return unsubscribe;
-}
-
-export function renderWaitingList(players) {
-  const waitingListEl = document.getElementById('waiting-list');
-  if (!waitingListEl) return;
-
-  waitingListEl.innerHTML = '';
-
-  if (!players || players.length === 0) {
-    waitingListEl.innerHTML = `<li class="empty-list">La lista de espera está vacía.</li>`;
-    // Aún así invocamos createIcons por consistencia (no hay íconos, pero no pasa nada)
-    createIcons({ icons: { Armchair, Eraser } });
-    return;
-  }
-
-  for (const player of players) {
-    if (!player || !player.name) continue;
-
-    const li = document.createElement('li');
-    li.className = 'waiting-list-item';
-    li.dataset.player = JSON.stringify(player);
-
-    const hasAvatar = !!player.avatar && typeof player.avatar === 'string' && player.avatar.trim() !== '';
-    const avatarHTML = hasAvatar
-      ? `<img class="wl-avatar" src="${player.avatar}" alt="${player.name}" />`
-      : `<div class="wl-avatar placeholder">${player.name.charAt(0).toUpperCase()}</div>`;
-
-    li.innerHTML = `
-      <div class="waiting-player">
-        ${avatarHTML}
-        <span class="wl-name">${player.name}</span>
-        <div class="player-actions">
-          <button class="wl-action-btn sit-btn" title="Sentar">
-            <i data-lucide="armchair"></i>
-          </button>
-          <button class="wl-action-btn delete-btn" title="Eliminar">
-            <i data-lucide="eraser"></i>
-          </button>
-        </div>
-      </div>
-    `;
-
-    waitingListEl.appendChild(li);
-  }
-
-  // IMPORTANTÍSIMO: reemplaza los <i data-lucide="..."> por SVGs
-  createIcons({
-    icons: { Armchair, Eraser },
-    attrs: { width: 18, height: 18, stroke: 'currentColor', 'stroke-width': 2 }
+  }, (err) => {
+    console.warn('[waiting-list:tableUnsub]', err);
   });
+
+  const combinedUnsubscribe = () => {
+    tableUnsub();
+    if (wlUnsub) wlUnsub();
+  };
+
+  section._unsub = combinedUnsubscribe;
+  return combinedUnsubscribe;
 }
+
+// ── Render temporal / no usado en el nuevo flujo ────────────────
+export function renderWaitingList() {
+  return { destroy() {} };
+}
+export default renderWaitingList;
+

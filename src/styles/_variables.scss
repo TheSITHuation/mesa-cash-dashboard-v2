@@ -13,3 +13,18 @@ $modal-background: $secondary-dark;
 $input-background: $primary-dark;
 $border-color: #475569;// Fuentes
 $font-main: sans-serif;
+/* ===== iOS glass tokens ===== */
+$glass-bg: rgba(12, 18, 28, .45);
+$glass-overlay-1: rgba(255, 255, 255, .08);
+$glass-overlay-2: rgba(255, 255, 255, .03);
+$glass-border: rgba(255, 255, 255, .18);
+$glass-inner: rgba(255, 255, 255, .06);
+$glass-highlight: rgba(255, 255, 255, .25);
+$glass-shadow: rgba(2, 6, 12, .50);
+$glass-radius: 22px;
+$glass-blur: 18px;
+$glass-gap: 14px;
+$ios-blue: #3b82f6;
+$ios-green: #22c55e;
+$ios-amber: #f59e0b;
+$ios-red: #ef4444;

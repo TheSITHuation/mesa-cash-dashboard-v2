@@ -1,19 +1,38 @@
 // src/components/poker-table/poker-table.js
-import { openModal as openSeatModal } from '../seat-modal/seat-modal.js';
+import { emitOpenSeatModal as openSeatModal } from '../../utils/modalBridge.js';
 import { openDealerModal } from '../dealer-modal/dealer-modal.js';
-import { openPlayerCard } from '../player-card/player-card.js';
 
-const seatPositions = [
-  { x:  0.45, y: -0.65 },
-  { x:  0.77, y: -0.28 },
-  { x:  0.75, y:  0.30 },
-  { x:  0.42, y:  0.65 },
-  { x:  0.00, y:  0.66 },
-  { x: -0.42, y:  0.65 },
-  { x: -0.75, y:  0.30 },
-  { x: -0.77, y: -0.28 },
-  { x: -0.45, y: -0.65 }
-];
+const seatLayouts = {
+  6: [
+    { x: 0.55, y: -0.62 },
+    { x: 0.79, y: 0.15 },
+    { x: 0.35, y: 0.65 },
+    { x: -0.35, y: 0.65 },
+    { x: -0.79, y: 0.15 },
+    { x: -0.55, y: -0.62 }
+  ],
+  8: [
+    { x: 0.45, y: -0.65 },
+    { x: 0.78, y: -0.20 },
+    { x: 0.70, y: 0.45 },
+    { x: 0.25, y: 0.66 },
+    { x: -0.25, y: 0.66 },
+    { x: -0.70, y: 0.45 },
+    { x: -0.78, y: -0.20 },
+    { x: -0.45, y: -0.65 }
+  ],
+  9: [
+    { x: 0.45, y: -0.65 },
+    { x: 0.77, y: -0.28 },
+    { x: 0.75, y: 0.30 },
+    { x: 0.42, y: 0.65 },
+    { x: 0.00, y: 0.66 },
+    { x: -0.42, y: 0.65 },
+    { x: -0.75, y: 0.30 },
+    { x: -0.77, y: -0.28 },
+    { x: -0.45, y: -0.65 }
+  ]
+};
 
 // ────────────────────────── utils base ──────────────────────────
 function normalizeArgs(a, b) {
@@ -82,6 +101,12 @@ function startLiveClockTick() {
     document.querySelectorAll('.seat-timer').forEach(el => {
       const occupied = el.dataset.occupied === '1';
       if (!occupied) { el.textContent = ''; return; }
+      const paused = el.dataset.paused === '1';
+      if (paused) {
+        const base = Number(el.dataset.ptTotal || 0);
+        el.textContent = msToHMS(base);
+        return;
+      }
       const base = Number(el.dataset.ptTotal || 0);
       const last = Number(el.dataset.ptLast || now);
       const live = base + Math.max(0, now - last);
@@ -96,6 +121,101 @@ function stopLiveClockTick() {
   }
 }
 
+// ─────────────────────── tooltip flotante ───────────────────────
+let _activeTooltip = null;
+
+function showSeatTooltip(seatEl, { name, chips, seatInfo }) {
+  if (_activeTooltip) {
+    _activeTooltip.remove();
+    _activeTooltip = null;
+  }
+
+  const ptTotal = Number(seatInfo?.playTime?.totalMs || 0);
+  const ptLast = Number(seatInfo?.playTime?.lastTick || Date.now());
+  const ptPaused = !!seatInfo?.playTime?.paused;
+  const elapsed = ptPaused ? ptTotal : ptTotal + Math.max(0, Date.now() - ptLast);
+
+  const tip = document.createElement('div');
+  tip.className = 'seat-tooltip-float';
+  const totalSec = Math.floor(elapsed / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  const timeStr = h > 0 ? `${pad(h)} : ${pad(m)} : ${pad(s)}` : `${pad(m)} : ${pad(s)}`;
+  tip.innerHTML = `
+    <div class="stf-name">${name}</div>
+    <div class="stf-chips">$${Number(chips).toLocaleString('es-MX')}</div>
+    <div class="stf-time">${timeStr}</div>
+    <div class="stf-hint">Mantén presionado para ver ficha</div>
+  `;
+
+  const rect = seatEl.getBoundingClientRect();
+  tip.style.cssText = `
+    position: fixed;
+    left: ${rect.left + rect.width / 2}px;
+    top: ${rect.top - 8}px;
+    transform: translate(-50%, -100%);
+    background: rgba(10,14,22,.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    z-index: 8000;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,.45);
+    min-width: 120px;
+  `;
+
+  document.body.appendChild(tip);
+  _activeTooltip = tip;
+
+  // Auto-cerrar después de 2.5 segundos
+  setTimeout(() => {
+    if (_activeTooltip === tip) {
+      tip.style.opacity = '0';
+      tip.style.transition = 'opacity .2s ease';
+      setTimeout(() => {
+        tip.remove();
+        if (_activeTooltip === tip) _activeTooltip = null;
+      }, 200);
+    }
+  }, 2500);
+
+  // Cerrar al tocar cualquier otro lado
+  const closeOnOutside = (e) => {
+    if (!seatEl.contains(e.target)) {
+      tip.remove();
+      if (_activeTooltip === tip) _activeTooltip = null;
+      document.removeEventListener('pointerdown', closeOnOutside);
+    }
+  };
+  setTimeout(() => document.addEventListener('pointerdown', closeOnOutside), 100);
+}
+
+// ── Watcher de urgencia de ausencia ──────────────────────────
+let _absenceWatcher = null;
+
+function startAbsenceWatcher(tableEl, maxMinutes) {
+  if (_absenceWatcher) { clearInterval(_absenceWatcher); }
+  const maxMs = (maxMinutes || 15) * 60 * 1000;
+  _absenceWatcher = setInterval(() => {
+    tableEl.querySelectorAll('.absence-ring[data-since]').forEach(ring => {
+      const since = Number(ring.dataset.since || 0);
+      if (!since) return;
+      const elapsed = Date.now() - since;
+      const chip = ring.closest('[data-seat-id]');
+      if (elapsed >= maxMs) {
+        chip?.classList.add('is-urgent');
+      }
+    });
+  }, 5000);
+}
 // ─────────────────────── render principal ───────────────────────
 export function renderTable(a, b) {
   const { tableData, seatsData } = normalizeArgs(a, b);
@@ -142,7 +262,7 @@ export function renderTable(a, b) {
     dealerSeatEl.addEventListener('click', openDealerModal);
     pokerTableEl.appendChild(dealerSeatEl);
 
-    // Auto-flip con sesgo a la cara del dealer (y limpieza en re-render)
+    // Auto-flip del dealer
     const inner = dealerSeatEl.querySelector('.dealer-card__inner');
     let showingFront = true;
     const scheduleNextFlip = () => {
@@ -159,14 +279,17 @@ export function renderTable(a, b) {
     dealerSeatEl.addEventListener('mouseleave', () => scheduleNextFlip());
 
     // Radios elípticos
-    const tableWidth  = Math.max(width, 600);
+    const tableWidth = Math.max(width, 600);
     const tableHeight = Math.max(height, 380);
     const hRadius = tableWidth / 2 + 50;
     const vRadius = tableHeight / 2 + 50;
 
-    // Asientos (mapa esperado: seatsData['seat_1'] …)
-    for (let i = 0; i < seatPositions.length; i++) {
-      const pos = seatPositions[i];
+    // Asientos
+    const maxSeats = Number(tableData?.maxSeats) || 9;
+    const currentLayout = seatLayouts[maxSeats] || seatLayouts[9];
+
+    for (let i = 0; i < currentLayout.length; i++) {
+      const pos = currentLayout[i];
       let x = hRadius * pos.x;
       let y = vRadius * pos.y;
       if (!Number.isFinite(x)) x = 0;
@@ -176,12 +299,13 @@ export function renderTable(a, b) {
       const seatInfo = seatsData?.[seatId] || { status: 'empty', seatNumber: i + 1 };
 
       const st = String(seatInfo?.status || 'empty').toLowerCase();
-      const isOccupied = st !== 'empty' && st !== 'available'
-                      || !!(seatInfo?.name || seatInfo?.playerName || seatInfo?.player?.name)
-                      || Number(seatInfo?.chips ?? seatInfo?.player?.chips ?? 0) > 0;
+      const isOccupied =
+        (st !== 'empty' && st !== 'available') ||
+        !!(seatInfo?.name || seatInfo?.playerName || seatInfo?.player?.name) ||
+        Number(seatInfo?.chips ?? seatInfo?.player?.chips ?? 0) > 0;
 
-      const name   = seatInfo?.player?.name || seatInfo?.playerName || seatInfo?.name || 'Jugador';
-      const chips  = Number(seatInfo?.player?.chips ?? seatInfo?.chips ?? 0);
+      const name = seatInfo?.player?.name || seatInfo?.playerName || seatInfo?.name || 'Jugador';
+      const chips = Number(seatInfo?.player?.chips ?? seatInfo?.chips ?? 0);
       const avatar = seatInfo?.player?.avatar || seatInfo?.avatarUrl || seatInfo?.avatarURL || '/avatars/default.png';
 
       const seatEl = document.createElement('div');
@@ -194,31 +318,56 @@ export function renderTable(a, b) {
 
       if (isOccupied) {
         seatEl.className = 'seat player-seat occupied';
-        const ptTotal = Number(seatInfo?.playTime?.totalMs || 0);
-        const ptLast  = Number(seatInfo?.playTime?.lastTick || Date.now());
+
+        const isAbsent = !!seatInfo?.absent;
+        const absentSince = Number(seatInfo?.absentSince || 0);
 
         seatEl.innerHTML = `
-    <div class="seat-chip full-avatar" aria-label="${name}">
-      <img class="seat-avatar-full" src="${avatar}" alt="${name}">
-    </div>
-    <div class="seat-tooltip" role="tooltip" aria-hidden="true">
-      <strong>${name}</strong>
-      <span>$ ${chips.toLocaleString?.() ?? chips}</span>
-          </div>
-        `;
-        seatEl.addEventListener('click', () =>
-          openPlayerCard(seatId, { ...seatInfo, name, chips, avatar })
-        );
+  <div class="seat-chip full-avatar ${isAbsent ? 'is-absent' : ''}" aria-label="${name}">
+    <img class="seat-avatar-full" src="${avatar}" alt="${name}">
+  </div>
+  ${isAbsent ? `<div class="absence-ring" data-since="${absentSince}"></div>` : ''}
+`;
+
+        // ── Long press = tarjeta completa | Click corto = tooltip ──
+        let pressTimer = null;
+        let didLongPress = false;
+
+        seatEl.addEventListener('pointerdown', () => {
+          didLongPress = false;
+          pressTimer = setTimeout(() => {
+            didLongPress = true;
+            // Cerrar tooltip si estaba abierto
+            if (_activeTooltip) { _activeTooltip.remove(); _activeTooltip = null; }
+            window.dispatchEvent(new CustomEvent('open-player-card', {
+              detail: { seatId, seatInfo: { ...seatInfo, name, chips, avatar } }
+            }));
+          }, 400);
+        });
+
+        seatEl.addEventListener('pointerup', () => {
+          clearTimeout(pressTimer);
+        });
+
+        seatEl.addEventListener('pointercancel', () => {
+          clearTimeout(pressTimer);
+        });
+
+        seatEl.addEventListener('click', () => {
+          if (didLongPress) return;
+          showSeatTooltip(seatEl, { name, chips, seatInfo });
+        });
+
       } else {
         seatEl.className = 'seat player-seat available';
         seatEl.innerHTML = `
           <div class="available-circle"></div>
           <div class="seat-timer" data-seat="${seatId}" data-occupied="0"></div>
         `;
-        seatEl.addEventListener('click', () => openSeatModal(seatId, seatInfo));
+        seatEl.addEventListener('click', () => openSeatModal(seatId, seatInfo, { maxSeats }));
       }
 
-      // badge número
+      // Badge número de asiento
       const badge = document.createElement('span');
       badge.className = 'seat-badge';
       badge.textContent = String(i + 1);
@@ -227,7 +376,7 @@ export function renderTable(a, b) {
       pokerTableEl.appendChild(seatEl);
     }
 
-    // efectos y clock en vivo
+    // Efectos y clock en vivo
     startRandomSeatSparks(pokerTableEl);
     startLiveClockTick();
   });

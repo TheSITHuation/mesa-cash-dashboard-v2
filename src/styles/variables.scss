@@ -1,0 +1,22 @@
+/* tokens base (CSS custom properties) */
+:root{
+  --brand-gold:   #f4c33e;
+  --brand-gold-2: #ffd972;
+  --text:         #e9eef7;
+  --muted:        rgba(255,255,255,.72);
+
+  /* glass defaults */
+  --glass-blur: 18px;
+  --glass-alpha: .18;         /* transparencia de panel */
+  --glass-saturate: 1.25;
+  --glass-contrast: 1.0;
+  --glass-highlight: .10;
+
+  /* liquid */
+  --glass-scale:       120;
+  --glass-base-freq-x: 0.014;
+  --glass-base-freq-y: 0.014;
+  --glass-octaves:     3;
+  --glass-blur-noise:  2.8;
+  --glass-opac:        .50;
+}

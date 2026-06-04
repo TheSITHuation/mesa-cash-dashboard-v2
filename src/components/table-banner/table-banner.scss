@@ -1,6 +1,45 @@
-/* src/components/table-banner/table-banner.scss */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-@import '../../styles/variables';
+@use '../../styles/_variables' as *;
+@use '../../styles/tokens' as *;
+@use '../../styles/mixins' as m;
+@use '../../styles/glass' as *;
+
+/* Contenedor principal del banner */
+.table-banner,
+.info-banner {
+  border-radius: 20px;
+  padding: 12px 16px;
+}
+
+/* Píldoras/meta dentro del banner (ajusta selectores a los tuyos) */
+.table-banner .banner-pill,
+.info-banner .banner-pill,
+.table-banner .meta-chip,
+.info-banner .meta-chip {
+}
+
+/* Timer de cabecera si existe */
+.table-banner .timer,
+.info-banner .timer,
+.table-banner .session-timer,
+.info-banner .session-timer {
+}
+
+/* Botones del banner */
+.table-banner .btn,
+.info-banner .btn {
+  border-radius: 12px;
+}
+.table-banner .btn--danger,
+.info-banner .btn--danger {
+}
+
+
+.info-banner{ @extend .glass-panel; padding:12px 14px; }
+.info-banner h3{ @extend .glass-title; }
+.info-banner .meta .chip{ @extend .glass-pill; }
+.info-banner .timer { @extend .glass-timer !optional; }
+.info-banner .btn{ @extend .glass-btn; }
+
 
 .info-banner {
   position: fixed;
@@ -26,30 +65,31 @@
   align-items: center;
 
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Apple Color Emoji','Segoe UI Emoji';
-  color: $text-light;
+  color: var(--text-2, rgba(255,255,255,.86));
   z-index: 800;
 
   /* --- Efecto de destello animado --- */
   overflow: hidden;
   --shine-duration: 2.8s;
 
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 -55%; /* arranca fuera de la izquierda */
-    width: 55%;
-    height: 100%;
-    pointer-events: none;
-    background: linear-gradient(
-      120deg,
-      transparent,
-      rgba(255,255,255,0.28),
-      rgba(255,255,255,0.18),
-      transparent
-    );
-    transform: skewX(-20deg);
-    animation: bannerShine var(--shine-duration) linear infinite;
-  }
+&::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 40%;
+  width: 30%;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+rgba(255,255,255,.12) 45%,
+rgba(255,255,255,.20) 50%,
+rgba(255,255,255,.12) 55%,
+    transparent 80%
+  );
+  transform: skewX(-15deg);
+  animation: bannerShine var(--shine-duration) ease-in-out infinite;
+}
 
   &::before {
     content: "";
@@ -76,7 +116,7 @@
     }
 
     .label {
-      font-size: .78rem;
+      font-size: .88rem;
       font-weight: 400;
       color: rgba(255,255,255,0.75);
       letter-spacing: .5px;
@@ -110,14 +150,12 @@
   }
 }
 
-/* Keyframes del brillo */
 @keyframes bannerShine {
-  0%   { left: -55%; opacity: 0; }
-  5%   { opacity: .6; }
-  40%  { left: 120%; opacity: 0; } /* llega rápido al final */
-  100% { left: 120%; opacity: 0; } /* pausa el resto del ciclo */
+0%  { left: -35%;  opacity: 0; }
+6%  { opacity: .8; }
+38% { left: 105%;  opacity: 0; }
+100%{ left: 105%;  opacity: 0; }
 }
-
 
 /* Responsive */
 @media (max-width: 720px) {
@@ -147,3 +185,137 @@
   }
 }
 
+/* ───────────── Glass+ BOOST (añadir al final del archivo) ───────────── */
+
+/* Ajustes globales rápidos (sube/baja intensidad si quieres) */
+:root{
+  --glass-blur: 28px;          /* antes 22px */
+  --glass-alpha: .80;          /* más opaco para “cristal” */
+  --glass-saturate: 1.35;      /* más saturación iOS */
+  --glass-contrast: 1.05;      /* leve contraste */
+  --glass-border: .26;         /* borde más definido */
+}
+
+/* Contenedor principal con efecto reforzado */
+.side-panel{
+  position: relative; /* necesario para los pseudo-elementos */
+  overflow: hidden;   /* recorta brillos dentro del radio */
+
+  background:
+    /* grano/ruido sutil (no SVG largo, usamos gradients) */
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.035), transparent 60%),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,.03),  transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.035)),
+    rgba(10,14,22, var(--glass-alpha)) !important;
+
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
+
+  border: 1px solid rgba(255,255,255,var(--glass-border)) !important;
+  box-shadow:
+    0 28px 60px rgba(0,0,0,.50),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+
+/* Brillo superior suave (más notorio) */
+.side-panel::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.32), transparent 42%),
+    radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,.18), transparent 60%);
+  pointer-events:none; opacity:.2;
+}
+
+/* Borde perlado real (truco con máscara) */
+.info-panel::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: inherit;
+  padding:1px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.66),
+    rgba(255,255,255,.22) 28%,
+    rgba(255,255,255,.10) 60%,
+    rgba(255,255,255,.42));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events:none;
+  opacity:.85; /* baja si lo ves muy marcado */
+}
+
+/* Tarjetas internas: un toque más “cristal” y relieve */
+.panel-section{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03)),
+    rgba(14,18,28,.45) !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  box-shadow:
+    0 16px 34px rgba(0,0,0,.38),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+/* Botones/tiles activos: brillo y foco más iOS */
+.state-btn.active{
+  color: #0f1220;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05)),
+    radial-gradient(120% 120% at 50% 8%, rgba(59,130,246,.34), transparent 70%) !important;
+  border-color: rgba(59,130,246,.36) !important;
+  box-shadow:
+    0 16px 28px rgba(59,130,246,.28),
+    inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+/* Timer con más relieve */
+#session-timer, .session-timer, .timer{
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.20)) !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.14),
+    0 14px 30px rgba(0,0,0,.36) !important;
+}
+
+/* Chips de lista de espera: glass unificado */
+.waiting-list-item{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)),
+              rgba(12,16,24,.42) !important;
+  border: 1px solid rgba(255,255,255,.20) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+/* Hover sutil homogéneo */
+.tool-btn:hover, .state-btn:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.16) !important;
+}
+
+/* Fallback (sin blur) — sostén el look */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .info-panel{ background: rgba(21,30,45,.96) !important; }
+}
+/* src/components/table-banner/table-banner.scss */
+.table-banner { @extend .glass-panel; }
+.table-banner .pill, .table-banner .badge { @extend .glass-pill; }
+.table-banner .btn { @extend .glass-btn; }      /* si tienes botones */
+/* Fuerza el banner a anclarse al viewport, centrado */
+.info-banner,
+.table-info-banner,
+.table-banner {
+  position: fixed !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: clamp(12px, 3vh, 28px) !important;
+
+  /* tamaño y capas */
+  width: min(980px, calc(100vw - 40px));
+  margin: 0 !important;
+  z-index: 1900; /* por debajo del side-panel (2000), por encima de la mesa */
+}
+
+/* Por si algún contenedor le inyecta márgenes inesperados */
+.info-banner * { margin-block: 0; }

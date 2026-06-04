@@ -1,0 +1,24 @@
+@use './variables';
+@use './glass';
+
+/* resetcito y tipografía */
+*{ box-sizing:border-box; }
+html,body,#root{ height:100%; }
+body {
+  margin: 0;
+  color: #fff;
+  background-color: #0a0a0f;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(80, 40, 120, 0.06) 0%, transparent 50%);
+  background-attachment: fixed;
+  font-family: 'SF Pro Text', 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Fallback para navegadores antiguos */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-card, .glass-panel, .glass-pill, .glass-btn, .tf-card, .login-card {
+    background: rgba(16, 19, 27, 0.95) !important;
+  }
+}

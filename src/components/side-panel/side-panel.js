@@ -1,5 +1,5 @@
 // src/components/side-panel/side-panel.js
-// Panel lateral (glass) — controla estado de mesa y gobierna timers (panel + asientos)
+// Panel lateral (glass) — controla estado de mesa y timers. Admin emite estado de UI; mirror solo lee.
 
 import { renderWaitingList } from '../waiting-list/waiting-list.js';
 import { listenToTableData, updateTableStatus } from '../../services/firebase/tableService.js';
@@ -10,46 +10,149 @@ import {
   doc, getDoc, onSnapshot, updateDoc, serverTimestamp,
   collection, getDocs, writeBatch
 } from 'firebase/firestore';
+
 import { getTableId } from '../../utils/getTableId.js';
-
 import { startPlayTimeTicker, stopPlayTimeTicker } from '../../services/firebase/playTimeService.js';
+import { setDisplayState } from '../../services/displaySync.js';
 
-// --- DOM ---
-const sidePanelEl      = document.getElementById('side-panel');
-const panelFabBtn      = document.getElementById('panel-fab');
+import { createRoot } from 'react-dom/client';
+import { createElement } from 'react';
+import TimerDisplay from '../timer-display/TimerDisplay.jsx';
 
-const timerEl          = document.getElementById('session-timer');
-const createdAtTextEl  = document.getElementById('created-at-text');
-
-// nuevo: controles con iconos
-const stateIconsWrap   = document.getElementById('state-icons');
-
-// lista / acciones
-const waitingSection   = document.getElementById('waiting-list-section');
-const wlAddBtn         = document.getElementById('wl-add-btn');
-const addPlayerForm    = document.getElementById('add-player-form');
-const addPlayerInput   = document.getElementById('player-name-input');
-const confirmAddBtn    = document.getElementById('confirm-add-player-btn');
-const exportCsvBtn     = document.getElementById('export-csv-btn');
+// --- DOM (se reobtienen en init) ---
+let sidePanelEl = document.getElementById('side-panel');
+let panelFabBtn = document.getElementById('panel-fab');
+let timerRoot     = null;
+let timerEl       = null;
+let createdAtTextEl = null;
+let stateIconsWrap  = null;
+let waitingSection  = null;
+let wlAddBtn        = null;
+let addPlayerForm   = null;
+let addPlayerInput  = null;
+let confirmAddBtn   = null;
+let exportCsvBtn    = null;
 
 let sessionInterval = null;
 
-/* ───────────────────────── helpers de tiempo (UI) ───────────────────────── */
+/* Montaje: asegura panel/FAB bajo <body> creando el HTML dinámicamente */
+function normalizeMountPoint() {
+  if (!document.getElementById('side-panel')) {
+    const aside = document.createElement('aside');
+    aside.id = 'side-panel';
+    aside.className = 'side-panel side-panel--glass';
+    aside.innerHTML = `
+      <div class="panel-content">
+        <div class="panel-header">
+          <span class="panel-header__title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+            Panel de Mesa
+          </span>
+          <div class="panel-header__actions">
+            <button id="panel-mirror-btn" class="panel-icon-btn" title="Abrir espejo">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <section class="panel-section">
+          <div class="panel-section__label">Estado de la Mesa</div>
+          <div class="glass-radio-group" id="state-icons">
+            <input type="radio" name="table-state" id="state-activa" value="activa" />
+            <label for="state-activa" data-state="activa">Activa</label>
+            <input type="radio" name="table-state" id="state-pausa" value="en espera" />
+            <label for="state-pausa" data-state="en espera">Pausa</label>
+            <input type="radio" name="table-state" id="state-stop" value="inactiva" />
+            <label for="state-stop" data-state="inactiva">Stop</label>
+            <div class="glass-glider"></div>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <div class="panel-section__label">Sesión</div>
+          <div class="timer-box-new">
+            <div id="session-timer-root" class="timer-value-new"></div>
+            <div id="created-at-text" class="timer-started-new"></div>
+          </div>
+        </section>
+
+        <section class="panel-section" id="waiting-list-section">
+          <div class="wl-header-new">
+            <div class="panel-section__label" style="margin:0">Lista de Espera</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="wl-badge-count" id="wl-count-badge">0</span>
+              <button id="wl-add-btn" class="wl-add-btn-new">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+            </div>
+          </div>
+          <ul id="waiting-list" class="waiting-list-new"></ul>
+          <div id="add-player-form" class="add-player-form-new hidden">
+            <input type="text" id="player-name-input" class="wl-input-new" placeholder="Nombre..."/>
+            <button id="confirm-add-player-btn" class="wl-submit-new">Añadir</button>
+          </div>
+        </section>
+      </div>
+    `;
+    document.body.appendChild(aside);
+  }
+
+  if (!document.getElementById('panel-fab')) {
+    const fab = document.createElement('button');
+    fab.id = 'panel-fab';
+    fab.className = 'panel-fab';
+    fab.innerHTML = `
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    `;
+    document.body.appendChild(fab);
+  }
+}
+
+/* ===== Tiles visuales ===== */
+function markTile(selector, state = 'on') {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  el.classList.remove('is-on', 'is-danger');
+  if (state === 'on') el.classList.add('is-on');
+  if (state === 'danger') el.classList.add('is-danger');
+}
+function resetTiles() {
+  document.querySelectorAll('.cc-tile').forEach(el => el.classList.remove('is-on', 'is-danger'));
+}
+function reflectStatusOnTiles(status) {
+  resetTiles();
+  if (status === 'activa') markTile('.cc-tile[data-action="play"]', 'on');
+  else if (status === 'en espera') markTile('.cc-tile[data-action="pause"]', 'on');
+  else if (status === 'inactiva') markTile('.cc-tile[data-action="stop"]', 'danger');
+}
+
+/* ===== Tiempo UI ===== */
 function formatTime(totalSeconds) {
-  if (isNaN(totalSeconds) || totalSeconds < 0) return '00:00:00';
-  const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-  const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-  const s = (totalSeconds % 60).toString().padStart(2, '0');
+  if (!Number.isFinite(totalSeconds) || totalSeconds < 0) return '00:00:00';
+  const h = String(Math.floor(totalSeconds / 3600)).padStart(2,'0');
+  const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2,'0');
+  const s = String(totalSeconds % 60).padStart(2,'0');
   return `${h}:${m}:${s}`;
 }
 function computeElapsedForState(d) {
   const state          = d?.sessionState || 'idle';
-  const startMs        = d?.sessionStartAt?.toMillis?.() ?? null;
+  const startAt        = d?.sessionStartAt;
   const pausedTotalMs  = Number(d?.pausedTotalMs || 0);
   const pauseStartedMs = d?.pauseStartedAt?.toMillis?.() ?? null;
 
-  if (!startMs) return 0;
+  // Handle Firestore Timestamp or plain number
+  let startMs = null;
+  if (startAt) {
+    if (typeof startAt.toMillis === 'function') {
+      startMs = startAt.toMillis();
+    } else if (typeof startAt === 'number') {
+      startMs = startAt;
+    } else if (startAt.seconds) {
+      startMs = startAt.seconds * 1000 + (startAt.nanoseconds || 0) / 1e6;
+    }
+  }
 
+  if (!startMs) return 0;
   if (state === 'running') {
     const now = Date.now();
     return Math.max(0, Math.floor((now - startMs - pausedTotalMs) / 1000));
@@ -58,22 +161,29 @@ function computeElapsedForState(d) {
     const stopMs = pauseStartedMs || Date.now();
     return Math.max(0, Math.floor((stopMs - startMs - pausedTotalMs) / 1000));
   }
-  return 0; // idle
+  return 0;
 }
 function startPanelTicker(getData) {
   if (sessionInterval) clearInterval(sessionInterval);
   sessionInterval = setInterval(() => {
     const d = getData();
-    if (timerEl) timerEl.textContent = formatTime(computeElapsedForState(d));
+    if (timerRoot) {
+      const st = d.sessionState || 'idle';
+      const paused = (st === 'paused' || st === 'idle');
+      const elapsed = computeElapsedForState(d);
+      timerRoot.render(createElement(TimerDisplay, { totalSeconds: elapsed, paused }));
+    }
   }, 1000);
 }
 
-/* ────────────── helpers que PERSISITEN sesión en la mesa ─────────────── */
+/* ===== Persistencia de sesión de mesa ===== */
 async function startSession(tableId) {
   const ref = doc(db, 'tables', tableId);
+  // Use local timestamp as fallback, serverTimestamp will overwrite on sync
+  const localNow = Date.now();
   await updateDoc(ref, {
     sessionState: 'running',
-    sessionStartAt: serverTimestamp(),
+    sessionStartAt: localNow,
     pauseStartedAt: null,
     pausedTotalMs: 0,
     updatedAt: serverTimestamp(),
@@ -95,7 +205,6 @@ async function resumeSession(tableId) {
   const pauseStartedAtMs = d?.pauseStartedAt?.toMillis?.() ?? null;
   const pausedTotalMs    = Number(d?.pausedTotalMs || 0);
   const extra            = pauseStartedAtMs ? (Date.now() - pauseStartedAtMs) : 0;
-
   await updateDoc(ref, {
     sessionState: 'running',
     pauseStartedAt: null,
@@ -114,8 +223,7 @@ async function resetSession(tableId) {
   });
 }
 
-/* ────────────── GOBIERNO de timers por asiento (batch) ─────────────── */
-/** Pausa todos los asientos ocupados: acumula delta y marca paused:true */
+/* ===== Timers por asiento (batch) ===== */
 async function pauseAllSeatTimers(tableId) {
   if (!tableId) tableId = getTableId();
   if (!tableId) return;
@@ -123,30 +231,20 @@ async function pauseAllSeatTimers(tableId) {
   const qs = await getDocs(colRef);
   const now = Date.now();
   const batch = writeBatch(db);
-
-  qs.forEach((d) => {
+  qs.forEach(d => {
     const seat = d.data();
     if (!seat || seat.status !== 'occupied') return;
-
     const pt = seat.playTime || {};
     const last = typeof pt.lastTick === 'number' ? pt.lastTick : now;
     const base = Number(pt.totalMs || 0);
     const delta = Math.max(0, now - last);
-
     batch.update(d.ref, {
-      playTime: {
-        totalMs: base + delta,
-        lastTick: now,
-        paused: true
-      },
+      playTime: { totalMs: base + delta, lastTick: now, paused: true },
       updatedAt: serverTimestamp()
     });
   });
-
   await batch.commit();
 }
-
-/** Reanuda todos los asientos ocupados: paused:false y lastTick=now */
 async function resumeAllSeatTimers(tableId) {
   if (!tableId) tableId = getTableId();
   if (!tableId) return;
@@ -154,35 +252,87 @@ async function resumeAllSeatTimers(tableId) {
   const qs = await getDocs(colRef);
   const now = Date.now();
   const batch = writeBatch(db);
-
-  qs.forEach((d) => {
+  qs.forEach(d => {
     const seat = d.data();
     if (!seat || seat.status !== 'occupied') return;
     const pt = seat.playTime || {};
     batch.update(d.ref, {
-      playTime: {
-        totalMs: Number(pt.totalMs || 0),
-        lastTick: now,
-        paused: false
-      },
+      playTime: { totalMs: Number(pt.totalMs || 0), lastTick: now, paused: false },
       updatedAt: serverTimestamp()
     });
   });
-
   await batch.commit();
 }
 
-/* ───────────────────────────── Init principal ─────────────────────────── */
+/* ===== Init principal ===== */
 export function initSidePanel(mesaData) {
+  normalizeMountPoint();
+
+  // Re-obtener referencias después de montar el DOM
+  sidePanelEl      = document.getElementById('side-panel');
+  panelFabBtn      = document.getElementById('panel-fab');
+  const timerRootEl = document.getElementById('session-timer-root');
+  createdAtTextEl  = document.getElementById('created-at-text');
+  stateIconsWrap   = document.getElementById('state-icons');
+  waitingSection   = document.getElementById('waiting-list-section');
+  wlAddBtn         = document.getElementById('wl-add-btn');
+  addPlayerForm    = document.getElementById('add-player-form');
+  addPlayerInput   = document.getElementById('player-name-input');
+  confirmAddBtn    = document.getElementById('confirm-add-player-btn');
+  exportCsvBtn     = document.getElementById('export-csv-btn');
+
+  if (!sidePanelEl) return;
+
+  // Mount React timer
+  if (timerRootEl && !timerRoot) {
+    timerRoot = createRoot(timerRootEl);
+    timerRoot.render(createElement(TimerDisplay, { totalSeconds: 0, paused: true }));
+  }
+
   if (!sidePanelEl) return;
 
   const tableId = mesaData?.id || getTableId();
 
-  // FAB open/close
+  // Seguridad: cuelga en body
+  if (sidePanelEl.parentElement !== document.body) document.body.appendChild(sidePanelEl);
+  if (panelFabBtn && panelFabBtn.parentElement !== document.body) document.body.appendChild(panelFabBtn);
+
+  const IS_DISPLAY = document.body.classList.contains('is-display');
+
+  // ── ADMIN: emite al mirror apertura/cierre y cambio de tab ──
+  if (!IS_DISPLAY) {
+    // Emite panelOpen cuando cambia la clase
+    const obs = new MutationObserver(() => {
+      const open = sidePanelEl.classList.contains('is-open');
+      setDisplayState(tableId, { panelOpen: !!open, ts: Date.now() });
+    });
+    obs.observe(sidePanelEl, { attributes: true, attributeFilter: ['class'] });
+
+    // Emite pestaña activa cuando se hace clic en tabs dentro del panel
+    sidePanelEl.addEventListener('click', (ev) => {
+      const btn = ev.target.closest?.('[data-panel-tab],[data-tab]');
+      if (!btn) return;
+      const tab = btn.dataset.panelTab || btn.dataset.tab;
+      if (tab) setDisplayState(tableId, { activePanelTab: tab, ts: Date.now() });
+    });
+
+    // Estado inicial
+    setDisplayState(tableId, { panelOpen: sidePanelEl.classList.contains('is-open'), ts: Date.now() });
+  }
+
+  // ▶ Abierto por defecto (excepto en display)
+  if (!IS_DISPLAY) {
+    sidePanelEl.classList.add('is-open');
+    panelFabBtn?.classList.add('is-open');
+  }
+
+  // FAB open/close (en display está oculto por CSS)
   panelFabBtn?.addEventListener('click', () => {
     sidePanelEl.classList.toggle('is-open');
     panelFabBtn.classList.toggle('is-open');
   });
+
+  // Cerrar con ESC
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && sidePanelEl.classList.contains('is-open')) {
       sidePanelEl.classList.remove('is-open');
@@ -194,23 +344,21 @@ export function initSidePanel(mesaData) {
   const createdAt = mesaData?.createdAt?.toDate?.() || new Date();
   if (createdAtTextEl) {
     const fmt = { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true };
-    createdAtTextEl.textContent = `🕓 Iniciada el: ${createdAt.toLocaleString('es-MX', fmt)}`;
+    createdAtTextEl.textContent = `Iniciada el: ${createdAt.toLocaleString('es-MX', fmt)}`;
   }
 
-  // Controles de estado con iconos
+  // Controles de estado (radio group)
   stateIconsWrap?.addEventListener('click', async (ev) => {
-    const btn = ev.target.closest('.state-btn');
-    if (!btn) return;
-    const status = btn.dataset.state; // 'activa' | 'en espera' | 'inactiva'
+    const label = ev.target.closest('label[data-state]');
+    if (!label) return;
+    const status = label.dataset.state;
+    const radio = stateIconsWrap.querySelector(`input[value="${status}"]`);
+    if (radio) radio.checked = true;
 
-    // pinta activo
-    for (const el of stateIconsWrap.querySelectorAll('.state-btn')) el.classList.remove('active');
-    btn.classList.add('active');
+    // persiste status de mesa
+    updateTableStatus(status, tableId);
 
-    // Guarda status de la mesa (campo status)
-    updateTableStatus(status);
-
-    // Controla sesión + timers por asiento + ticker central
+    // timers + ticker
     try {
       const ref  = doc(db, 'tables', tableId);
       const snap = await getDoc(ref);
@@ -220,90 +368,86 @@ export function initSidePanel(mesaData) {
         await resumeAllSeatTimers(tableId);
         if (d.sessionState === 'paused') await resumeSession(tableId);
         else if (d.sessionState !== 'running') await startSession(tableId);
-        startPlayTimeTicker(tableId);                // asegura escritura periódica
-        timerEl && (timerEl.dataset.paused = '0');   // UI
+        startPlayTimeTicker(tableId);
+        if (timerEl) timerEl.dataset.paused = '0';
       } else if (status === 'en espera') {
         await pauseAllSeatTimers(tableId);
         if (d.sessionState === 'running') await pauseSession(tableId);
         stopPlayTimeTicker();
-        timerEl && (timerEl.dataset.paused = '1');
+        if (timerEl) timerEl.dataset.paused = '1';
       } else if (status === 'inactiva') {
         await pauseAllSeatTimers(tableId);
         await resetSession(tableId);
         stopPlayTimeTicker();
-        timerEl && (timerEl.dataset.paused = '1');
+        if (timerEl) timerEl.dataset.paused = '1';
       }
+
+      reflectStatusOnTiles(status);
     } catch (e) {
       console.error('[side-panel] error controlando sesión', e);
     }
   });
 
-  // Realtime del doc mesa para timer y estado activo
+  // Realtime mesa para timer/estado/fecha
   const tableRef = doc(db, 'tables', tableId);
   let latestData = mesaData || {};
   onSnapshot(tableRef, (snap) => {
     if (!snap.exists()) return;
     latestData = snap.data();
 
-    // marca icono activo si viene status desde backend
     if (latestData.status && stateIconsWrap) {
-      for (const el of stateIconsWrap.querySelectorAll('.state-btn')) {
-        el.classList.toggle('active', el.dataset.state === latestData.status);
-      }
+      const radio = stateIconsWrap.querySelector(`input[value="${latestData.status}"]`);
+      if (radio) radio.checked = true;
+      reflectStatusOnTiles(latestData.status);
     }
-    // dataset.paused según sessionState
-    if (timerEl) {
+
+    if (createdAtTextEl && latestData.createdAt?.toDate) {
+      const dt = latestData.createdAt.toDate();
+      const fmt = { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true };
+      createdAtTextEl.textContent = `Iniciada el: ${dt.toLocaleString('es-MX', fmt)}`;
+    }
+
+    if (timerRoot) {
       const st = latestData.sessionState || 'idle';
-      timerEl.dataset.paused = (st === 'paused' || st === 'idle') ? '1' : '0';
-      timerEl.textContent = formatTime(computeElapsedForState(latestData));
+      const paused = (st === 'paused' || st === 'idle');
+      const elapsed = computeElapsedForState(latestData);
+      timerRoot.render(createElement(TimerDisplay, { totalSeconds: elapsed, paused }));
     }
   });
   startPanelTicker(() => latestData);
 
-  // Waitlist realtime (tu lógica de siempre)
-  listenToTableData((tableData) => {
+  // Waitlist realtime (si usas este render)
+  const unlisten = listenToTableData((tableData) => {
     if (!tableData) return;
     renderWaitingList(tableData.waitingList);
-  });
+  }, tableId);
 
-  // Botón icono "añadir jugador" -> muestra/oculta el formulario
-  wlAddBtn?.addEventListener('click', () => {
-    waitingSection?.classList.toggle('is-adding');
-    if (waitingSection?.classList.contains('is-adding')) {
-      setTimeout(() => addPlayerInput?.focus(), 50);
-    }
-  });
-
-  // Confirmar añadir
-  confirmAddBtn?.addEventListener('click', async () => {
-    const name = (addPlayerInput?.value || '').trim();
-    if (!name) return;
-    await addToWaitingList(name, tableId);
-    if (addPlayerInput) addPlayerInput.value = '';
-    waitingSection?.classList.remove('is-adding');
-  });
+  // Botón espejo
+document.getElementById('panel-mirror-btn')?.addEventListener('click', () => {
+  const tid = tableId || getTableId();
+  if (!tid) return;
+  window.open(`${location.origin}${location.pathname}?mirror=1&table=${tid}`, '_blank');
+});
 
   // Export CSV
   exportCsvBtn?.addEventListener('click', handleExportCSV);
-  console.log('Side panel listo.');
+
+
 }
 
-/* ───────────────────────────── CSV (placeholder) ───────────────────────── */
+/* ===== CSV placeholder ===== */
 async function handleExportCSV() {
   alert('Generando reporte CSV...');
-
   const reportData = await getTableReportData();
   if (!reportData || !reportData.tableInfo || !reportData.seats) {
     alert('No se pudieron obtener los datos para generar el reporte.');
     return;
   }
-
   const headers = ['Asiento','Jugador','Fichas Finales','Total Comprado','Tiempo en Mesa (HH:MM:SS)'];
   let csvContent = headers.join(',') + '\r\n';
-
-  reportData.seats.forEach((seat) => {
+  reportData.seats.forEach(seat => {
     if (seat.status === 'occupied') {
-      const totalBuyIn = seat.buyInHistory ? seat.buyInHistory.reduce((a, b) => a + b, 0) : 0;
+      const totalBuyIn = seat.buyInHistory ? seat.buyInHistory.reduce((a,b)=>a+b,0) : 0;
       const sessionSeconds = seat.sitDownTime ? Math.floor((new Date() - seat.sitDownTime.toDate()) / 1000) : 0;
       const row = [
         seat.id.replace('asiento_', ''),
@@ -315,20 +459,15 @@ async function handleExportCSV() {
       csvContent += row.join(',') + '\r\n';
     }
   });
-
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url  = URL.createObjectURL(blob);
-  const timestamp = new Date().toISOString().slice(0,16).replace('T','_').replace(/:/g,'-');
+  const ts = new Date().toISOString().slice(0,16).replace('T','_').replace(/:/g,'-');
   link.href = url;
-  link.download = `reporte_mesa_${timestamp}.csv`;
+  link.download = `reporte_mesa_${ts}.csv`;
   link.style.display = 'none';
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 }
-
-// Si tienes un servicio real de reportes, reemplázalo.
-async function getTableReportData() {
-  return null;
-}
+async function getTableReportData() { return null; }

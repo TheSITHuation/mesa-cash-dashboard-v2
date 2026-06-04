@@ -17,7 +17,7 @@ export function renderStartScreen() {
   const logo = document.createElement('div');
   logo.className = 'start-screen__logo';
   const img = document.createElement('img');
-  img.src = 'public/casino-logo.png'; // Ruta ya válida desde /public
+  img.src = '/branding/logo.png'; // Ruta ya válida desde /public
   img.alt = 'Logo del Casino';
   logo.appendChild(img);
 
@@ -47,12 +47,7 @@ export function renderStartScreen() {
 export function destroyStartScreen() {
   const screen = document.querySelector('.start-screen');
   if (!screen) return;
-
-  screen.classList.add('fade-out');
-
-  screen.addEventListener('animationend', () => {
-    screen.remove();
-    document.body.classList.remove('start-screen-active');
-  }, { once: true });
+  screen.remove(); // eliminar directo sin animación
+  document.body.classList.remove('start-screen-active');
 }
 

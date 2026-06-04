@@ -1,11 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap');
-@import '../../styles/variables';
+/* ¡Nada antes de estas líneas! */
+@use "sass:color";
+@use "../../styles/tokens" as *;
+@use "../../styles/legacy" as *;
+@use '../../styles/variables' as *;
+
+
+$table-border-color: $ring !default;
+$armrest-base: $table-border-color !default;
+
+/* ===== Tokens de control del brillo/destellos ===== */
+:root{
+  /* velocidad del destello sobre AVATARES OCUPADOS (más grande = más lento) */
+  --seat-sheen-duration: 8s;
+
+  /* velocidad del shine de ASIENTOS DISPONIBLES */
+  --available-sheen-duration: 2.2s;
+}
 
 /* Armrest (descansa-brazos) */
 $armrest-thickness: 20px;                  // grosor del aro (antes era tu border)
 $armrest-base:      $table-border-color;   // color del aro (conserva tu dorado)
-$armrest-dark:      mix(#000, $armrest-base, 35%);
-$armrest-lite:      mix(#fff, $armrest-base, 25%);
+$armrest-dark:      color.mix(#000, $armrest-base, 35%);
+$armrest-lite:      color.mix(#fff, $armrest-base, 25%);
 
 /* =========================================================
    CONFIG RÁPIDA
@@ -29,20 +45,22 @@ $seat-size: 100px;            // tamaño del chip de asiento (ancho/alto)
   height: 450px;
   border-radius: 225px;
 
-  /* Color base del paño */
-  background: #0d47a1; /* puedes cambiarlo por tu $table-color si ya lo tienes */
+  /* Color base del paño - Premium Charcoal */
+  background: radial-gradient(ellipse at center, #1e2024 0%, #0a0b0d 100%);
 
-  /* Textura sobrepuesta */
+  /* Textura sobrepuesta de fieltro premium */
   background-image: 
-    url("https://www.transparenttextures.com/patterns/fake-brick.png"),
-    radial-gradient(120% 90% at 50% 20%, rgba(255,255,255, .06), transparent 55%),
-    radial-gradient(120% 120% at 50% 70%, rgba(0,0,0, .28), transparent 60%);
+    url("https://www.transparenttextures.com/patterns/carbon-fibre.png"),
+    radial-gradient(120% 90% at 50% 20%, rgba(212,175,55, .08), transparent 55%),
+    radial-gradient(120% 120% at 50% 70%, rgba(0,0,0, .4), transparent 60%);
 
   background-repeat: repeat, no-repeat, no-repeat;
   background-size: auto, cover, cover;
-  background-blend-mode: multiply, soft-light, normal;
+  background-blend-mode: overlay, screen, normal;
 
-  border: 20px solid $table-border-color;
+  /* Borde de la mesa (Rail) en cuero negro con filo de oro */
+  border: $armrest-thickness solid #111;
+  position: relative;
 
   box-shadow:
     inset 0 0 26px rgba(0,0,0,.50),
@@ -58,18 +76,20 @@ $seat-size: 100px;            // tamaño del chip de asiento (ancho/alto)
   &::before {
     content: "";
     position: absolute;
-    inset: -20px;
+    inset: -#{$armrest-thickness};
     border-radius: inherit;
     pointer-events: none;
-    padding: 20px;
-    background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(0,0,0,0));
+    padding: $armrest-thickness;
+    background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,0.4));
     -webkit-mask:
-      radial-gradient(closest-side, #000 99%, transparent 100%) content-box,
+      radial-gradient(closest-side, #000 99.5%, transparent 100%) content-box,
       radial-gradient(farthest-side, #000 0) padding-box;
     mask:
-      radial-gradient(closest-side, #000 99%, transparent 100%) content-box,
+      radial-gradient(closest-side, #000 99.5%, transparent 100%) content-box,
       radial-gradient(farthest-side, #000 0) padding-box;
-    box-shadow: 0 2px 0 rgba(0,0,0,.25);
+    box-shadow: 
+      inset 0 0 0 2px rgba(212,175,55,0.4), /* El hilo de oro interno */
+      0 4px 12px rgba(0,0,0,0.6);
   }
 
   &::after {
@@ -91,8 +111,8 @@ $seat-size: 100px;            // tamaño del chip de asiento (ancho/alto)
   left: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  opacity: .16;               /* discreto para no robar foco */
-  filter: none;               /* sin efectos */
+  opacity: .08;               /* Ultra discreto, marca de agua premium */
+  filter: sepia(1) saturate(2) hue-rotate(5deg) brightness(1.2); /* Tono dorado suave */
 }
 
 .table-logo img {
@@ -110,7 +130,7 @@ $seat-size: 100px;            // tamaño del chip de asiento (ancho/alto)
   width: $seat-size;
   height: $seat-size;
   border-radius: 50%;
-  border: .05px solid rgba(255,255,255,.8);
+  border: 1px solid rgba(255,255,255,.2);
   box-shadow: 0 2px 5px rgba(0,0,0,.3);
   cursor: pointer;
   transition: transform .2s ease;
@@ -311,15 +331,15 @@ $seat-size: 100px;            // tamaño del chip de asiento (ancho/alto)
 
 .player-seat.occupied:hover .seat-chip.full-avatar::after {
   opacity: 1;
-  animation: seatSheenHold 4s ease infinite;   /* 1 pasada + pausa larga */
+  animation: seatSheenHold var(--seat-sheen-duration) ease-in-out infinite;
 }
 
 /* Cruza de izquierda a derecha y luego se queda “muerto” (pausa) */
 @keyframes seatSheenHold {
   0%   { transform: translateX(-130%) skewX(-20deg); opacity: 0; }
-  10%  { opacity: 1; }
-  30%  { transform: translateX(130%)  skewX(-20deg); opacity: 0; }
-  100% { transform: translateX(130%)  skewX(-20deg); opacity: 0; } /* pausa */
+  10%  { opacity: 1; }                          /* entra y enciende */
+  60%  { transform: translateX(130%) skewX(-20deg); opacity: 0; }  /* cruza LENTO */
+  100% { transform: translateX(130%) skewX(-20deg); opacity: 0; }  /* pausa larga */
 }
 
 /* Brillo sobre el chip — versión **estática y sutil** (sin cruzar el avatar) */
@@ -479,25 +499,66 @@ position: absolute;
   background: linear-gradient(110deg, transparent, rgba(255,255,255,.25), transparent);
   border-radius: 0%;            /* coincide con el contenedor circular */
   pointer-events: none;
-  animation: seatShine 1s forwards;
+  animation: seatShine var(--available-sheen-duration) forwards;
 }
 
 @keyframes seatShine {
   from { transform: rotate(25deg) translateX(-120%); }
   to   { transform: rotate(25deg) translateX(120%); }
 }
-
-
-/* Cuando JS agrega la clase .auto-sheen se dispara 1 pasada */
 .player-seat.occupied.auto-sheen .seat-chip.full-avatar::after {
   opacity: 1;
-  animation: seatSheenHold 1.6s ease forwards; /* misma keyframe que ya tienes */
+  animation: seatSheenHold 1.6s ease forwards;
 }
+
+
 
 /* Si el usuario prefiere menos movimiento, desactivamos la auto-animación */
 @media (prefers-reduced-motion: reduce) {
-  .player-seat.occupied.auto-sheen .seat-chip.full-avatar::after {
-    animation: none !important;
-    opacity: 0 !important;
-  }
+  .player-seat:hover .available-circle::after { animation: none; }
+}
+
+@keyframes tooltipFadeIn {
+  from { opacity: 0; transform: translate(-50%, -90%); }
+  to   { opacity: 1; transform: translate(-50%, -100%); }
+}
+.seat-tooltip-float {
+  .stf-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .stf-chips { font-size: 16px; font-weight: 700; color: #fdd835; margin-bottom: 2px; }
+  .stf-time { font-size: 12px; color: rgba(255,255,255,.6); margin-bottom: 4px; }
+  .stf-hint { font-size: 10px; color: rgba(255,255,255,.35); font-style: italic; }
+}
+// ── Pulso de ausencia ──────────────────────────
+.player-seat .absence-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2.5px solid #ffd60a;
+  animation: absencePulse 1.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.player-seat.is-urgent .absence-ring {
+  border-color: #ff453a;
+  animation: absencePulseUrgent .8s ease-in-out infinite;
+}
+
+.player-seat .seat-chip.is-absent .seat-avatar-full {
+  filter: brightness(.75) saturate(.5);
+  transition: filter .3s;
+}
+
+@keyframes absencePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .3; transform: scale(1.1); }
+}
+
+@keyframes absencePulseUrgent {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px #ff453a88; }
+  50%       { opacity: .4; transform: scale(1.14); box-shadow: 0 0 20px #ff453a; }
+}
+
+.seat-chip {
+  position: relative;
 }

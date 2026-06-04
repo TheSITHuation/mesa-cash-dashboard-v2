@@ -1,6 +1,6 @@
 // src/services/firebase/seatService.js
 // CRUD sobre tables/{tableId}/seats
-import { doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, deleteDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig.js';
 import { getTableId } from '../../utils/getTableId.js';
 
@@ -32,6 +32,19 @@ export async function sitPlayer(tableId, seatId, player) {
   const chips = Number(player?.chips ?? 0);
   const avatarUrl = String(player?.avatarUrl || player?.avatar || '') || '/avatars/default.png';
 
+  // Check table status to determine if seat timer should start immediately
+  let tablePaused = true;
+  try {
+    const tableSnap = await getDoc(doc(db, 'tables', tid));
+    if (tableSnap.exists()) {
+      const tData = tableSnap.data();
+      const st = String(tData?.status || '').toLowerCase();
+      tablePaused = (st !== 'activa' && st !== 'active');
+    }
+  } catch {
+    // fallback: assume paused
+  }
+
   await setDoc(
     seatRef(tid, sid),
     {
@@ -45,7 +58,7 @@ export async function sitPlayer(tableId, seatId, player) {
 
       player: { id: player?.id ?? null, name, chips, avatar: avatarUrl },
 
-      playTime: { totalMs: 0, lastTick: now },
+      playTime: { totalMs: 0, lastTick: now, paused: tablePaused },
 
       buyIns: Number(player?.buyIns ?? 1),
       movements: Array.isArray(player?.movements) ? player.movements : [],

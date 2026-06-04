@@ -15,5 +15,5 @@ export async function cleanupSeatsSubcollection() {
 
   await Promise.all(deletions);
 
-  console.log(`🔥 Subcolección 'seats' eliminada (${snapshot.docs.length} documentos)`);
+
 }

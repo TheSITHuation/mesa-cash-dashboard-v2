@@ -1,0 +1,31 @@
+/* src/styles/_tokens.scss */
+
+/* ====== Fuentes ====== */
+$font-main: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+  "Segoe UI Emoji", sans-serif !default;
+
+$font-title: "Inter", "SF Pro Display", "Poppins", $font-main !default;
+$font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+  "Liberation Mono", "Courier New", monospace !default;
+
+/* ====== Colores de texto ====== */
+$text-0: #fff !default;
+$text-1: rgba(255,255,255,.92) !default;
+$text-light: rgba(255,255,255,.86) !default;
+$text-dim: rgba(255,255,255,.65) !default;
+$text-muted: rgba(255,255,255,.45) !default;
+
+/* ====== Superficies / bordes ====== */
+$panel: rgba(255,255,255,.06) !default;
+$panel-strong: rgba(255,255,255,.10) !default;
+$ring: rgba(255,255,255,.18) !default;
+
+/* ====== Marca / tema ====== */
+$brand-1: #d9b66f !default;
+$primary-dark: #0d0f12 !default;     /* la pedías en _base.scss */
+$light-gold: $brand-1 !default;      /* usado en títulos */
+
+/* ====== Radios ====== */
+$radius-xl: 16px !default;
+$radius-2xl: 20px !default;

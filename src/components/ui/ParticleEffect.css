@@ -1,0 +1,19 @@
+/* src/components/ui/ParticleEffect.css */
+
+.particle-container {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.particle {
+  position: absolute;
+  width: var(--particle-size, 6px);
+  height: var(--particle-size, 6px);
+  border-radius: 50%;
+  background: var(--particle-color, #ffd766);
+  box-shadow:
+    0 0 6px var(--particle-color, #ffd766),
+    0 0 12px var(--particle-color, #ffd766);
+  will-change: transform, opacity;
+}

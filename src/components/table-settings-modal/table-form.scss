@@ -1,57 +1,247 @@
-/* src/components/table-settings-modal/table-form.scss */
+/* === Table Form (glass liquid, sin brillos) =============================== */
 
-.table-form {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #111;
-  padding: 30px;
-  border-radius: 12px;
-  border: 1px solid #333;
-  box-shadow: 0 0 20px rgba(255, 204, 0, 0.1);
-  z-index: 1000;
-  width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  font-family: 'Segoe UI', sans-serif;
-  color: #eee;
-}
+/* Ámbito: funcionará si el contenedor tiene CUALQUIERA de estas marcas */
+.table-form,
+.table-settings-modal,
+#table-form-modal,
+#table-settings-modal {
+  --tf-alpha: .32;                 /* ← transparencia del panel */
+  --tf-alpha-2: .24;               /* inputs/botones */
+  --tf-border: rgba(255,255,255,.08);
+  --tf-ring:   rgba(94,129,255,.55);
+  --tf-radius: 20px;
+  --tf-shadow: 0 6px 26px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.28);
 
-.table-form h2 {
-  color: #ffcc00;
-  margin-bottom: 10px;
-  text-align: center;
-}
+  /* Overlay modal opcional (si tu markup lo usa) */
+  &.tf-overlay {
+    position: fixed; inset: 0; z-index: 3000;
+    display: grid; place-items: center;
+    background: rgba(8,12,18,.35);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
 
-.table-form label {
-  font-size: 14px;
-  margin-bottom: 4px;
-}
+  /* Tarjeta contenedora del formulario */
+  .tf-card {
+    width: min(820px, 94vw);
+    background: rgba(12,16,22,var(--tf-alpha));
+    border: 1px solid var(--tf-border);
+    border-radius: var(--tf-radius);
+    box-shadow: var(--tf-shadow);
+    backdrop-filter: blur(6px) saturate(1.05);
+    -webkit-backdrop-filter: blur(6px) saturate(1.05);
+    padding: clamp(16px, 3vw, 28px);
+    color: rgba(255,255,255,.96);
+    position: relative;
+  }
 
-.table-form input,
-.table-form select {
-  padding: 10px;
-  border: 1px solid #444;
-  border-radius: 6px;
-  background: #1b1b1b;
-  color: #fff;
-  font-size: 15px;
-}
+  /* Cabecera */
+  .tf-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .tf-title {
+    margin: 0; font-size: clamp(18px, 3vw, 22px); font-weight: 700;
+    letter-spacing: .2px;
+  }
 
-.table-form button {
-  background-color: #ffcc00;
-  color: #111;
-  border: none;
-  padding: 12px;
-  font-weight: bold;
-  font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
+  /* Slot preview */
+  .tf-slot-preview {
+    background: rgba(48, 209, 88, 0.1);
+    border: 1px solid rgba(48, 209, 88, 0.2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .tf-slot-preview strong {
+    color: #30d158;
+    font-weight: 600;
+  }
+  .tf-slot-preview--full {
+    background: rgba(255, 69, 58, 0.1);
+    border-color: rgba(255, 69, 58, 0.2);
+  }
+  .tf-slot-preview--full strong {
+    color: #ff453a;
+  }
 
-.table-form button:hover {
-  background-color: #ffd633;
+  /* Wheel picker vertical (tipo iOS slot machine) */
+  .tf-wheel-picker {
+    position: relative;
+    height: 144px; /* 3 items visibles (48px cada uno) */
+    overflow: hidden;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 8px;
+    
+    /* Línea central de selección */
+    &__highlight {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 48px;
+      transform: translateY(-50%);
+      background: rgba(48, 209, 88, 0.08);
+      border-top: 1px solid rgba(48, 209, 88, 0.3);
+      border-bottom: 1px solid rgba(48, 209, 88, 0.3);
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* Gradientes superior e inferior para efecto de profundidad */
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 48px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    &::before {
+      top: 0;
+      background: linear-gradient(to bottom, rgba(12, 16, 22, 0.9), transparent);
+    }
+    &::after {
+      bottom: 0;
+      background: linear-gradient(to top, rgba(12, 16, 22, 0.9), transparent);
+    }
+    
+    &__track {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 0;
+      
+      &::-webkit-scrollbar { display: none; }
+    }
+    
+    &__spacer {
+      height: 48px; /* Centrar el primer item */
+      flex-shrink: 0;
+    }
+  }
+
+  .tf-wheel-item {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    
+    &__label {
+      font-size: 20px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.3);
+      transition: all 0.15s ease;
+    }
+    
+    &.selected {
+      .tf-wheel-item__label {
+        color: #30d158;
+        font-weight: 700;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .tf-help {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
+  }
+
+  /* Grid del formulario */
+  form { margin: 0; }
+  .tf-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+  }
+  @media (max-width: 680px){
+    .tf-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Campos */
+  .tf-field { display: flex; flex-direction: column; gap: 6px; }
+  .tf-label {
+    font-size: .95rem; font-weight: 600;
+    color: rgba(255,255,255,.88);
+  }
+  .tf-help  {
+    font-size: .80rem; color: rgba(255,255,255,.65);
+  }
+
+  /* Inputs */
+  .tf-input,
+  input[type="text"], input[type="number"], select {
+    appearance: none;
+    background: rgba(255,255,255,.06);
+    border: 1px solid var(--tf-border);
+    border-radius: 12px;
+    color: #fff;
+    padding: 10px 12px;
+    outline: none;
+    transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .tf-input:focus,
+  input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    border-color: var(--tf-ring);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tf-ring) 35%, transparent);
+    background: rgba(255,255,255,.10);
+  }
+
+  /* Fila compacta (SB/BB, min/max, etc.) */
+  .tf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px){ .tf-row { grid-template-columns: 1fr; } }
+
+  /* Switch/checkbox */
+  .tf-switch {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid var(--tf-border);
+    padding: 8px 10px;
+    border-radius: 12px;
+  }
+  .tf-switch input { accent-color: #5e81ff; width: 18px; height: 18px; }
+
+  /* Acciones */
+  .tf-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    margin-top: 16px;
+  }
+  .btn { cursor: pointer; }
+
+  .btn.glass-btn {
+    background: rgba(12,16,22,var(--tf-alpha-2));
+    border: 1px solid var(--tf-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+  .btn.glass-btn:hover { background: rgba(255,255,255,.08); }
+
+  .btn-primary {
+    background: linear-gradient(180deg, #ffd972, #f4c33e);
+    color: #161616;
+    font-weight: 700;
+    border: 1px solid rgba(0,0,0,.12);
+  }
+  .btn-ghost { background: rgba(255,255,255,.08); }
+
+  /* Quitar brillos heredados */
+  &::before, &::after,
+  .tf-card::before, .tf-card::after { content: none !important; }
 }

@@ -1,36 +1,33 @@
-// src/styles/_base.scss
+/* src/styles/_base.scss */
+@use "./tokens" as *;
 
-// ¡ESTA LÍNEA ES LA SOLUCIÓN!
-// Importa las variables al principio para que estén disponibles en todo el archivo.
-@import 'variables';
+/* ---- Reset Básico ---- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-// ---- Reset Básico ----
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ---- Estilos Globales ---- */
+html, body { height: 100%; }
 
-// ---- Estilos Globales ----
 body {
   font-family: $font-main;
-  background-color: $primary-dark; // Variable correcta del nuevo tema
-  color: $text-light;           // Variable correcta del nuevo tema
+  background-color: #0a0a0f;
+  color: $text-light;
   line-height: 1.6;
-      background-image: 
-        radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-    background-position: 0 0, 20px 20px;
+
+  /* Fondo premium con degradados profundos */
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(80, 40, 120, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, #0a0a0f 0%, #050508 100%);
+  background-attachment: fixed;
 }
 
 h1, h2, h3 {
   line-height: 1.2;
   margin-bottom: 1rem;
-  color: $light-gold; // Usamos el dorado para los títulos
+  color: $light-gold;
 }
 
-// Estilo para el contenedor principal de la aplicación
+/* Estilo para el contenedor principal */
 #app {
   max-width: 1400px;
   margin: 0 auto;

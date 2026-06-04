@@ -1,0 +1,28 @@
+@use "./tokens" as *;
+
+/* Compartidos como placeholders y mixins */
+%glass-surface {
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border: 1px solid $ring;
+  border-radius: $radius-xl;
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  box-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 8px 24px rgba(0,0,0,.25);
+}
+
+%glass-pill {
+  @extend %glass-surface;
+  padding: 10px 14px;
+}
+
+%glass-timer {
+  @extend %glass-surface;
+  padding: 14px 16px;
+  color: $text-light;
+  font-weight: 700;
+}
+
+/* Mixins equivalentes si prefieres @include */
+@mixin glass-surface { @extend %glass-surface; }
+@mixin glass-pill    { @extend %glass-pill; }
+@mixin glass-timer   { @extend %glass-timer; }

@@ -1,0 +1,87 @@
+/* Player Card aún más cristal */
+.theme-liquid #player-card-modal .player-card-header{
+  background:
+    radial-gradient(120% 120% at 50% -40%, rgba(255,255,255,.28), transparent 62%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+}
+.theme-liquid #player-card-modal .player-card-body{
+  background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.16));
+}
+.theme-liquid .pc-row{
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+  border-color: rgba(255,255,255,.20);
+}
+
+/* Side panel más transparente */
+.theme-liquid .side-panel{
+  padding: 12px;                 /* borde interior respira más */
+  background:
+    radial-gradient(140% 110% at 50% -20%, rgba(255,255,255,.24), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.05)),
+    rgba(10,14,22, .20) !important;  /* <— base muy clara */
+}
+
+/* ======= LOBBY – Rect pack & sheen fix ======= */
+
+/* 1) Hero más limpio y brillo alineado */
+.lobby-hero__glass{
+  border-radius: 16px;               /* antes 18 o más */
+  overflow: hidden;                  /* recorta el destello dentro */
+}
+.lobby-hero__glass::after{
+  /* brillo más suave y sin “rayas” */
+  inset: -22% -40%;                  /* recorta mejor en los bordes */
+  filter: blur(4px);
+  opacity: .55;
+  background: linear-gradient(
+    120deg,
+    transparent 42%,
+    rgba(255,255,255,.18) 50%,
+    transparent 58%
+  );
+  /* difuminado en bordes para que no se note el corte */
+  -webkit-mask-image: radial-gradient(120% 220% at 50% 50%, #000 60%, transparent 78%);
+          mask-image: radial-gradient(120% 220% at 50% 50%, #000 60%, transparent 78%);
+}
+@keyframes heroSheen{
+  0%   { transform: translateX(-110%) rotate(8deg); }
+  55%  { transform: translateX(15%)   rotate(8deg); }
+  100% { transform: translateX(15%)   rotate(8deg); }
+}
+
+/* 2) Tarjetas rectangulares (adiós cápsula) */
+.lobby__list--rows .lobby-card{
+  border-radius: 16px !important;    /* reemplaza 9999px */
+  min-height: 84px;                  /* un poquito más altas */
+  padding: 16px 18px;                /* margen más respirado */
+}
+
+/* 3) Pequeños ajustes visuales */
+.lc-title{ font-size: 1.05rem; }
+.lc-row{ grid-template-columns: 22px auto 1fr; gap: 8px; }
+.badge{ border-color: rgba(255,255,255,.18); }
+.btn{ padding: 10px 14px; border-color: rgba(255,255,255,.16); }
+
+/* 4) Fondo del lobby: baja repetición del logo para que no se vean líneas */
+.lobby::before{
+  background-size:
+    760px auto,          /* halo/logo grande */
+    180px auto;          /* mosaico más grande -> menos “rayado” */
+  opacity: .04;          /* un poco más tenue */
+}
+
+/* Asegura que el panel exista visualmente en el modo display */
+body.is-display .side-panel { display: block !important; }
+
+/* Resaltado breve al enfocar un asiento desde el admin */
+.mirror-focus {
+  outline: 2px solid #ffd972;
+  box-shadow: 0 0 0 4px rgba(255,217,114,.28);
+  border-radius: 999px;
+  animation: mf-pulse .9s ease 2;
+}
+@keyframes mf-pulse {
+  0% { transform: scale(1) }
+  50%{ transform: scale(1.06) }
+  100%{ transform: scale(1) }
+}

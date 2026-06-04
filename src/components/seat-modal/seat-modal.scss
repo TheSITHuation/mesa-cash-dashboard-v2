@@ -1,205 +1,345 @@
 // src/components/seat-modal/seat-modal.scss
-@import '../../styles/variables';
-// El overlay gris oscuro que cubre toda la pantalla
-.modal-overlay {
-    position: fixed; // Se queda fijo aunque hagas scroll
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.75); // Fondo semitransparente
+@use "../../styles/tokens" as *;
+@use "../../styles/variables" as *;
+
+.sm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 10, 0.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 20px);
+}
+
+.sm-content {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 40px);
+  background: linear-gradient(165deg, rgba(25, 28, 35, 0.95) 0%, rgba(10, 12, 16, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  padding: 0;
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(212, 175, 55, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sm-header {
+  padding: 24px 32px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+  h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.sm-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.sm-scroll {
+  padding: 24px 32px;
+  overflow-y: auto;
+  flex: 1;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+}
+
+.sm-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px;
+  background: rgba(255, 107, 107, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  margin-bottom: 20px;
+}
+
+.sm-success {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  background: rgba(48, 209, 88, 0.1);
+  border: 1px solid rgba(48, 209, 88, 0.3);
+  border-radius: 16px;
+  color: #30d158;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 20px;
+  overflow: visible;
+}
+
+.sm-success-icon {
+  font-size: 20px;
+  color: #30d158;
+}
+
+.sm-success-particles {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.sm-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffd766;
+  box-shadow: 0 0 8px #ffd766, 0 0 12px #ffd766;
+}
+
+.form-group-refined {
+  margin-bottom: 24px;
+
+  label {
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000; // Se asegura de que esté por encima de todo
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
-
-    // Clase para ocultar el modal con una transición suave
-    &.hidden {
-        opacity: 0;
-        pointer-events: none; // Evita que se pueda hacer clic en él cuando está oculto
-    }
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #d4af37;
+    margin-bottom: 10px;
+    margin-left: 4px;
+    opacity: 0.9;
+  }
 }
 
-// La ventana de contenido del modal
-.modal-content {
-    background: #2c2c2c;
-    padding: 25px 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-    width: 90%;
-    max-width: 420px;
-    position: relative;
-    border-top: 4px solid $seat-available-color; // Un toque de color
-    transform: scale(1);
-    transition: transform 0.3s ease-in-out;
-
-    // Animación de entrada para el modal
-    .modal-overlay:not(.hidden) & {
-        transform: scale(1);
-    }
-    .modal-overlay.hidden & {
-        transform: scale(0.95);
-    }
+.seat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
 }
 
-// Título del modal
-#modal-title {
-    margin-top: 0;
-    margin-bottom: 25px;
-    color: #ffffff;
-    font-size: 1.5rem;
-    text-align: center;
+.seat-pill {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background: rgba(48, 209, 88, 0.12);
+    border-color: rgba(48, 209, 88, 0.3);
+    color: #30d158;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(48, 209, 88, 0.15);
+  }
+
+  &.selected {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: #d4af37;
+    color: #d4af37;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.15), 0 0 24px rgba(212, 175, 55, 0.05);
+    transform: scale(1.05);
+  }
+
+  &.occupied {
+    background: rgba(255, 69, 58, 0.08);
+    border-color: rgba(255, 69, 58, 0.2);
+    color: rgba(255, 69, 58, 0.5);
+    cursor: not-allowed;
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 }
 
-// Contenedor de la información del jugador ocupado
-#info-seat-occupied {
-    h3 {
-        text-align: center;
-        margin-top: 0;
-        margin-bottom: 10px;
-        color: $text-light;
-    }
-    p {
-        text-align: center;
-        font-size: 1.1rem;
-        margin: 0 0 20px 0;
-        strong {
-            color: #aaa;
-        }
-    }
+.input-elegant {
+  width: 100%;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0 18px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:focus {
+    border-color: rgba(212, 175, 55, 0.5);
+    background: rgba(212, 175, 55, 0.03);
+    box-shadow:
+      0 0 0 4px rgba(212, 175, 55, 0.08),
+      inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+  }
 }
 
-// Estilos para los formularios y grupos de acciones
-form, .actions {
-    display: flex;
-    flex-direction: column;
-    gap: 18px; // Espacio entre elementos
+select.input-elegant {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23d4af37' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
 }
 
-.action-group {
-    display: flex;
-    gap: 10px;
+.avatar-grid-elegant {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+  padding: 2px;
 
-    input {
-        flex-grow: 1; // El input ocupa el espacio sobrante
-    }
-}
-
-// Estilos para labels y inputs
-label {
-    font-weight: bold;
-    font-size: 0.9rem;
-    color: #ccc;
-    margin-bottom: -10px;
-}
-
-input[type="text"], input[type="number"] {
-    padding: 12px;
-    border-radius: 6px;
-    border: 1px solid #555;
-    background-color: #1e1e1e;
-    color: #fff;
-    font-size: 1rem;
-    width: 100%;
-    box-sizing: border-box; // Asegura que el padding no afecte el ancho
-
-    &:focus {
-        outline: none;
-        border-color: $seat-available-color;
-    }
-}
-
-// Botón de cerrar modal
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 15px;
+  .avatar-item-refined {
+    aspect-ratio: 1;
     background: none;
     border: none;
-    font-size: 28px;
-    line-height: 1;
-    color: #888;
+    padding: 0;
     cursor: pointer;
-    transition: color 0.2s;
+    position: relative;
+    border-radius: 18px;
 
-    &:hover {
-        color: #fff;
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
-}
-// ... tus estilos del modal de asientos ...
 
-// Estilos para la galería de avatares
-.gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.gallery img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-        border-color: $light-gold; // Usando la variable de color dorado
-        transform: scale(1.1);
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 21px;
+      border: 2px solid #d4af37;
+      opacity: 0;
+      transform: scale(1.1);
+      transition: all 0.3s ease;
     }
-}
-// ... tus estilos del modal de asientos ...
 
-// Dentro de seat-modal.scss
+    &:hover img {
+      transform: translateY(-4px);
+      border-color: rgba(212, 175, 55, 0.4);
+    }
 
-// ... tus otros estilos ...
-
-/* === Avatar picker === */
-.avatar-search-container {
-  position: relative;
-}
-
-#avatar-search-input {
-  width: 100%;
-}
-
-#avatar-preview {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
-  gap: 8px;
-  max-height: 220px;      /* hace scroll si hay muchos */
-  overflow: auto;
-  margin-top: 8px;        /* separa del input */
-  padding: 2px;
+    &.selected {
+      img {
+        border-color: #d4af37;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+      }
+      &::after {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
 }
 
-#avatar-preview .avatar-item {
-  border: 0;
-  background: transparent;
-  padding: 0;
+.modal-footer-refined {
+  padding: 20px 32px 32px;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: 16px;
+}
+
+.btn-elegant {
+  flex: 1;
+  height: 56px;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
 }
 
-#avatar-preview .avatar-item img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.15) inset;
-  transition: transform .12s ease, box-shadow .12s ease;
+.btn-elegant-cancel {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
 }
 
-#avatar-preview .avatar-item img:hover {
-  transform: scale(1.06);
-  box-shadow: 0 0 0 2px rgba(255,214,102,.85);
-}
+.btn-elegant-primary {
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color: #000;
+  box-shadow: 0 12px 24px rgba(184, 134, 11, 0.25);
 
-#avatar-preview .avatar-item.selected img {
-  box-shadow: 0 0 0 3px rgba(255,214,102,.95);
-  transform: scale(1.06);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(184, 134, 11, 0.35);
+    filter: brightness(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
 }

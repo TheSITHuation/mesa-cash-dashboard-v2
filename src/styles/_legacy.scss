@@ -1,0 +1,43 @@
+/* src/styles/_legacy.scss */
+@use "./tokens" as *;
+
+/* ===== Aliases legacy ya usados antes ===== */
+$table-border-color: $ring !default;
+$armrest-base: $table-border-color !default;
+
+$seat-available-color: $brand-1 !default;
+$seat-occupied-color: rgba(255,255,255,.35) !default;
+$seat-reserved-color: rgba(255,255,255,.55) !default;
+
+$modal-bg: rgba(13,15,18,.85) !default;
+$modal-border: $ring !default;
+
+$light-gold: $brand-1 !default;  /* ya lo necesitabas en dealer-modal */
+$gold: $brand-1 !default;
+$accent: $brand-1 !default;
+
+/* ===== Nuevos aliases detectados en el scan ===== */
+$accent-gold: $brand-1 !default;
+
+$armrest-dark: rgba(255,255,255,.10) !default;
+$armrest-lite: rgba(255,255,255,.05) !default;
+$armrest-thickness: 10px !default;
+
+$seat-size: 48px !default;                 /* tamaño chip/seat compacto */
+$table-color: #0e1612 !default;            /* si prefieres, usa $panel */
+
+$border-color: $ring !default;
+
+$card-bg: rgba(255,255,255,.06) !default;  /* pill/widget bg */
+$card-hover-bg: rgba(255,255,255,.10) !default;
+$card-border: $ring !default;
+$card-shadow: 0 10px 30px rgba(0,0,0,.35) !default;
+
+$duration-fast: .15s !default;
+$ease-std: cubic-bezier(.2,.7,.2,1) !default;
+$focus-ring: 0 0 0 3px rgba(217,182,111,.35) !default;
+
+$radius-md: 12px !default;
+$radius-lg: 20px !default;
+
+$text-dimmed: rgba(255,255,255,.65) !default; /* alias a $text-dim */
