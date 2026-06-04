@@ -16,6 +16,7 @@ import { markPlayerAbsent, markPlayerReturned } from '../../services/firebase/ab
 import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
 import TimerDisplay from '../timer-display/TimerDisplay.jsx';
+import { showError } from '../ui/toast.js';
 
 /* =================== Refs DOM =================== */
 let modal,
@@ -626,7 +627,7 @@ async function onToggleAbsent(e) {
     }
   } catch (err) {
     console.error('[absence] error:', err);
-    alert('No se pudo actualizar el estado de ausencia.');
+    showError('No se pudo actualizar el estado de ausencia.');
   }
 }
 
@@ -674,7 +675,7 @@ async function onRebuy(e) {
     if (buyinInput) buyinInput.value = '';
   } catch (err) {
     console.error('[rebuy] error', err);
-    alert('No se pudo registrar el rebuy.');
+    showError('No se pudo registrar el rebuy.');
   }
 }
 
@@ -703,6 +704,6 @@ async function onCashout(e) {
     onCancel();
   } catch (err) {
     console.error('[cashout] error', err);
-    alert('No se pudo hacer cashout. Revisa reglas de Firestore.');
+    showError('No se pudo hacer cashout. Revisa reglas de Firestore.');
   }
 }

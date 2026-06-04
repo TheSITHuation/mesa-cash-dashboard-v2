@@ -1,6 +1,7 @@
 // src/components/waiting-list/waiting-list.js
 import { db } from '../../services/config/firebaseConfig.js';
 import { addToWaitingList, removeFromWaitingList } from '../../services/firebase/waitingListService.js';
+import { showError } from '../ui/toast.js';
 import { collection, onSnapshot, orderBy, query, where, doc } from 'firebase/firestore';
 
 const qs = (s, r = document) => r.querySelector(s);
@@ -45,7 +46,7 @@ export function initWaitingList(tableId) {
         if (input) input.focus();
       } catch (err) {
         console.error('[waiting-list] add error:', err);
-        alert(err?.message || 'No se pudo agregar a la lista');
+        showError(err?.message || 'No se pudo agregar a la lista');
       } finally {
         form.dataset.busy = '0';
         if (btnSubmit) btnSubmit.disabled = false;
