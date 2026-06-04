@@ -73,8 +73,11 @@ export function initWaitingList(tableId) {
 
   if (!listEl) return () => {};
 
-  // Escuchar la mesa para obtener gameType y blinds, y luego filtrar la lista de espera general
+  // Suscribe a la mesa UNA vez; sólo re-suscribe la lista de espera
+  // cuando cambian los campos que determinan el filtro (gameType, blinds).
+  // Antes se re-suscribía en cada update de mesa (1Hz por el session timer).
   let wlUnsub = null;
+  let lastFilterKey = null;
 
   const tableRef = doc(db, 'tables', tableId);
   const tableUnsub = onSnapshot(tableRef, (tableSnap) => {
@@ -83,11 +86,11 @@ export function initWaitingList(tableId) {
     const gt = tableData.gameType || 'NLHE';
     const sb = Number(tableData.smallBlind || 0);
     const bb = Number(tableData.bigBlind || 0);
+    const filterKey = `${gt}|${sb}|${bb}`;
+    if (filterKey === lastFilterKey) return;
+    lastFilterKey = filterKey;
 
-    if (wlUnsub) {
-      wlUnsub();
-      wlUnsub = null;
-    }
+    if (wlUnsub) { wlUnsub(); wlUnsub = null; }
 
     const q = query(
       collection(db, 'generalWaitingList'),
