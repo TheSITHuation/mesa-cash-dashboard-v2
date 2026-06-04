@@ -1,6 +1,6 @@
 // src/pages/Lobby.jsx
 import React, { useMemo, useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
-import { motion, AnimatePresence, useAnimate } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import useAuthAnon from '../hooks/useAuthAnon.js';
 import useTd3 from '../hooks/useTd3.js';
 import useTournamentList from '../hooks/useTournamentList.js';
@@ -804,19 +804,17 @@ export default function Lobby() {
   const [activeTab, setActiveTab] = useState('cash'); // 'cash' | 'tourney'
 
   // ─── Bottom-dock sliding pill ─────────────────────────────────
-  // A single persistent pill (no `layoutId`) animated imperatively via
-  // `useAnimate`. This replaces framer-motion's shared layout, which was
-  // leaving the pill in a residual state that buried the icons and
-  // intercepted pointer events. The pill is `pointer-events: none` and
-  // always lives below the buttons in the stacking order, so it can
-  // never block clicks or hide its own content.
+  // The pill is a `::before` pseudo-element of `.bottom-dock` (painted
+  // before the buttons, so it can never visually cover them) and its
+  // position is driven by two CSS custom properties (`--pill-x`,
+  // `--pill-w`). This avoids every z-index/stacking-context issue that
+  // the previous separate-element + framer-motion approach hit, and
+  // the transition runs off the main thread.
   const dockRef = useRef(null);
-  const pillRef = useRef(null);
-  const [, animatePill] = useAnimate();
   const pillPosInit = useRef(false);
 
-  const updatePillPosition = useCallback((animate = true) => {
-    if (!dockRef.current || !pillRef.current) return;
+  const measureAndSetPill = useCallback((withTransition = true) => {
+    if (!dockRef.current) return;
     const items = dockRef.current.querySelectorAll('.dock-item');
     const activeIdx = activeTab === 'cash' ? 0 : 1;
     const target = items[activeIdx];
@@ -826,31 +824,36 @@ export default function Lobby() {
     // 4px dock padding + 4px pill inset = 8px from the dock's outer edge.
     const x = targetRect.left - dockRect.left - 4;
     const width = targetRect.width - 8;
-    // Width is set instantly (changing width triggers layout reflow).
-    pillRef.current.style.width = `${width}px`;
-    if (!animate) {
-      pillRef.current.style.transform = `translate3d(${x}px, 0, 0)`;
-    } else {
-      animatePill(pillRef.current, { x }, { duration: 0.22, ease: EASE_MATERIAL });
+    if (!withTransition) {
+      // Disable the CSS transition so the initial set (or a resize) is
+      // applied instantly without a visible slide from 0 → target.
+      dockRef.current.classList.add('no-pill-transition');
     }
-  }, [activeTab, animatePill]);
+    dockRef.current.style.setProperty('--pill-x', `${x}px`);
+    dockRef.current.style.setProperty('--pill-w', `${width}px`);
+    if (!withTransition) {
+      requestAnimationFrame(() => {
+        if (dockRef.current) {
+          dockRef.current.classList.remove('no-pill-transition');
+        }
+      });
+    }
+  }, [activeTab]);
 
   useLayoutEffect(() => {
     if (!pillPosInit.current) {
-      updatePillPosition(false);
+      measureAndSetPill(false);
       pillPosInit.current = true;
     } else {
-      updatePillPosition(true);
+      measureAndSetPill(true);
     }
-  }, [activeTab, updatePillPosition]);
+  }, [activeTab, measureAndSetPill]);
 
   // Re-measure on window resize (dock is `width: min(90vw, 380px)`).
   useEffect(() => {
-    if (!dockRef.current) return;
-    const handleResize = () => updatePillPosition(false);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [updatePillPosition]);
+    window.addEventListener('resize', () => measureAndSetPill(false));
+    return () => window.removeEventListener('resize', () => measureAndSetPill(false));
+  }, [measureAndSetPill]);
 
   const [cashExpanded, setCashExpanded] = useState(true);
   const [tourneyExpanded, setTourneyExpanded] = useState(true);
@@ -1835,11 +1838,6 @@ export default function Lobby() {
         {/* FLOATING BOTTOM DOCK (iPhone Style) */}
         <div className="bottom-dock-container">
           <nav className="bottom-dock" ref={dockRef}>
-            <span
-              ref={pillRef}
-              className="dock-pill"
-              aria-hidden="true"
-            />
             <motion.button
               onClick={() => setActiveTab('cash')}
               className={`dock-item ${activeTab === 'cash' ? 'active' : ''}`}
