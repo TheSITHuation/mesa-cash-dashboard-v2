@@ -1,6 +1,8 @@
 # Logs
 logs
 *.log
+logs.txt
+recent_logs.txt
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -10,6 +12,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dev-dist
 *.local
 
 # Editor directories and files
@@ -22,3 +25,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Variables de entorno (credenciales)
+.env
+.env.local
