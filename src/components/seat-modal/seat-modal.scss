@@ -343,3 +343,83 @@ select.input-elegant {
     transform: none;
   }
 }
+
+// ─── Migrated from SeatModal.jsx inline style blocks ───
+
+.sm-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sm-form-label-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sm-avatar-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.sm-avatar-chevron {
+  display: inline-block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s ease;
+  transform: rotate(0deg);
+
+  &--open {
+    transform: rotate(180deg);
+  }
+}
+
+.sm-avatar-chosen-tag {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-left: 4px;
+}
+
+.sm-avatar-collapse {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+
+  &--open {
+    max-height: 500px;
+    opacity: 1;
+  }
+}
+
+.sm-avatar-search {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.sm-avatar-grid-scroll {
+  max-height: 350px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+}
+
+.sm-spinner {
+  display: inline-block;
+}

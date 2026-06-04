@@ -232,12 +232,7 @@ export default function SeatModal({
 
             <form
               onSubmit={handleSubmit}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                flex: 1,
-                overflow: 'hidden',
-              }}
+              className="sm-form"
             >
               <div className="sm-scroll">
                 <motion.div
@@ -259,7 +254,7 @@ export default function SeatModal({
                       <circle cx="12" cy="12" r="10" />
                       <path d="M12 8v8M8 12h8" />
                     </svg>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className="sm-form-label-inline">
                       Asiento
                     </span>
                   </label>
@@ -362,19 +357,13 @@ export default function SeatModal({
                       <path d="m16 12-4-4-4 4" />
                     </svg>
                     <span
-                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, userSelect: 'none' }}
+                      className="sm-avatar-trigger"
                       onClick={() => setAvatarGridOpen(!avatarGridOpen)}
                     >
                       Elección de Avatar
-                      <span style={{
-                        display: 'inline-block',
-                        transition: 'transform 0.2s ease',
-                        transform: avatarGridOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                        fontSize: 10,
-                        color: 'rgba(255,255,255,0.4)',
-                      }}>▼</span>
+                      <span className={`sm-avatar-chevron ${avatarGridOpen ? 'sm-avatar-chevron--open' : ''}`}>▼</span>
                       {avatarPath && (
-                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginLeft: 4 }}>
+                        <span className="sm-avatar-chosen-tag">
                           · {avatarSearch || 'Seleccionado'}
                         </span>
                       )}
@@ -382,27 +371,16 @@ export default function SeatModal({
                   </label>
                   
                   {/* Collapsible avatar grid */}
-                  <div style={{
-                    maxHeight: avatarGridOpen ? '500px' : '0',
-                    overflow: 'hidden',
-                    transition: 'max-height 0.3s ease, opacity 0.2s ease',
-                    opacity: avatarGridOpen ? 1 : 0,
-                  }}>
+                  <div className={`sm-avatar-collapse ${avatarGridOpen ? 'sm-avatar-collapse--open' : ''}`}>
                     <input
                       type="text"
-                      className="input-elegant"
+                      className="input-elegant sm-avatar-search"
                       value={avatarSearch}
                       onChange={handleAvatarSearch}
                       placeholder="Filtrar por nombre..."
-                      style={{ marginBottom: '12px', marginTop: '8px' }}
                     />
 
-                    <div style={{
-                      maxHeight: '350px',
-                      overflowY: 'auto',
-                      scrollbarWidth: 'thin',
-                      scrollbarColor: 'rgba(255,255,255,0.15) transparent',
-                    }}>
+                    <div className="sm-avatar-grid-scroll">
                       <div className="avatar-grid-elegant">
                         {avatarList.map((av) => (
                           <motion.button
@@ -511,13 +489,13 @@ export default function SeatModal({
                 >
                   {loading ? (
                     <motion.span
+                      className="sm-spinner"
                       animate={{ rotate: 360 }}
                       transition={{
                         duration: 0.8,
                         repeat: Infinity,
                         ease: 'linear',
                       }}
-                      style={{ display: 'inline-block' }}
                     >
                       ⟳
                     </motion.span>
