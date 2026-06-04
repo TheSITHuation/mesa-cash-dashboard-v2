@@ -1782,10 +1782,9 @@ export default function Lobby() {
         {/* FLOATING BOTTOM DOCK (iPhone Style) */}
         <div className="bottom-dock-container">
           <nav className="bottom-dock">
-            <motion.button
+            <button
               onClick={() => setActiveTab('cash')}
               className={`dock-item ${activeTab === 'cash' ? 'active' : ''}`}
-              whileTap={{ transform: 'scale(0.97)' }}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M12 2v4M12 18v4M2 12h4M18 12h4" strokeLinecap="round" strokeLinejoin="round" />
@@ -1793,12 +1792,11 @@ export default function Lobby() {
                 <circle cx="12" cy="12" r="6" strokeDasharray="3 3" />
               </svg>
               <span>Cash</span>
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               onClick={() => setActiveTab('tourney')}
               className={`dock-item ${activeTab === 'tourney' ? 'active' : ''}`}
-              whileTap={{ transform: 'scale(0.97)' }}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6V2h12v2h1.5a2.5 2.5 0 0 1 0 5H18a6 6 0 0 1-12 0Z" strokeLinecap="round" strokeLinejoin="round" />
@@ -1806,7 +1804,7 @@ export default function Lobby() {
               </svg>
               <span>Torneos</span>
               {showTd3 && <span className="dock-badge-live"></span>}
-            </motion.button>
+            </button>
           </nav>
         </div>
 

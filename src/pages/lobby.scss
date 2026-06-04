@@ -47,10 +47,22 @@
   box-sizing: border-box;
   background: transparent;
   border: none;
+  font: inherit;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  transition: color 200ms ease;
+  transition: color 200ms ease, transform 150ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
   -webkit-tap-highlight-color: transparent;
+  outline: none;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #d4af37;
+    outline-offset: -2px;
+    border-radius: 12px;
+  }
 
   svg {
     width: 19px;
