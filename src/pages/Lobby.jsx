@@ -18,11 +18,10 @@ import '../components/ui/TabSwitcher.css';
 // Tipos de juego disponibles
 const GAME_TYPES = ['NLHE', 'PLO', 'MAA', 'DCH', 'V&V'];
 
-// iOS drawer curve — fast start, smooth deceleration, zero overshoot.
-// Used for the bottom-dock pill so the indicator moves once and settles,
-// instead of the prior spring that overshot 10% and produced a
-// "boomerang" return-to-start motion.
-const EASE_DRAWER = [0.32, 0.72, 0, 1];
+// Material standard easing — gentle in, gentle out, zero overshoot.
+// Used for the bottom-dock pill so the indicator moves once and stops,
+// without the visual aggression of iOS drawer's fast-start curve.
+const EASE_DRAWER = [0.4, 0, 0.2, 1];
 
 // ─── helpers ────────────────────────────────────────────────────
 const fmtInt = (n) => Number(n || 0).toLocaleString('es-MX');
@@ -1789,13 +1788,13 @@ export default function Lobby() {
             <motion.button
               onClick={() => setActiveTab('cash')}
               className={`dock-item ${activeTab === 'cash' ? 'active' : ''}`}
-              whileTap={{ transform: 'scale(0.94)' }}
+              whileTap={{ transform: 'scale(0.97)' }}
             >
               {activeTab === 'cash' && (
                 <motion.span
                   layoutId="dock-pill"
                   className="dock-item-pill"
-                  transition={{ type: 'tween', duration: 0.32, ease: EASE_DRAWER }}
+                  transition={{ type: 'tween', duration: 0.22, ease: EASE_DRAWER }}
                 />
               )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -1809,13 +1808,13 @@ export default function Lobby() {
             <motion.button
               onClick={() => setActiveTab('tourney')}
               className={`dock-item ${activeTab === 'tourney' ? 'active' : ''}`}
-              whileTap={{ transform: 'scale(0.94)' }}
+              whileTap={{ transform: 'scale(0.97)' }}
             >
               {activeTab === 'tourney' && (
                 <motion.span
                   layoutId="dock-pill"
                   className="dock-item-pill"
-                  transition={{ type: 'tween', duration: 0.32, ease: EASE_DRAWER }}
+                  transition={{ type: 'tween', duration: 0.22, ease: EASE_DRAWER }}
                 />
               )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
