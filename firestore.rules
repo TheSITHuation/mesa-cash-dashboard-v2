@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isSuperAdmin() { return request.auth != null && request.auth.token.superAdmin == true; }
+    function isAdmin() { return request.auth != null && (request.auth.token.admin == true || request.auth.token.superAdmin == true); }
+
+    match /tables/{tableId} {
+      allow read: if resource.data.publicLobby == true || signedIn();
+      allow create, update, delete: if isAdmin();
+
+      match /seats/{seatId} {
+        allow read: if get(/databases/$(database)/documents/tables/$(tableId)).data.publicLobby == true
+                    || signedIn();
+        allow create, update, delete: if signedIn();
+      }
+
+      match /waitingList/{docId} {
+        allow read: if get(/databases/$(database)/documents/tables/$(tableId)).data.publicLobby == true
+                    || signedIn();
+        allow create, update, delete: if signedIn();
+      }
+
+      match /playTime/{sessionId} { allow read, write: if signedIn(); }
+      match /panelState/{docId}   { allow read, write: if signedIn(); }
+      match /pendingArrivals/{arrivalId} {
+        allow read: if signedIn();
+        allow create: if signedIn();
+        allow update, delete: if signedIn();
+      }
+    }
+
+    match /promotions/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /td3/{docId} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+
+      match /snapshots/{snapId} {
+        allow read, write: if signedIn();
+      }
+    }
+
+    match /meta/{docId} {
+      allow read: if signedIn();
+      allow write: if isSuperAdmin();
+    }
+
+    match /tables/{tableId}/meta/{docId} {
+      allow read, write: if isSuperAdmin();
+    }
+
+    match /tableClosures/{closureId} {
+      allow read, write: if signedIn();
+    }
+
+    match /dailyClosures/{dateKey} {
+      allow read, write: if signedIn();
+    }
+
+    match /generalWaitingList/{docId} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
