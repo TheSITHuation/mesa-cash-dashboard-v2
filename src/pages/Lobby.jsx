@@ -18,6 +18,12 @@ import '../components/ui/TabSwitcher.css';
 // Tipos de juego disponibles
 const GAME_TYPES = ['NLHE', 'PLO', 'MAA', 'DCH', 'V&V'];
 
+// iOS drawer curve — fast start, smooth deceleration, zero overshoot.
+// Used for the bottom-dock pill so the indicator moves once and settles,
+// instead of the prior spring that overshot 10% and produced a
+// "boomerang" return-to-start motion.
+const EASE_DRAWER = [0.32, 0.72, 0, 1];
+
 // ─── helpers ────────────────────────────────────────────────────
 const fmtInt = (n) => Number(n || 0).toLocaleString('es-MX');
 const fmtMXN = (n) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(n || 0);
@@ -1783,13 +1789,13 @@ export default function Lobby() {
             <motion.button
               onClick={() => setActiveTab('cash')}
               className={`dock-item ${activeTab === 'cash' ? 'active' : ''}`}
-              whileTap={{ scale: 0.94 }}
+              whileTap={{ transform: 'scale(0.94)' }}
             >
               {activeTab === 'cash' && (
                 <motion.span
                   layoutId="dock-pill"
                   className="dock-item-pill"
-                  transition={{ type: 'spring', duration: 0.6, bounce: 0.1 }}
+                  transition={{ type: 'tween', duration: 0.32, ease: EASE_DRAWER }}
                 />
               )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -1803,13 +1809,13 @@ export default function Lobby() {
             <motion.button
               onClick={() => setActiveTab('tourney')}
               className={`dock-item ${activeTab === 'tourney' ? 'active' : ''}`}
-              whileTap={{ scale: 0.94 }}
+              whileTap={{ transform: 'scale(0.94)' }}
             >
               {activeTab === 'tourney' && (
                 <motion.span
                   layoutId="dock-pill"
                   className="dock-item-pill"
-                  transition={{ type: 'spring', duration: 0.6, bounce: 0.1 }}
+                  transition={{ type: 'tween', duration: 0.32, ease: EASE_DRAWER }}
                 />
               )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
