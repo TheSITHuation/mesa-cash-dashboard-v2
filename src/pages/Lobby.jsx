@@ -1,5 +1,5 @@
 // src/pages/Lobby.jsx
-import React, { useMemo, useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAuthAnon from '../hooks/useAuthAnon.js';
 import useTd3 from '../hooks/useTd3.js';
@@ -15,13 +15,9 @@ import '../components/ui/CollapsibleSection.css';
 import './Lobby.scss';
 import '../components/ui/TabSwitcher.css';
 
-// Tipos de juego disponibles
-const GAME_TYPES = ['NLHE', 'PLO', 'MAA', 'DCH', 'V&V'];
+  // Tipos de juego disponibles
+  const GAME_TYPES = ['NLHE', 'PLO', 'MAA', 'DCH', 'V&V'];
 
-// Material standard easing — gentle in, gentle out, zero overshoot.
-// Used for the bottom-dock pill so the indicator moves once and stops,
-// without the visual aggression of iOS drawer's fast-start curve.
-const EASE_MATERIAL = [0.4, 0, 0.2, 1];
 
 // ─── helpers ────────────────────────────────────────────────────
 const fmtInt = (n) => Number(n || 0).toLocaleString('es-MX');
@@ -802,58 +798,6 @@ export default function Lobby() {
   const { promotions } = usePromotions();
 
   const [activeTab, setActiveTab] = useState('cash'); // 'cash' | 'tourney'
-
-  // ─── Bottom-dock sliding pill ─────────────────────────────────
-  // The pill is a `::before` pseudo-element of `.bottom-dock` (painted
-  // before the buttons, so it can never visually cover them) and its
-  // position is driven by two CSS custom properties (`--pill-x`,
-  // `--pill-w`). This avoids every z-index/stacking-context issue that
-  // the previous separate-element + framer-motion approach hit, and
-  // the transition runs off the main thread.
-  const dockRef = useRef(null);
-  const pillPosInit = useRef(false);
-
-  const measureAndSetPill = useCallback((withTransition = true) => {
-    if (!dockRef.current) return;
-    const items = dockRef.current.querySelectorAll('.dock-item');
-    const activeIdx = activeTab === 'cash' ? 0 : 1;
-    const target = items[activeIdx];
-    if (!target) return;
-    const dockRect = dockRef.current.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
-    // 4px dock padding + 4px pill inset = 8px from the dock's outer edge.
-    const x = targetRect.left - dockRect.left - 4;
-    const width = targetRect.width - 8;
-    if (!withTransition) {
-      // Disable the CSS transition so the initial set (or a resize) is
-      // applied instantly without a visible slide from 0 → target.
-      dockRef.current.classList.add('no-pill-transition');
-    }
-    dockRef.current.style.setProperty('--pill-x', `${x}px`);
-    dockRef.current.style.setProperty('--pill-w', `${width}px`);
-    if (!withTransition) {
-      requestAnimationFrame(() => {
-        if (dockRef.current) {
-          dockRef.current.classList.remove('no-pill-transition');
-        }
-      });
-    }
-  }, [activeTab]);
-
-  useLayoutEffect(() => {
-    if (!pillPosInit.current) {
-      measureAndSetPill(false);
-      pillPosInit.current = true;
-    } else {
-      measureAndSetPill(true);
-    }
-  }, [activeTab, measureAndSetPill]);
-
-  // Re-measure on window resize (dock is `width: min(90vw, 380px)`).
-  useEffect(() => {
-    window.addEventListener('resize', () => measureAndSetPill(false));
-    return () => window.removeEventListener('resize', () => measureAndSetPill(false));
-  }, [measureAndSetPill]);
 
   const [cashExpanded, setCashExpanded] = useState(true);
   const [tourneyExpanded, setTourneyExpanded] = useState(true);
@@ -1837,7 +1781,7 @@ export default function Lobby() {
 
         {/* FLOATING BOTTOM DOCK (iPhone Style) */}
         <div className="bottom-dock-container">
-          <nav className="bottom-dock" ref={dockRef}>
+          <nav className="bottom-dock">
             <motion.button
               onClick={() => setActiveTab('cash')}
               className={`dock-item ${activeTab === 'cash' ? 'active' : ''}`}

@@ -11,7 +11,6 @@
 }
 
 .bottom-dock {
-  position: relative; /* containing block for the absolute ::before pill */
   pointer-events: auto; /* Reactiva clicks en el dock */
   display: flex;
   align-items: center;
@@ -27,46 +26,14 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* Sliding pill — a `::before` pseudo-element of the dock itself, so it
-   is painted BEFORE the buttons (DOM order) and can never visually
-   cover them. Position is driven by `--pill-x` / `--pill-w` custom
-   properties set from React, and the transition runs off the main
-   thread. The previous separate-element + framer-motion approach hit
-   a residual-state bug where the pill buried the icons. */
-.bottom-dock::before {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  height: calc(100% - 8px);
-  width: var(--pill-w, 50%); /* JS overrides on first layout */
-  transform: translate3d(var(--pill-x, 0), 0, 0);
-  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 0; /* below the buttons (z-index 1) — DOM order alone would
-                  also suffice, but explicit z-index documents intent */
-  pointer-events: none; /* never intercept clicks on the buttons */
-  border-radius: 24px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.06));
-  border: 1px solid rgba(212, 175, 55, 0.22);
-  box-shadow:
-    0 4px 12px rgba(212, 175, 55, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  will-change: transform;
-}
-
-/* Toggle this class to disable the pill's transition (used on the
-   initial render and on window resize, where we want an instant snap
-   to the new position rather than a slide from 0). */
-.bottom-dock.no-pill-transition::before {
-  transition: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bottom-dock::before {
-    transition: none;
-  }
-}
-
+/* FLAT design — no sliding pill. The active state is communicated
+   through static visual feedback on the button itself (color, lift,
+   gold dot), so nothing can ever overlap the icons. The pill was
+   removed because three iterations (framer-motion layoutId, separate
+   element + useAnimate, ::before pseudo-element) all hit a residual
+   state where the pill covered the active tab's icon. A new
+   non-overlapping treatment can be designed once the rest of the
+   dock is stable. */
 .dock-item {
   position: relative;
   flex: 1;
@@ -82,30 +49,24 @@
   border: none;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  z-index: 1; /* above the ::before pill so icon/label/dot are visible */
   transition: color 200ms ease;
   -webkit-tap-highlight-color: transparent;
-  isolation: isolate;
 
   svg {
     width: 19px;
     height: 19px;
     stroke-width: 1.8;
-    position: relative;
-    z-index: 1;
     transition: transform 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
                 filter 200ms ease;
   }
 
   span {
-    position: relative;
-    z-index: 1;
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: transform 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
-                opacity 200ms ease;
+                color 200ms ease;
   }
 
   &.active {
@@ -133,7 +94,6 @@
       border-radius: 50%;
       box-shadow: 0 0 10px #d4af37;
       animation: dockDotIn 0.3s var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
-      z-index: 1;
     }
   }
 }
