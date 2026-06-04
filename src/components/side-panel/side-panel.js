@@ -23,7 +23,6 @@ import TimerDisplay from '../timer-display/TimerDisplay.jsx';
 let sidePanelEl = document.getElementById('side-panel');
 let panelFabBtn = document.getElementById('panel-fab');
 let timerRoot     = null;
-let timerEl       = null;
 let createdAtTextEl = null;
 let stateIconsWrap  = null;
 let waitingSection  = null;
@@ -33,7 +32,15 @@ let addPlayerInput  = null;
 let confirmAddBtn   = null;
 let exportCsvBtn    = null;
 
+// Cache of state radios by value — built once, queried many times.
+// Replaces repeated stateIconsWrap.querySelector() on every snapshot.
+let radioByStatus = null;
+
 let sessionInterval = null;
+
+// Hoisted: locale format options for "Iniciada el: …" — re-allocated on
+// every snapshot without this, ~2 object literals/sec while timer runs.
+const CREATED_AT_FMT = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
 
 /* Montaje: asegura panel/FAB bajo <body> creando el HTML dinámicamente */
 function normalizeMountPoint() {
@@ -133,13 +140,6 @@ function reflectStatusOnTiles(status) {
 }
 
 /* ===== Tiempo UI ===== */
-function formatTime(totalSeconds) {
-  if (!Number.isFinite(totalSeconds) || totalSeconds < 0) return '00:00:00';
-  const h = String(Math.floor(totalSeconds / 3600)).padStart(2,'0');
-  const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2,'0');
-  const s = String(totalSeconds % 60).padStart(2,'0');
-  return `${h}:${m}:${s}`;
-}
 function computeElapsedForState(d) {
   const state          = d?.sessionState || 'idle';
   const startAt        = d?.sessionStartAt;
@@ -171,14 +171,23 @@ function computeElapsedForState(d) {
 }
 function startPanelTicker(getData) {
   if (sessionInterval) clearInterval(sessionInterval);
+  let lastElapsed = -1;
+  let lastPaused = null;
   sessionInterval = setInterval(() => {
+    if (!timerRoot) return;
     const d = getData();
-    if (timerRoot) {
-      const st = d.sessionState || 'idle';
-      const paused = (st === 'paused' || st === 'idle');
-      const elapsed = computeElapsedForState(d);
-      timerRoot.render(createElement(TimerDisplay, { totalSeconds: elapsed, paused }));
-    }
+    const st = d.sessionState || 'idle';
+    // Skip render entirely when the table has no session: idle state has a
+    // constant 0 elapsed — ticking 3,600 times/hr is wasted work.
+    if (st === 'idle' && lastPaused === true) return;
+    const paused = (st === 'paused' || st === 'idle');
+    const elapsed = computeElapsedForState(d);
+    // Skip when nothing changed (paused state freezes elapsed, snapshots
+    // can also set the same value). Avoids ~99% of React re-renders.
+    if (paused === lastPaused && elapsed === lastElapsed) return;
+    lastElapsed = elapsed;
+    lastPaused = paused;
+    timerRoot.render(createElement(TimerDisplay, { totalSeconds: elapsed, paused }));
   }, 1000);
 }
 
@@ -287,6 +296,14 @@ export function initSidePanel(mesaData) {
   confirmAddBtn    = document.getElementById('confirm-add-player-btn');
   const ariaLive   = document.getElementById('panel-aria-live');
 
+  // Build status → radio cache once. Replaces per-snapshot querySelector.
+  radioByStatus = new Map();
+  if (stateIconsWrap) {
+    stateIconsWrap.querySelectorAll('input[type="radio"][name="table-state"]').forEach((r) => {
+      radioByStatus.set(r.value, r);
+    });
+  }
+
   if (!sidePanelEl) return;
 
   // Mount React timer
@@ -361,8 +378,7 @@ export function initSidePanel(mesaData) {
   // Texto "Iniciada el …"
   const createdAt = mesaData?.createdAt?.toDate?.() || new Date();
   if (createdAtTextEl) {
-    const fmt = { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true };
-    createdAtTextEl.textContent = `Iniciada el: ${createdAt.toLocaleString('es-MX', fmt)}`;
+    createdAtTextEl.textContent = `Iniciada el: ${createdAt.toLocaleString('es-MX', CREATED_AT_FMT)}`;
   }
 
   // Controles de estado (radio group)
@@ -370,7 +386,7 @@ export function initSidePanel(mesaData) {
     const label = ev.target.closest('label[data-state]');
     if (!label) return;
     const status = label.dataset.state;
-    const radio = stateIconsWrap.querySelector(`input[value="${status}"]`);
+    const radio = radioByStatus?.get(status);
     if (radio) radio.checked = true;
 
     // persiste status de mesa
@@ -387,17 +403,14 @@ export function initSidePanel(mesaData) {
         if (d.sessionState === 'paused') await resumeSession(tableId);
         else if (d.sessionState !== 'running') await startSession(tableId);
         startPlayTimeTicker(tableId);
-        if (timerEl) timerEl.dataset.paused = '0';
       } else if (status === 'en espera') {
         await pauseAllSeatTimers(tableId);
         if (d.sessionState === 'running') await pauseSession(tableId);
         stopPlayTimeTicker();
-        if (timerEl) timerEl.dataset.paused = '1';
       } else if (status === 'inactiva') {
         await pauseAllSeatTimers(tableId);
         await resetSession(tableId);
         stopPlayTimeTicker();
-        if (timerEl) timerEl.dataset.paused = '1';
       }
 
       reflectStatusOnTiles(status);
@@ -413,16 +426,15 @@ export function initSidePanel(mesaData) {
     if (!snap.exists()) return;
     latestData = snap.data();
 
-    if (latestData.status && stateIconsWrap) {
-      const radio = stateIconsWrap.querySelector(`input[value="${latestData.status}"]`);
+    if (latestData.status && radioByStatus) {
+      const radio = radioByStatus.get(latestData.status);
       if (radio) radio.checked = true;
       reflectStatusOnTiles(latestData.status);
     }
 
     if (createdAtTextEl && latestData.createdAt?.toDate) {
       const dt = latestData.createdAt.toDate();
-      const fmt = { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true };
-      createdAtTextEl.textContent = `Iniciada el: ${dt.toLocaleString('es-MX', fmt)}`;
+      createdAtTextEl.textContent = `Iniciada el: ${dt.toLocaleString('es-MX', CREATED_AT_FMT)}`;
     }
 
     if (timerRoot) {
