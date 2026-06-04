@@ -25,7 +25,7 @@ const WA = ({ phone = '+522212038839' }) => {
       target="_blank"
       rel="noopener"
       aria-label="WhatsApp"
-      initial={{ opacity: 0, transform: 'translateY(20px)' }}
+      initial={{ opacity: 0, transform: 'translateY(8px)' }}
       animate={{ opacity: 1, transform: 'translateY(0)' }}
       transition={{ delay: 1.2, ...APPLE_SPRING }}
     >
@@ -156,10 +156,10 @@ export default function StartOverlay({ show, phone }) {
                 <div className="so-status-dot" />
                 <div className="so-status-dot" />
               </motion.div>
+
+              <WA phone={phone} />
             </div>
           </motion.div>
-
-          <WA phone={phone} />
         </motion.section>
       )}
     </AnimatePresence>

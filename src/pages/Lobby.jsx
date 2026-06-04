@@ -1287,65 +1287,6 @@ export default function Lobby() {
           letter-spacing: 0.2px;
         }
 
-        .so-loading-bar {
-          width: 120px;
-          height: 3px;
-          background: rgba(255,255,255,0.05);
-          border-radius: 99px;
-          overflow: hidden;
-        }
-
-        .so-loading-fill {
-          height: 100%;
-          width: 40%;
-          background: #d4af37;
-          border-radius: 99px;
-          animation: soLoader 2s ease-in-out infinite;
-        }
-
-        @keyframes soLoader {
-          0% { transform: translateX(-100%); }
-          50% { transform: translateX(150%); }
-          100% { transform: translateX(-100%); }
-        }
-
-        .so-wa-premium {
-          position: absolute;
-          bottom: 120px; /* Subido para quedar por encima del nav */
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 14px 24px;
-          background: rgba(37, 211, 102, 0.1);
-          border: 1px solid rgba(37, 211, 102, 0.2);
-          border-radius: 99px;
-          color: #25d366;
-          text-decoration: none;
-          font-weight: 600;
-          font-size: 15px;
-          transition: all 0.3s ease;
-        }
-
-        .so-wa-premium:hover {
-          background: rgba(37, 211, 102, 0.2);
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        .so-wa-pulse {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          width: 100% !important;
-          height: 100% !important;
-          border-radius: 99px;
-          background: rgba(37, 211, 102, 0.25);
-          pointer-events: none;
-          z-index: -1;
-        }
-
         .so-ripples {
           position: absolute;
           inset: 0;
@@ -1456,40 +1397,32 @@ export default function Lobby() {
           50%      { background-position: 100% 50%; }
         }
 
-        /* Loading bar — shimmer that travels + pulsing progress */
+        /* Loading bar — single shimmer sweep across full width (Emil: one clear motion) */
         .so-loading-bar {
           position: relative;
-          width: 180px;
-          height: 4px;
+          width: 100%;
+          max-width: 200px;
+          height: 3px;
           margin-top: 4px;
-          background: rgba(255,255,255,0.06);
+          background: rgba(255,255,255,0.05);
           border-radius: 99px;
           overflow: hidden;
         }
         .so-loading-fill {
           position: absolute;
-          inset: 0;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 60%;
           border-radius: 99px;
           background: linear-gradient(90deg, transparent 0%, rgba(212,175,55,0.95) 50%, transparent 100%);
-          background-size: 200% 100%;
-          animation: soShimmer 2.4s var(--ease-in-out) infinite;
-        }
-        .so-loading-fill::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 99px;
-          background: rgba(212,175,55,0.15);
-          transform-origin: left;
-          animation: soProgress 3.2s var(--ease-in-out) infinite;
+          filter: blur(0.5px);
+          animation: soShimmer 2.2s linear infinite;
+          will-change: transform;
         }
         @keyframes soShimmer {
-          0%   { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        @keyframes soProgress {
-          0%, 100% { transform: scaleX(0.15); }
-          50%      { transform: scaleX(0.85); }
+          0%   { transform: translateX(-100%); }
+          100% { transform: translateX(220%); }
         }
 
         /* Bottom status row — 3 cycling dots, offset breathing */
@@ -1514,44 +1447,48 @@ export default function Lobby() {
           50%      { opacity: 1; transform: scale(1.15); }
         }
 
-        /* WhatsApp CTA — alternating dual pulse rings (refined) */
+        /* WhatsApp CTA — full-width, in-card, single subtle ring (was floating) */
         .so-wa-premium {
-          position: absolute;
-          bottom: 120px;
-          display: inline-flex; align-items: center; gap: 10px;
-          padding: 14px 26px;
-          background: linear-gradient(135deg, rgba(37,211,102,0.16), rgba(37,211,102,0.08));
-          border: 1px solid rgba(37,211,102,0.28);
-          border-radius: 99px;
-          color: #25d366;
+          position: relative;
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+          width: 100%;
+          height: 48px;
+          margin-top: 22px;
+          padding: 0 24px;
+          background: linear-gradient(135deg, rgba(37,211,102,0.18), rgba(37,211,102,0.08));
+          border: 1px solid rgba(37,211,102,0.32);
+          border-radius: 14px;
+          color: #4ee584;
           text-decoration: none;
           font-weight: 600;
-          font-size: 15px;
+          font-size: 14px;
           font-family: inherit;
-          box-shadow: 0 10px 30px rgba(37,211,102,0.15), inset 0 1px 0 rgba(255,255,255,0.06);
+          letter-spacing: 0.3px;
+          box-shadow:
+            0 6px 18px rgba(37,211,102,0.12),
+            inset 0 1px 0 rgba(255,255,255,0.06);
           cursor: pointer;
-          transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+          transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out);
         }
-        .so-wa-premium::before,
         .so-wa-premium::after {
           content: '';
           position: absolute;
           inset: 0;
-          border-radius: 99px;
-          border: 1.5px solid rgba(37,211,102,0.55);
-          animation: soWaRipple 2.2s var(--ease-out) infinite;
+          border-radius: 14px;
+          border: 1px solid rgba(37,211,102,0.35);
+          opacity: 0;
           pointer-events: none;
-        }
-        .so-wa-premium::after { animation-delay: 1.1s; }
-        @keyframes soWaRipple {
-          0%   { transform: scale(1); opacity: 0.55; }
-          100% { transform: scale(1.4); opacity: 0; }
+          transition: transform 600ms var(--ease-out), opacity 600ms var(--ease-out);
         }
         .so-wa-premium:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 14px 36px rgba(37,211,102,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+          background: linear-gradient(135deg, rgba(37,211,102,0.24), rgba(37,211,102,0.12));
+          box-shadow: 0 10px 24px rgba(37,211,102,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
         }
-        .so-wa-premium:active { transform: scale(0.97); }
+        .so-wa-premium:hover::after {
+          transform: scale(1.06);
+          opacity: 0.6;
+        }
+        .so-wa-premium:active { transform: scale(0.98); }
         .so-wa-premium:focus-visible {
           outline: 2px solid rgba(37,211,102,0.7);
           outline-offset: 3px;
@@ -1642,15 +1579,13 @@ export default function Lobby() {
           .so-logo-premium,
           .so-brand-name,
           .so-loading-fill,
-          .so-loading-fill::after,
           .so-status-dot,
-          .so-wa-premium::before,
-          .so-wa-premium::after,
           .lobby-empty-card,
           .lobby-empty-trophy::after {
             animation: none !important;
           }
           .lobby-empty-card { opacity: 0.7; }
+          .so-loading-fill { opacity: 0.6; }
         }
 
       `}</style>
@@ -1854,7 +1789,7 @@ export default function Lobby() {
                 <motion.span
                   layoutId="dock-pill"
                   className="dock-item-pill"
-                  transition={{ type: 'spring', duration: 0.5, bounce: 0.18 }}
+                  transition={{ type: 'spring', duration: 0.6, bounce: 0.1 }}
                 />
               )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -1874,7 +1809,7 @@ export default function Lobby() {
                 <motion.span
                   layoutId="dock-pill"
                   className="dock-item-pill"
-                  transition={{ type: 'spring', duration: 0.5, bounce: 0.18 }}
+                  transition={{ type: 'spring', duration: 0.6, bounce: 0.1 }}
                 />
               )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
