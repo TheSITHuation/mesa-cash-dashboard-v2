@@ -495,6 +495,50 @@ function renderWaitingScreen() {
       .tm-wait-create-banner:hover { background:linear-gradient(135deg,rgba(212,175,55,.22),rgba(212,175,55,.10)); box-shadow:0 0 20px rgba(212,175,55,.12); }
       .tm-wait-create-arrow { margin-left:auto; font-size:18px; opacity:.6; }
       @keyframes tmFadeIn{0%{opacity:0;transform:translateY(-6px)}100%{opacity:1;transform:translateY(0)}}
+
+      /* Back / navigation — quieter than .tm-btn-announce (no chrome by default) */
+      .tm-btn-back {
+        display: inline-flex; align-items: center; gap: 6px;
+        height: 40px; min-height: 44px;
+        padding: 0 14px 0 12px;
+        border-radius: 10px;
+        background: transparent;
+        border: 1px solid transparent;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 13px; font-weight: 600;
+        font-family: inherit; letter-spacing: 0.1px;
+        cursor: pointer;
+        transition:
+          background 180ms ease-out,
+          color 180ms ease-out,
+          border-color 180ms ease-out,
+          transform 180ms ease-out;
+      }
+      .tm-btn-back__icon {
+        width: 16px; height: 16px;
+        flex-shrink: 0;
+        margin-top: -1px;
+        transition: transform 180ms ease-out;
+      }
+      .tm-btn-back:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      .tm-btn-back:hover .tm-btn-back__icon { transform: translateX(-3px); }
+      .tm-btn-back:active {
+        background: rgba(255, 255, 255, 0.09);
+        transform: scale(0.97);
+      }
+      .tm-btn-back:focus-visible {
+        outline: 2px solid rgba(212, 175, 55, 0.7);
+        outline-offset: 2px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .tm-btn-back, .tm-btn-back__icon { transition: none; }
+        .tm-btn-back:hover .tm-btn-back__icon { transform: none; }
+        .tm-btn-back:active { transform: none; }
+      }
     </style>
     <div class="tm-header">
       <div>
@@ -502,7 +546,13 @@ function renderWaitingScreen() {
         <div class="tm-header-sub">Staff controla la asignación · prioridad a mesas con menos jugadores</div>
       </div>
       <div class="tm-hdr-right">
-        <button class="tm-btn-announce" id="tm-tables">🔙 Volver</button>
+        <button class="tm-btn-back" id="tm-tables" type="button" aria-label="Volver al gestor de mesas">
+          <svg class="tm-btn-back__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m12 19-7-7 7-7"/>
+            <path d="M19 12H5"/>
+          </svg>
+          <span>Volver</span>
+        </button>
       </div>
     </div>
     <div id="tm-notif-area" class="tm-notif-area"></div>
