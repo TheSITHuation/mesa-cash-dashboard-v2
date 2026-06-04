@@ -28,3 +28,7 @@ dev-dist
 # Variables de entorno (credenciales)
 .env
 .env.local
+
+# Tool caches y plugins externos
+.firebase/
+claude-seo/
