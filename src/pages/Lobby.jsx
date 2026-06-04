@@ -1205,23 +1205,19 @@ export default function Lobby() {
           border-radius: 32px;
           background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
           box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-          animation: soPopUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        @keyframes soPopUp {
-          from { opacity: 0; transform: scale(0.9) translateY(20px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .so-card-content {
+          position: relative;
           background: #0f0f14;
           border-radius: 30px;
-          padding: 40px 32px;
+          padding: 36px 32px 28px;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
           backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
         }
 
         .so-logo-container {
@@ -1463,9 +1459,10 @@ export default function Lobby() {
         /* Loading bar — shimmer that travels + pulsing progress */
         .so-loading-bar {
           position: relative;
-          width: 160px;
-          height: 3px;
-          background: rgba(255,255,255,0.05);
+          width: 180px;
+          height: 4px;
+          margin-top: 4px;
+          background: rgba(255,255,255,0.06);
           border-radius: 99px;
           overflow: hidden;
         }
@@ -1851,10 +1848,15 @@ export default function Lobby() {
             <motion.button
               onClick={() => setActiveTab('cash')}
               className={`dock-item ${activeTab === 'cash' ? 'active' : ''}`}
-              whileTap={{ scale: 0.92 }}
-              animate={activeTab === 'cash' ? { scale: [1, 1.06, 1] } : {}}
-              transition={{ duration: 0.2 }}
+              whileTap={{ scale: 0.94 }}
             >
+              {activeTab === 'cash' && (
+                <motion.span
+                  layoutId="dock-pill"
+                  className="dock-item-pill"
+                  transition={{ type: 'spring', duration: 0.5, bounce: 0.18 }}
+                />
+              )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M12 2v4M12 18v4M2 12h4M18 12h4" strokeLinecap="round" strokeLinejoin="round" />
                 <circle cx="12" cy="12" r="10" />
@@ -1866,10 +1868,15 @@ export default function Lobby() {
             <motion.button
               onClick={() => setActiveTab('tourney')}
               className={`dock-item ${activeTab === 'tourney' ? 'active' : ''}`}
-              whileTap={{ scale: 0.92 }}
-              animate={activeTab === 'tourney' ? { scale: [1, 1.06, 1] } : {}}
-              transition={{ duration: 0.2 }}
+              whileTap={{ scale: 0.94 }}
             >
+              {activeTab === 'tourney' && (
+                <motion.span
+                  layoutId="dock-pill"
+                  className="dock-item-pill"
+                  transition={{ type: 'spring', duration: 0.5, bounce: 0.18 }}
+                />
+              )}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6V2h12v2h1.5a2.5 2.5 0 0 1 0 5H18a6 6 0 0 1-12 0Z" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M12 15v4M9 22h6" strokeLinecap="round" strokeLinejoin="round" />

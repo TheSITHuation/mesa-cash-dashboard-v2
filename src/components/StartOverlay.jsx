@@ -86,75 +86,77 @@ export default function StartOverlay({ show, phone }) {
             exit={{ opacity: 0, transform: 'translateY(-20px) scale(0.95)', transition: { duration: 0.35, ease: EASE_OUT } }}
             transition={APPLE_SPRING}
           >
-            {/* Logo: 3 halo rings (staggered) + logo image + soft glow */}
-            <div className="so-halo-stack" aria-hidden="true">
-              <div className="so-halo so-halo--1" />
-              <div className="so-halo so-halo--2" />
-              <div className="so-halo so-halo--3" />
-            </div>
+            <div className="so-card-content">
+              {/* Logo: 3 halo rings (staggered) + logo image + soft glow */}
+              <div className="so-halo-stack" aria-hidden="true">
+                <div className="so-halo so-halo--1" />
+                <div className="so-halo so-halo--2" />
+                <div className="so-halo so-halo--3" />
+              </div>
 
-            <motion.div
-              className="so-logo-container"
-              initial={{ opacity: 0, transform: 'scale(0.88) rotateY(-8deg)' }}
-              animate={{ opacity: 1, transform: 'scale(1) rotateY(0deg)' }}
-              transition={{ delay: 0.1, ...APPLE_SPRING }}
-            >
-              <motion.img
-                className="so-logo-premium"
-                src="/branding/logo.png"
-                alt="Casino Logo"
-                whileHover={{ transform: 'scale(1.05) rotateY(4deg)' }}
-                transition={{ type: 'spring', duration: 0.4, bounce: 0.25 }}
+              <motion.div
+                className="so-logo-container"
+                initial={{ opacity: 0, transform: 'scale(0.88) rotateY(-8deg)' }}
+                animate={{ opacity: 1, transform: 'scale(1) rotateY(0deg)' }}
+                transition={{ delay: 0.1, ...APPLE_SPRING }}
+              >
+                <motion.img
+                  className="so-logo-premium"
+                  src="/branding/logo.png"
+                  alt="Casino Logo"
+                  whileHover={{ transform: 'scale(1.05) rotateY(4deg)' }}
+                  transition={{ type: 'spring', duration: 0.4, bounce: 0.25 }}
+                />
+                <div className="so-logo-glow" />
+              </motion.div>
+
+              <motion.h2
+                className="so-title-premium"
+                initial={{ opacity: 0, transform: 'translateY(14px)' }}
+                animate={{ opacity: 1, transform: 'translateY(0)' }}
+                transition={{ delay: 0.5, ...APPLE_SPRING }}
+              >
+                Bienvenido a <span className="so-brand-name">Experience Poker</span>
+              </motion.h2>
+
+              <motion.div
+                className="so-separator"
+                initial={{ transform: 'scaleX(0)', opacity: 0 }}
+                animate={{ transform: 'scaleX(1)', opacity: 0.5 }}
+                transition={{ delay: 0.6, duration: 0.5, ease: EASE_OUT }}
               />
-              <div className="so-logo-glow" />
-            </motion.div>
 
-            <motion.h2
-              className="so-title-premium"
-              initial={{ opacity: 0, transform: 'translateY(14px)' }}
-              animate={{ opacity: 1, transform: 'translateY(0)' }}
-              transition={{ delay: 0.5, ...APPLE_SPRING }}
-            >
-              Bienvenido a <span className="so-brand-name">Experience Poker</span>
-            </motion.h2>
+              <motion.p
+                className="so-sub-premium"
+                initial={{ opacity: 0, transform: 'translateY(10px)' }}
+                animate={{ opacity: 1, transform: 'translateY(0)' }}
+                transition={{ delay: 0.7, ...APPLE_SPRING }}
+              >
+                Pronto comenzaremos. Mantente atento
+              </motion.p>
 
-            <motion.div
-              className="so-separator"
-              initial={{ transform: 'scaleX(0)', opacity: 0 }}
-              animate={{ transform: 'scaleX(1)', opacity: 0.5 }}
-              transition={{ delay: 0.6, duration: 0.5, ease: EASE_OUT }}
-            />
+              <motion.div
+                className="so-loading-bar"
+                initial={{ opacity: 0, transform: 'scaleX(0.4)' }}
+                animate={{ opacity: 1, transform: 'scaleX(1)' }}
+                transition={{ delay: 0.9, duration: 0.5, ease: EASE_OUT }}
+              >
+                <div className="so-loading-fill" />
+              </motion.div>
 
-            <motion.p
-              className="so-sub-premium"
-              initial={{ opacity: 0, transform: 'translateY(10px)' }}
-              animate={{ opacity: 1, transform: 'translateY(0)' }}
-              transition={{ delay: 0.7, ...APPLE_SPRING }}
-            >
-              Pronto comenzaremos. Mantente atento
-            </motion.p>
-
-            <motion.div
-              className="so-loading-bar"
-              initial={{ opacity: 0, transform: 'scaleX(0.4)' }}
-              animate={{ opacity: 1, transform: 'scaleX(1)' }}
-              transition={{ delay: 0.9, duration: 0.5, ease: EASE_OUT }}
-            >
-              <div className="so-loading-fill" />
-            </motion.div>
-
-            <motion.div
-              className="so-status-row"
-              initial={{ opacity: 0, transform: 'translateY(6px)' }}
-              animate={{ opacity: 1, transform: 'translateY(0)' }}
-              transition={{ delay: 1.05, ...GENTLE_SPRING }}
-              aria-hidden="true"
-            >
-              <span>Próximamente</span>
-              <div className="so-status-dot" />
-              <div className="so-status-dot" />
-              <div className="so-status-dot" />
-            </motion.div>
+              <motion.div
+                className="so-status-row"
+                initial={{ opacity: 0, transform: 'translateY(6px)' }}
+                animate={{ opacity: 1, transform: 'translateY(0)' }}
+                transition={{ delay: 1.05, ...GENTLE_SPRING }}
+                aria-hidden="true"
+              >
+                <span>Próximamente</span>
+                <div className="so-status-dot" />
+                <div className="so-status-dot" />
+                <div className="so-status-dot" />
+              </motion.div>
+            </div>
           </motion.div>
 
           <WA phone={phone} />
