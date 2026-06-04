@@ -1,0 +1,64 @@
+/* ========= Cupertino / iOS Widget Glass ========= */
+:root{
+  --ios-blur: 22px;
+  --ios-alpha1: .28;
+  --ios-alpha2: .14;
+  --ios-stroke: rgba(255,255,255,.32);
+  --ios-inner: rgba(255,255,255,.45);
+  --ios-shadow: 0 20px 40px rgba(0,0,0,.35);
+  --ios-text: rgba(255,255,255,.95);
+}
+
+.ios-widget{
+  position: relative;
+  border-radius: 26px;
+  background: linear-gradient(180deg, rgba(255,255,255,var(--ios-alpha1)), rgba(255,255,255,var(--ios-alpha2)));
+  border: 1px solid var(--ios-stroke);
+  backdrop-filter: blur(var(--ios-blur)) saturate(1.8) brightness(1.05);
+  -webkit-backdrop-filter: blur(var(--ios-blur)) saturate(1.8) brightness(1.05);
+  box-shadow: inset 0 1px 0 var(--ios-inner), var(--ios-shadow);
+}
+.ios-widget::before{
+  content:""; position:absolute; inset:0; border-radius:inherit;
+  background: radial-gradient(120% 160% at 15% -5%, rgba(255,255,255,.55), transparent 45%);
+  mix-blend-mode: screen; pointer-events:none; opacity:.5;
+}
+
+/* Banner tint variants */
+.ios-banner{ display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:16px;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+  border: 1px solid rgba(255,255,255,.30);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.ios-banner.level{ --t: 45 70% 58%; border-color: hsla(var(--t)/.45); background-image: linear-gradient(180deg, hsla(var(--t)/.22), hsla(var(--t)/.10));}
+.ios-banner.break{ --t: 192 80% 55%; border-color: hsla(var(--t)/.45); background-image: linear-gradient(180deg, hsla(var(--t)/.22), hsla(var(--t)/.10));}
+.ios-banner.final{ --t: 270 75% 65%; border-color: hsla(var(--t)/.45); background-image: linear-gradient(180deg, hsla(var(--t)/.22), hsla(var(--t)/.10));}
+.ios-banner-dot{ width:22px; height:22px; border-radius:99px; box-shadow: inset 0 1px 0 rgba(255,255,255,.55); background: hsla(var(--t)/.35); border: 1px solid hsla(var(--t)/.55); }
+.ios-banner .label{ font-weight: 900; letter-spacing:.6px; color: var(--ios-text); }
+
+/* Pills */
+.ios-pill{
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.12));
+  border: 1px solid rgba(255,255,255,.38);
+  backdrop-filter: blur(12px) saturate(1.6);
+  -webkit-backdrop-filter: blur(12px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 8px 22px rgba(0,0,0,.28);
+}
+
+/* Stats cells */
+.ios-cell{
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+  border: 1px solid rgba(255,255,255,.30);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 6px 18px rgba(0,0,0,.2);
+}
+
+/* Typography */
+.ios-title{ color: var(--ios-text); font-weight: 900; font-size: clamp(22px, 6vw, 38px); line-height:1.06; }
+.ios-sub{ color: rgba(255,255,255,.85); }
+.label{ color: rgba(255,255,255,.85); }
+
+/* Layout helper */
+.stats-grid--2col{ grid-template-columns: repeat(2, minmax(0,1fr)) !important; }

@@ -1,0 +1,95 @@
+/* ===================== Cupertino FINAL Layout =====================
+   Carga ESTE archivo DESPUÉS de: cupertino.css, cupertino-proportions.css
+   e ios-tight.css. Fija proporciones como el mock/screenshot.
+==================================================================== */
+
+:root{
+  --mobile-max: 440px;              /* ancho lógico del canvas móvil */
+  --final-gap: 16px;                /* separación vertical base */
+
+  /* Header */
+  --hdr-logo: 44px;
+  --hdr-title-min: 26px;
+  --hdr-title-fluid: 6vw;
+  --hdr-title-max: 40px;
+
+  /* Banner LEVEL/BREAK */
+  --bnr-h: 44px;
+  --bnr-radius: 16px;
+  --bnr-dot: 18px;
+  --bnr-font: 13.5px;
+
+  /* Clock */
+  --clk-min: 64px;
+  --clk-fluid: 16.5vw;
+  --clk-max: 150px;
+
+  /* Pills (blinds) */
+  --pill-h: 54px;
+  --pill-radius: 22px;
+  --pill-pad-x: 16px;
+
+  /* Stats cells */
+  --cell-h: 48px;
+  --cell-radius: 12px;
+  --cell-font: 18px;
+  --cell-gap: 12px;
+  --label-font: 12px;
+}
+
+.container{ max-width: var(--mobile-max); margin-inline: auto; }
+
+/* Header exacto */
+.header-logo{ width: var(--hdr-logo) !important; height: var(--hdr-logo) !important; border-radius: 10px !important; }
+.ios-title{
+  font-size: clamp(var(--hdr-title-min), var(--hdr-title-fluid), var(--hdr-title-max)) !important;
+  line-height: 1.06 !important;
+}
+
+/* Capsule wrapper */
+.ios-widget{ border-radius: 22px !important; }
+.mobile-capsule{ gap: var(--final-gap) !important; }
+
+/* Banner */
+.mobile-capsule .ios-banner{
+  min-height: var(--bnr-h) !important;
+  border-radius: var(--bnr-radius) !important;
+  padding: 8px 12px !important;
+  gap: 10px !important;
+}
+.mobile-capsule .ios-banner-dot{
+  width: var(--bnr-dot) !important;
+  height: var(--bnr-dot) !important;
+}
+.mobile-capsule .ios-banner .label{
+  font-size: var(--bnr-font) !important;
+  letter-spacing: .6px !important;
+  font-weight: 900 !important;
+}
+
+/* Clock */
+.mobile-capsule .clock{ gap: 6px !important; }
+.mobile-capsule .clock-time{
+  font-size: clamp(var(--clk-min), var(--clk-fluid), var(--clk-max)) !important;
+  letter-spacing: 1.8px !important;
+}
+
+/* Blinds pills */
+.mobile-capsule .ios-pill{
+  min-height: var(--pill-h) !important;
+  border-radius: var(--pill-radius) !important;
+  padding-inline: var(--pill-pad-x) !important;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+}
+
+/* Stats grid */
+.mobile-capsule .stats-grid{ gap: var(--cell-gap) !important; }
+.mobile-capsule .label{ font-size: var(--label-font) !important; opacity: .95 !important; }
+.mobile-capsule .ios-cell{
+  min-height: var(--cell-h) !important;
+  border-radius: var(--cell-radius) !important;
+  font-size: var(--cell-font) !important;
+  font-weight: 900 !important;
+  padding: 8px 12px !important;
+}

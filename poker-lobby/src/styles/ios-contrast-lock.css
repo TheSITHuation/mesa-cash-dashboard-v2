@@ -1,0 +1,48 @@
+/* ================= iOS Contrast LOCK =================
+   Cárgalo al FINAL de todos tus estilos (después de cupertino-final.css).
+   Fija los tonos de texto para: reloj, pills y stats (labels + valores).
+======================================================== */
+
+:root{
+  /* Tonos finales */
+  --tone-value: #ffffff;           /* valores: blancos puros */
+  --tone-label: #ECEFF4;           /* labels: blanco suave */
+  --tone-sub:   rgba(255,255,255,.96);
+  --tone-shadow: 0 10px 28px rgba(0,0,0,.55);
+}
+
+/* --- Clock --- */
+.mobile-capsule .clock-time{
+  color: var(--tone-value) !important;
+  text-shadow: var(--tone-shadow), 0 0 18px rgba(255,255,255,.08) !important;
+}
+.mobile-capsule .clock > :not(.clock-time){
+  color: var(--tone-label) !important;
+  opacity: 1 !important;
+}
+
+/* --- Pills (Blinds / Siguiente) --- */
+.mobile-capsule .ios-pill{
+  color: var(--tone-value) !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.18) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.32), rgba(255,255,255,.16)) !important;
+  border-color: rgba(255,255,255,.42) !important;
+}
+
+/* --- Stats (2×4) --- */
+.mobile-capsule .label{
+  color: var(--tone-label) !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+  letter-spacing: .55px !important;
+}
+.mobile-capsule .ios-cell{
+  color: var(--tone-value) !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.15) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.12)) !important;
+  border-color: rgba(255,255,255,.38) !important;
+  font-weight: 900 !important;
+}
+
+/* Opcional: refuerza el título del header (coherencia visual) */
+.ios-title{ color: var(--tone-sub) !important; }

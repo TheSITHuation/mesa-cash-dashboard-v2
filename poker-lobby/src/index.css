@@ -1,0 +1,120 @@
+:root{
+  --bg: #070b0f;
+  --petrol: #0e2430;
+  --gold: #d9b66f;
+  --glass: rgba(255,255,255,0.05);
+  --ring: rgba(255,255,255,0.22);
+  --text: rgba(255,255,255,0.96);
+
+  /* more liquid feel */
+  --lg-turbulence: 0.028;
+  --lg-scale: 240;
+  --lg-blur: 3.2;
+}
+
+*{ box-sizing: border-box; }
+html,body,#root{ height: 100%; }
+body{
+  margin:0;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 750px at 16% 10%, rgba(217,182,111,.12), transparent 60%),
+    radial-gradient(1100px 700px at 86% 8%, rgba(11,33,44,.35), transparent 63%),
+    radial-gradient(1200px 820px at 50% 100%, rgba(11,33,44,.55), transparent 70%),
+    var(--bg);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+
+.container{ max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+.stack{ display:grid; gap:14px; }
+.row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.badge{ display:inline-flex; gap:8px; align-items:center; padding:6px 12px; border-radius:999px;
+  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  font-weight: 800;
+}
+.badge b{ color: white }
+.label{ opacity:.78; font-weight:700; }
+.value{ font-weight:900; letter-spacing:.2px }
+.row-kv{ display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center; }
+
+.title{ font-size: clamp(32px, 3.4vw, 46px); line-height: 1.08; margin: 0; font-weight: 900; letter-spacing:.2px; }
+.sub{ opacity:.9; margin: 0; font-weight:700 }
+@media (max-width: 420px){
+  .container{ padding: 0 12px; }
+  /* fuerza 1 columna para el grid de stats */
+  .fluid-glass .stats-grid,
+  .stats-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 480px){
+  .container { padding: 0 12px; }
+  /* fuerza una sola columna de stats */
+  .container .stack + div[style*="gridTemplateColumns"] { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 420px){
+  .stats-grid { grid-template-columns: 1fr !important; }
+}
+/* Fuerza 2 columnas, incluso en móvil */
+.stats-grid--2col{
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+}
+/* ===========================
+   LIQUID / DROPLET VARIANT
+   =========================== */
+:root{
+  --drop-op: .14;           /* opacidad base del vidrio */
+  --drop-border: .28;       /* fuerza del borde */
+  --drop-blur: 8px;        /* blur de fondo */
+  --drop-sat: 1.4;          /* saturación del fondo */
+}
+
+/* contenedor con look gota */
+.drop {
+  position: relative;
+  border-radius: 24px;
+  background:
+    radial-gradient(140% 120% at 50% -10%, rgba(255,255,255,.35), rgba(255,255,255,0) 46%),
+    rgba(255,255,255,var(--drop-op));
+  border: 1px solid rgba(255,255,255,var(--drop-border));
+  backdrop-filter: blur(var(--drop-blur)) saturate(var(--drop-sat)) contrast(1.05);
+  -webkit-backdrop-filter: blur(var(--drop-blur)) saturate(var(--drop-sat)) contrast(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.25),
+    0 12px 42px rgba(0,0,0,.28);
+}
+
+/* brillos animados tipo gota */
+.drop::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: inherit;
+  background:
+    radial-gradient(90% 120% at 18% 14%, rgba(255,255,255,.65), transparent 52%),
+    radial-gradient(70% 100% at 82% 6%, rgba(255,255,255,.25), transparent 56%),
+    radial-gradient(120% 160% at 50% 110%, rgba(255,255,255,.08), transparent 60%);
+  mix-blend-mode: screen;
+  pointer-events:none;
+  animation: dropSheen 14s linear infinite;
+  opacity:.9;
+}
+@keyframes dropSheen {
+  0%   { transform: translateY(0) }
+  100% { transform: translateY(-1.2%) }
+}
+
+/* versión potente (para la cápsula grande) */
+.drop--strong { box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 18px 60px rgba(0,0,0,.34); }
+
+/* pills compactas con look gota */
+.drop-pill{
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+  border: 1px solid rgba(255,255,255,.28);
+  backdrop-filter: blur(8px) saturate(1.15);
+  -webkit-backdrop-filter: blur(8px) saturate(1.15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 10px 30px rgba(0,0,0,.22);
+}
+
+/* fuerza 2 columnas en stats SIEMPRE */
+.stats-grid--2col{ grid-template-columns: repeat(2, minmax(0,1fr)) !important; }

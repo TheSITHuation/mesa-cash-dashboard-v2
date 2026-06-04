@@ -1,0 +1,60 @@
+/* ====== Stats en pill (con label + valor dentro) ======
+   Importa este CSS al FINAL de tus estilos (después de cupertino-final
+   e ios-contrast-lock) para que gane la cascada.
+*/
+:root{
+  --statpill-h: 58px;
+  --statpill-label: 11.5px;
+  --statpill-value: 18px;
+  --statpill-gap: 4px;
+}
+
+/* El grid ya es 2 columnas; forzamos ancho completo */
+.mobile-capsule .stats-grid{ grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+.mobile-capsule .stats-grid > *{ width: 100% !important; }
+
+/* Pill compacta reutilizando el look iOS */
+.ios-pill--stat{
+  width: 100%;
+  min-height: var(--statpill-h);
+  border-radius: 18px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--statpill-gap);
+
+  /* mismo glass y contraste que las pills de blinds */
+  color: #fff;
+  background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.12));
+  border: 1px solid rgba(255,255,255,.38);
+  backdrop-filter: blur(10px) saturate(1.6);
+  -webkit-backdrop-filter: blur(10px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 8px 22px rgba(0,0,0,.24);
+}
+
+/* Tipografía dentro de la pill */
+.ios-pill--stat .pill-label{
+  color: var(--tone-label, #ECEFF4);
+  font-weight: 900;
+  font-size: var(--statpill-label);
+  letter-spacing: .55px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  opacity: 1;
+}
+.ios-pill--stat .pill-value{
+  color: #fff;
+  font-weight: 900;
+  font-size: var(--statpill-value);
+  line-height: 1.1;
+}
+
+/* Responsivo suave */
+@media (min-width: 480px){
+  :root{
+    --statpill-h: 62px;
+    --statpill-value: 19px;
+  }
+}

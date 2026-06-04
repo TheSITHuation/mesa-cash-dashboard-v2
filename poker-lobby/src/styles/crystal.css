@@ -1,0 +1,82 @@
+/* ========== Subtle Liquid-Glass (Crystal) UI ========== */
+:root{
+  --crystal-blur: 10px;
+  --crystal-bg-1: rgba(255,255,255,.10);
+  --crystal-bg-2: rgba(255,255,255,.05);
+  --crystal-border: rgba(255,255,255,.22);
+  --crystal-shadow: 0 10px 32px rgba(0,0,0,.28);
+}
+
+/* Panel grande (header y cápsula) */
+.crystal-panel{
+  position: relative;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, var(--crystal-bg-1), var(--crystal-bg-2));
+  border: 1px solid var(--crystal-border);
+  backdrop-filter: blur(var(--crystal-blur)) saturate(1.15);
+  -webkit-backdrop-filter: blur(var(--crystal-blur)) saturate(1.15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), var(--crystal-shadow);
+}
+.crystal-panel::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: inherit;
+  background:
+    radial-gradient(140% 120% at 50% -10%, rgba(255,255,255,.25), transparent 46%);
+  pointer-events:none;
+  mix-blend-mode: screen;
+  opacity:.45;
+}
+
+/* Banner (LEVEL/BREAK/FINAL TABLE) encima del cristal */
+.crystal-banner{
+  border-radius: 14px;
+  padding: 8px 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.25);
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+}
+.banner{ will-change: transform, box-shadow; }
+.banner--final{ animation: bannerPulseFinal 1.8s ease-in-out infinite; }
+.banner--break{ animation: bannerPulseBreak 2.2s ease-in-out infinite; }
+@keyframes bannerPulseFinal { 50% { box-shadow: 0 0 22px rgba(165,105,255,.30) } }
+@keyframes bannerPulseBreak { 50% { box-shadow: 0 0 18px rgba(53,178,212,.25) } }
+
+/* Pills (blinds y stats) */
+.crystal-pill{
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+  border: 1px solid rgba(255,255,255,.24);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 8px 24px rgba(0,0,0,.22);
+}
+
+/* Celdas de stats (más compactas) */
+.crystal-cell{
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
+  border: 1px solid rgba(255,255,255,.20);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.20), 0 6px 18px rgba(0,0,0,.18);
+}
+
+/* Header logo (mantenemos el clamp, sin vidrio propio) */
+.header-logo{
+  width: clamp(36px, 9vw, 52px);
+  height: clamp(36px, 9vw, 52px);
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+.header-logo img{ width:100%; height:100%; object-fit: contain; }
+
+/* Utilidad: dos columnas en stats siempre */
+.stats-grid--2col{ grid-template-columns: repeat(2, minmax(0,1fr)) !important; }

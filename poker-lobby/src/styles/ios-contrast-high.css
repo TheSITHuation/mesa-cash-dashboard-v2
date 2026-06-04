@@ -1,0 +1,41 @@
+/* ================== iOS High-Contrast Overlay ==================
+   Carga este archivo DESPUÉS de todos los estilos (incluido cupertino-final.css)
+   para subir contraste de reloj, pills y celdas de stats.
+================================================================== */
+
+:root{
+  --hc-value: rgba(255,255,255,.98);
+  --hc-label: rgba(255,255,255,.92);
+  --hc-shadow: 0 10px 28px rgba(0,0,0,.55);
+}
+
+/* Clock */
+.mobile-capsule .clock-time{
+  color: var(--hc-value) !important;
+  text-shadow: var(--hc-shadow), 0 0 22px rgba(255,255,255,.08) !important;
+}
+.mobile-capsule .clock :not(.clock-time){
+  color: var(--hc-label) !important;
+  opacity: .98 !important;
+}
+
+/* Pills (blinds) */
+.mobile-capsule .ios-pill{
+  color: var(--hc-value) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.32), rgba(255,255,255,.16)) !important;
+  border-color: rgba(255,255,255,.42) !important;
+}
+
+/* Stats cells */
+.mobile-capsule .ios-cell{
+  color: var(--hc-value) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.12)) !important;
+  border-color: rgba(255,255,255,.38) !important;
+}
+
+/* Labels encima de celdas */
+.mobile-capsule .label{
+  color: var(--hc-label) !important;
+  opacity: .98 !important;
+  letter-spacing: .55px !important;
+}

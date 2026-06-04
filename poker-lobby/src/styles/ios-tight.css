@@ -1,0 +1,48 @@
+/* ==================== iOS Tight Grid Overrides ====================
+   Carga ESTE archivo DESPUÉS de cupertino.css y cupertino-proportions.css
+   Mantiene el layout compacto que te gustó anteriormente.
+=====================================================================*/
+
+:root{
+  /* Anchura lógica de móvil; centra contenido si hay pantallas anchas */
+  --mobile-max: 430px;
+}
+
+/* Centro el contenido principal y limito ancho */
+.container{ max-width: var(--mobile-max); margin-inline: auto; }
+
+/* --- Header --- */
+.header-logo{ width: 44px !important; height: 44px !important; border-radius: 10px !important; }
+.ios-title{ font-size: clamp(24px, 5.5vw, 32px) !important; line-height: 1.05 !important; }
+
+/* --- Capsule root tweaks --- */
+.mobile-capsule{ --cap-gap: 14px; display:grid; gap: var(--cap-gap) !important; }
+.mobile-capsule .label{ font-size: 11px !important; letter-spacing: .5px !important; opacity:.9 !important; }
+
+/* Banner más delgado */
+.mobile-capsule .ios-banner{ min-height: 36px !important; padding: 6px 12px !important; border-radius: 14px !important; }
+.mobile-capsule .ios-banner .label{ font-size: 12px !important; }
+
+/* Reloj más compacto (pero dominante) */
+.mobile-capsule .clock-time{ font-size: clamp(56px, 16vw, 128px) !important; letter-spacing: 1.5px !important; }
+.mobile-capsule .clock{ gap: 4px !important; }
+
+/* Pills de blinds más compactas y simétricas */
+.mobile-capsule .ios-pill{
+  min-height: 42px !important;
+  padding: 6px 12px !important;
+  border-radius: 22px !important;
+}
+
+/* Stats 2x4 aún más compactos */
+.mobile-capsule .stats-grid{ gap: 10px !important; }
+.mobile-capsule .ios-cell{
+  min-height: 34px !important;
+  padding: 6px 10px !important;
+  border-radius: 12px !important;
+  font-size: 15px !important;
+}
+
+/* Reduce márgenes verticales extra dentro de la cápsula */
+.mobile-capsule > *:first-child{ margin-top: 2px !important; }
+.mobile-capsule > *:last-child{ margin-bottom: 2px !important; }

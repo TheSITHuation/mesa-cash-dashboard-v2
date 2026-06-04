@@ -1,0 +1,64 @@
+/* ===== iOS: Unificar glass de stats con Blinds + realzar reloj =====
+   Carga este CSS AL FINAL de todos tus estilos (después de cupertino-final.css
+   y de ios-contrast-lock.css / ios-stats-pill-embedded.css si los usas).
+*/
+
+:root{
+  /* Reloj más protagónico */
+  --clk-min: 72px;
+  --clk-fluid: 20vw;
+  --clk-max: 176px;
+}
+
+/* HERO CLOCK — tamaño + contraste */
+.mobile-capsule .clock-time{
+  font-size: clamp(var(--clk-min), var(--clk-fluid), var(--clk-max)) !important;
+  color: #fff !important;
+  text-shadow: 0 10px 28px rgba(0,0,0,.55), 0 0 22px rgba(255,255,255,.08) !important;
+  letter-spacing: 2px !important;
+}
+.mobile-capsule .clock{ gap: 6px !important; }
+
+/* PILL UNIFICADA (stats == blinds) */
+.mobile-capsule .ios-pill--stat{
+  /* Copiamos el look exacto de .ios-pill */
+  background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.12)) !important;
+  border: 1px solid rgba(255,255,255,.38) !important;
+  backdrop-filter: blur(12px) saturate(1.6) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.6) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.40), 0 8px 22px rgba(0,0,0,.28) !important;
+  color: #fff !important;
+
+  /* Proporciones iguales a blinds */
+  min-height: 54px !important;
+  border-radius: 22px !important;
+  padding: 8px 16px !important;
+}
+
+/* Tipografía interna consistente con banner/pills */
+.mobile-capsule .ios-pill--stat .pill-label{
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: .6px !important;
+  color: rgba(255,255,255,.95) !important;
+  opacity: 1 !important;
+  text-transform: uppercase;
+}
+.mobile-capsule .ios-pill--stat .pill-value{
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  color: #fff !important;
+  line-height: 1.1 !important;
+}
+
+/* Ajuste de grid para que rellene ancho y mantenga ritmo */
+.mobile-capsule .stats-grid{
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 12px !important;
+}
+.mobile-capsule .stats-grid > *{ width: 100% !important; }
+
+/* Opcional: bajar un poco el peso visual del banner para que el reloj destaque */
+.mobile-capsule .ios-banner{
+  opacity: .95;
+}

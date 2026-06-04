@@ -1,0 +1,64 @@
+/* ================= Cupertino Proportions Fix =================
+   Mantiene layout previo: reloj grande, pills compactas, stats 2x4.
+   Carga este archivo DESPUÉS de cupertino.css
+================================================================ */
+:root{
+  /* Panel y gaps */
+  --sz-panel-pad: 16px;
+  --sz-gap: 12px;
+  --sz-radius-panel: 20px;
+  --sz-radius-pill: 18px;
+  --sz-radius-cell: 12px;
+
+  /* Alturas */
+  --sz-banner-h: 40px;
+  --sz-pill-h: 46px;
+  --sz-cell-h: 38px;
+
+  /* Tipografía/clamp */
+  --clock-min: 64px;
+  --clock-fluid: 18vw;
+  --clock-max: 160px;
+  --title-min: 22px;
+  --title-fluid: 6vw;
+  --title-max: 36px;
+}
+
+/* Panel genérico */
+.ios-widget{
+  border-radius: var(--sz-radius-panel) !important;
+  padding: var(--sz-panel-pad) !important;
+}
+
+/* Título */
+.ios-title{
+  font-size: clamp(var(--title-min), var(--title-fluid), var(--title-max)) !important;
+  line-height: 1.06 !important;
+}
+
+/* Banner */
+.ios-banner{
+  min-height: var(--sz-banner-h) !important;
+  border-radius: 16px !important;
+  padding: 8px 12px !important;
+}
+
+/* Pills (blinds) */
+.ios-pill{
+  min-height: var(--sz-pill-h) !important;
+  border-radius: var(--sz-radius-pill) !important;
+  padding: 8px 14px !important;
+}
+
+/* Stats cells */
+.ios-cell{
+  min-height: var(--sz-cell-h) !important;
+  border-radius: var(--sz-radius-cell) !important;
+  padding: 6px 12px !important;
+}
+
+/* Grid gaps */
+.stats-grid{ gap: var(--sz-gap) !important; }
+
+/* Clock size */
+.clock-time{ font-size: clamp(var(--clock-min), var(--clock-fluid), var(--clock-max)) !important; }

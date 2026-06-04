@@ -32,3 +32,11 @@ dev-dist
 # Tool caches y plugins externos
 .firebase/
 claude-seo/
+
+# Notas y artefactos de trabajo
+*.SNIPPET.txt
+ADD_IMPORT*.txt
+*.tsbuildinfo
+
+# Subproyecto poker-lobby: solo se commitea poker-lobby/ raiz, no la copia anidada
+poker-lobby/poker-lobby/
