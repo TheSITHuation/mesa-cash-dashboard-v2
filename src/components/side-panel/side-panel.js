@@ -45,19 +45,19 @@ function normalizeMountPoint() {
       <div class="panel-content">
         <div class="panel-header">
           <span class="panel-header__title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
             Panel de Mesa
           </span>
           <div class="panel-header__actions">
-            <button id="panel-mirror-btn" class="panel-icon-btn" title="Abrir espejo">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <button id="panel-mirror-btn" class="panel-icon-btn" type="button" aria-label="Abrir espejo en nueva ventana" title="Abrir espejo">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
             </button>
           </div>
         </div>
 
         <section class="panel-section">
           <div class="panel-section__label">Estado de la Mesa</div>
-          <div class="glass-radio-group" id="state-icons">
+          <div class="glass-radio-group" id="state-icons" role="radiogroup" aria-label="Estado de la mesa">
             <input type="radio" name="table-state" id="state-activa" value="activa" />
             <label for="state-activa" data-state="activa">Activa</label>
             <input type="radio" name="table-state" id="state-pausa" value="en espera" />
@@ -71,28 +71,30 @@ function normalizeMountPoint() {
         <section class="panel-section">
           <div class="panel-section__label">Sesión</div>
           <div class="timer-box-new">
-            <div id="session-timer-root" class="timer-value-new"></div>
+            <div id="session-timer-root" class="timer-value-new" role="timer" aria-live="off"></div>
             <div id="created-at-text" class="timer-started-new"></div>
           </div>
         </section>
 
         <section class="panel-section" id="waiting-list-section">
           <div class="wl-header-new">
-            <div class="panel-section__label" style="margin:0">Lista de Espera</div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span class="wl-badge-count" id="wl-count-badge">0</span>
-              <button id="wl-add-btn" class="wl-add-btn-new">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <div class="panel-section__label wl-header-new__label">Lista de Espera</div>
+            <div class="wl-header-new__actions">
+              <span class="wl-badge-count" id="wl-count-badge" aria-label="Jugadores en espera">0</span>
+              <button id="wl-add-btn" class="wl-add-btn-new" type="button" aria-label="Añadir jugador a la lista">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </button>
             </div>
           </div>
-          <ul id="waiting-list" class="waiting-list-new"></ul>
+          <ul id="waiting-list" class="waiting-list-new" aria-live="polite"></ul>
           <div id="add-player-form" class="add-player-form-new hidden">
+            <label for="player-name-input" class="visually-hidden">Nombre del jugador</label>
             <input type="text" id="player-name-input" class="wl-input-new" placeholder="Nombre..."/>
-            <button id="confirm-add-player-btn" class="wl-submit-new">Añadir</button>
+            <button id="confirm-add-player-btn" class="wl-submit-new" type="button">Añadir</button>
           </div>
         </section>
       </div>
+      <div id="panel-aria-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
     `;
     document.body.appendChild(aside);
   }
@@ -101,8 +103,12 @@ function normalizeMountPoint() {
     const fab = document.createElement('button');
     fab.id = 'panel-fab';
     fab.className = 'panel-fab';
+    fab.type = 'button';
+    fab.setAttribute('aria-label', 'Alternar panel de mesa');
+    fab.setAttribute('aria-expanded', 'true');
+    fab.setAttribute('aria-controls', 'side-panel');
     fab.innerHTML = `
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     `;
     document.body.appendChild(fab);
   }
@@ -279,7 +285,7 @@ export function initSidePanel(mesaData) {
   addPlayerForm    = document.getElementById('add-player-form');
   addPlayerInput   = document.getElementById('player-name-input');
   confirmAddBtn    = document.getElementById('confirm-add-player-btn');
-  exportCsvBtn     = document.getElementById('export-csv-btn');
+  const ariaLive   = document.getElementById('panel-aria-live');
 
   if (!sidePanelEl) return;
 
@@ -299,12 +305,21 @@ export function initSidePanel(mesaData) {
 
   const IS_DISPLAY = document.body.classList.contains('is-display');
 
+  // Helper: anuncia mensajes al aria-live region
+  const announce = (msg) => {
+    if (!ariaLive || !msg) return;
+    ariaLive.textContent = '';
+    // microtask to ensure screen reader picks up the change
+    setTimeout(() => { ariaLive.textContent = msg; }, 30);
+  };
+
   // ── ADMIN: emite al mirror apertura/cierre y cambio de tab ──
   if (!IS_DISPLAY) {
     // Emite panelOpen cuando cambia la clase
     const obs = new MutationObserver(() => {
       const open = sidePanelEl.classList.contains('is-open');
       setDisplayState(tableId, { panelOpen: !!open, ts: Date.now() });
+      if (panelFabBtn) panelFabBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
     obs.observe(sidePanelEl, { attributes: true, attributeFilter: ['class'] });
 
@@ -324,12 +339,14 @@ export function initSidePanel(mesaData) {
   if (!IS_DISPLAY) {
     sidePanelEl.classList.add('is-open');
     panelFabBtn?.classList.add('is-open');
+    panelFabBtn?.setAttribute('aria-expanded', 'true');
   }
 
   // FAB open/close (en display está oculto por CSS)
   panelFabBtn?.addEventListener('click', () => {
-    sidePanelEl.classList.toggle('is-open');
-    panelFabBtn.classList.toggle('is-open');
+    const isOpen = sidePanelEl.classList.toggle('is-open');
+    panelFabBtn.classList.toggle('is-open', isOpen);
+    panelFabBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
 
   // Cerrar con ESC
@@ -337,6 +354,7 @@ export function initSidePanel(mesaData) {
     if (e.key === 'Escape' && sidePanelEl.classList.contains('is-open')) {
       sidePanelEl.classList.remove('is-open');
       panelFabBtn?.classList.remove('is-open');
+      panelFabBtn?.setAttribute('aria-expanded', 'false');
     }
   });
 
@@ -429,45 +447,8 @@ document.getElementById('panel-mirror-btn')?.addEventListener('click', () => {
   window.open(`${location.origin}${location.pathname}?mirror=1&table=${tid}`, '_blank');
 });
 
-  // Export CSV
-  exportCsvBtn?.addEventListener('click', handleExportCSV);
+  // Export CSV — pendiente: getTableReportData() aún devuelve null
+  // (exportCsvBtn no está en el template; se re-agregará cuando se implemente)
 
 
 }
-
-/* ===== CSV placeholder ===== */
-async function handleExportCSV() {
-  alert('Generando reporte CSV...');
-  const reportData = await getTableReportData();
-  if (!reportData || !reportData.tableInfo || !reportData.seats) {
-    alert('No se pudieron obtener los datos para generar el reporte.');
-    return;
-  }
-  const headers = ['Asiento','Jugador','Fichas Finales','Total Comprado','Tiempo en Mesa (HH:MM:SS)'];
-  let csvContent = headers.join(',') + '\r\n';
-  reportData.seats.forEach(seat => {
-    if (seat.status === 'occupied') {
-      const totalBuyIn = seat.buyInHistory ? seat.buyInHistory.reduce((a,b)=>a+b,0) : 0;
-      const sessionSeconds = seat.sitDownTime ? Math.floor((new Date() - seat.sitDownTime.toDate()) / 1000) : 0;
-      const row = [
-        seat.id.replace('asiento_', ''),
-        `"${seat.playerName}"`,
-        seat.chips,
-        totalBuyIn,
-        `"${formatTime(sessionSeconds)}"`,
-      ];
-      csvContent += row.join(',') + '\r\n';
-    }
-  });
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url  = URL.createObjectURL(blob);
-  const ts = new Date().toISOString().slice(0,16).replace('T','_').replace(/:/g,'-');
-  link.href = url;
-  link.download = `reporte_mesa_${ts}.csv`;
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-async function getTableReportData() { return null; }

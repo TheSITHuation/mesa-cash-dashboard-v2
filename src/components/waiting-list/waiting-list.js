@@ -108,21 +108,53 @@ export function initWaitingList(tableId) {
       // Actualizar badge contador
       if (countBadge) countBadge.textContent = items.length;
 
-      // Renderizar lista
+      // Renderizar lista (DOM API para evitar XSS con nombres de Firestore)
+      listEl.replaceChildren();
       if (!items.length) {
-        listEl.innerHTML = `<li class="wl-empty-new">No hay jugadores en espera</li>`;
+        const empty = document.createElement('li');
+        empty.className = 'wl-empty-new';
+        empty.textContent = 'No hay jugadores en espera';
+        listEl.appendChild(empty);
         return;
       }
 
-      listEl.innerHTML = items.map((item, i) => `
-        <li class="wl-item-new" data-id="${item.id}" data-name="${item.name}">
-          <span class="wl-item-num">${i + 1}</span>
-          <span class="wl-item-dot"></span>
-          <span class="wl-item-name">${item.name}</span>
-          <button class="wl-item-sit" data-action="sit" title="Sentar jugador">Sentar</button>
-          <span class="wl-item-remove" data-action="remove" title="Quitar de lista">×</span>
-        </li>
-      `).join('');
+      items.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.className = 'wl-item-new';
+        li.dataset.id = item.id;
+        li.dataset.name = item.name;
+
+        const num = document.createElement('span');
+        num.className = 'wl-item-num';
+        num.textContent = String(i + 1);
+
+        const dot = document.createElement('span');
+        dot.className = 'wl-item-dot';
+
+        const name = document.createElement('span');
+        name.className = 'wl-item-name';
+        name.textContent = item.name;
+
+        const sitBtn = document.createElement('button');
+        sitBtn.className = 'wl-item-sit';
+        sitBtn.dataset.action = 'sit';
+        sitBtn.type = 'button';
+        sitBtn.title = 'Sentar jugador';
+        sitBtn.setAttribute('aria-label', `Sentar a ${item.name}`);
+        sitBtn.textContent = 'Sentar';
+
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'wl-item-remove';
+        removeBtn.dataset.action = 'remove';
+        removeBtn.setAttribute('role', 'button');
+        removeBtn.setAttribute('tabindex', '0');
+        removeBtn.setAttribute('aria-label', `Quitar a ${item.name} de la lista`);
+        removeBtn.title = 'Quitar de lista';
+        removeBtn.textContent = '×';
+
+        li.append(num, dot, name, sitBtn, removeBtn);
+        listEl.appendChild(li);
+      });
 
       // ── Delegación de eventos ────────────────────────────────
       listEl.onclick = async (ev) => {

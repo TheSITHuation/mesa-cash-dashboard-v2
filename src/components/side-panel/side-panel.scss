@@ -713,3 +713,47 @@ body.is-display #panel-fab {
   white-space: nowrap;
   &:hover { background: rgba(48,209,88,.2); }
 }
+
+// ── Layout: new header structure (replaces inline styles) ──
+.wl-header-new__label {
+  margin: 0;
+}
+.wl-header-new__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// ── Accessibility: focus rings + visually-hidden ──────────────
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.panel-icon-btn:focus-visible,
+#panel-fab:focus-visible,
+.wl-add-btn-new:focus-visible,
+.wl-item-sit:focus-visible,
+.wl-submit-new:focus-visible,
+.glass-radio-group label:focus-within {
+  outline: 2px solid rgba(212, 175, 55, 0.85);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+}
+
+.wl-input-new:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, 0.7);
+  outline-offset: 1px;
+}
+
+#panel-fab:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, 0.9);
+  outline-offset: 3px;
+}
