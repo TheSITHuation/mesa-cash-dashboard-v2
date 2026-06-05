@@ -628,6 +628,11 @@ async function onRebuy(e) {
     setPurchases(currentPurchasesCount + 1);
     setTotalAmount(currentTotalAmount + amount);
     if (buyinInput) buyinInput.value = '';
+    // Close the modal after a successful rebuy so the operator doesn't
+    // have to click 'Cancelar' as a second step. If the transaction
+    // fails, the catch below keeps the modal open so the amount can
+    // be retried.
+    onCancel();
   } catch (err) {
     console.error('[rebuy] error', err);
     showError('No se pudo registrar el rebuy.');
