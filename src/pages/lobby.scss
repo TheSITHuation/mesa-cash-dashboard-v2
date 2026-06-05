@@ -10,45 +10,6 @@
   pointer-events: none; /* Deja pasar clicks al fondo si es necesario */
 }
 
-/* Sliding indicator — a 3px gold bar that sits ABOVE the dock (it is
-   a sibling of the dock, not a child), so it is physically incapable
-   of overlapping the icons inside the buttons. The active tab is
-   signalled by BOTH the indicator's position AND the tab's gold text,
-   satisfying the status-triad rule (icon + text + position). The
-   gradient gives a soft glow effect without being a heavy fill. */
-.bottom-dock-indicator {
-  position: absolute;
-  top: -8px;
-  left: 0;
-  height: 3px;
-  width: var(--indicator-w, 50%);
-  transform: translateX(var(--indicator-x, 0));
-  transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(212, 175, 55, 0.4) 15%,
-    #d4af37 50%,
-    rgba(212, 175, 55, 0.4) 85%,
-    transparent 100%);
-  border-radius: 2px;
-  pointer-events: none;
-  will-change: transform;
-  z-index: 1;
-}
-
-/* Toggle this class to disable the indicator's transition (used on
-   the initial render and on window resize, where we want an instant
-   snap to the new position rather than a slide from 0). */
-.bottom-dock-container.no-indicator-transition .bottom-dock-indicator {
-  transition: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bottom-dock-indicator {
-    transition: none;
-  }
-}
-
 .bottom-dock {
   pointer-events: auto; /* Reactiva clicks en el dock */
   display: flex;
@@ -110,12 +71,40 @@
     transition: color 200ms ease;
   }
 
+  /* Underline indicator — a short gold bar below the label, like
+     Material Design tabs. It grows from scaleX(0) to scaleX(1) when
+     the tab becomes active, and shrinks back when it deactivates.
+     GPU-accelerated via transform (no width/height animation). */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 22px;
+    height: 2px;
+    background: #d4af37;
+    border-radius: 1px;
+    transform: translateX(-50%) scaleX(0);
+    transform-origin: center;
+    transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   &.active {
     color: #d4af37;
 
     svg {
       filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.45));
     }
+
+    &::after {
+      transform: translateX(-50%) scaleX(1);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-item::after {
+    transition: none;
   }
 }
 
