@@ -799,6 +799,59 @@ export default function Lobby() {
 
   const [activeTab, setActiveTab] = useState('cash'); // 'cash' | 'tourney'
 
+  // ─── Bottom-dock sliding indicator ────────────────────────────
+  // The indicator is a SIBLING of the dock (not a child), positioned
+  // above it. This means it is physically incapable of overlapping the
+  // icons inside the buttons, regardless of z-index or stacking
+  // context. Its position is driven by two CSS custom properties
+  // (`--indicator-x`, `--indicator-w`) and the transition runs off
+  // the main thread. This replaces the previous in-dock pill, which
+  // hit a residual-state bug where the pill covered the icons.
+  const containerRef = useRef(null);
+  const dockRef = useRef(null);
+  const indicatorPosInit = useRef(false);
+
+  const updateIndicator = useCallback((withTransition = true) => {
+    if (!containerRef.current || !dockRef.current) return;
+    const items = dockRef.current.querySelectorAll('.dock-item');
+    const activeIdx = activeTab === 'cash' ? 0 : 1;
+    const target = items[activeIdx];
+    if (!target) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const x = targetRect.left - containerRect.left;
+    const width = targetRect.width;
+    if (!withTransition) {
+      // Disable the CSS transition so the initial set (or a resize)
+      // is applied instantly without a visible slide from 0.
+      containerRef.current.classList.add('no-indicator-transition');
+    }
+    containerRef.current.style.setProperty('--indicator-x', `${x}px`);
+    containerRef.current.style.setProperty('--indicator-w', `${width}px`);
+    if (!withTransition) {
+      requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.classList.remove('no-indicator-transition');
+        }
+      });
+    }
+  }, [activeTab]);
+
+  useLayoutEffect(() => {
+    if (!indicatorPosInit.current) {
+      updateIndicator(false);
+      indicatorPosInit.current = true;
+    } else {
+      updateIndicator(true);
+    }
+  }, [activeTab, updateIndicator]);
+
+  // Re-measure on window resize (dock is `width: min(90vw, 380px)`).
+  useEffect(() => {
+    window.addEventListener('resize', () => updateIndicator(false));
+    return () => window.removeEventListener('resize', () => updateIndicator(false));
+  }, [updateIndicator]);
+
   const [cashExpanded, setCashExpanded] = useState(true);
   const [tourneyExpanded, setTourneyExpanded] = useState(true);
   const [openPlayersFor, setOpenPlayersFor] = React.useState(null);
@@ -1780,8 +1833,9 @@ export default function Lobby() {
         </AnimatePresence>
 
         {/* FLOATING BOTTOM DOCK (iPhone Style) */}
-        <div className="bottom-dock-container">
-          <nav className="bottom-dock">
+        <div className="bottom-dock-container" ref={containerRef}>
+          <div className="bottom-dock-indicator" aria-hidden="true" />
+          <nav className="bottom-dock" ref={dockRef}>
             <button
               onClick={() => setActiveTab('cash')}
               className={`dock-item ${activeTab === 'cash' ? 'active' : ''}`}

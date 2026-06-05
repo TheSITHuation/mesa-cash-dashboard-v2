@@ -10,6 +10,45 @@
   pointer-events: none; /* Deja pasar clicks al fondo si es necesario */
 }
 
+/* Sliding indicator — a 3px gold bar that sits ABOVE the dock (it is
+   a sibling of the dock, not a child), so it is physically incapable
+   of overlapping the icons inside the buttons. The active tab is
+   signalled by BOTH the indicator's position AND the tab's gold text,
+   satisfying the status-triad rule (icon + text + position). The
+   gradient gives a soft glow effect without being a heavy fill. */
+.bottom-dock-indicator {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  height: 3px;
+  width: var(--indicator-w, 50%);
+  transform: translateX(var(--indicator-x, 0));
+  transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 175, 55, 0.4) 15%,
+    #d4af37 50%,
+    rgba(212, 175, 55, 0.4) 85%,
+    transparent 100%);
+  border-radius: 2px;
+  pointer-events: none;
+  will-change: transform;
+  z-index: 1;
+}
+
+/* Toggle this class to disable the indicator's transition (used on
+   the initial render and on window resize, where we want an instant
+   snap to the new position rather than a slide from 0). */
+.bottom-dock-container.no-indicator-transition .bottom-dock-indicator {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-dock-indicator {
+    transition: none;
+  }
+}
+
 .bottom-dock {
   pointer-events: auto; /* Reactiva clicks en el dock */
   display: flex;
@@ -26,14 +65,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* FLAT design — no sliding pill. The active state is communicated
-   through static visual feedback on the button itself (color, lift,
-   gold dot), so nothing can ever overlap the icons. The pill was
-   removed because three iterations (framer-motion layoutId, separate
-   element + useAnimate, ::before pseudo-element) all hit a residual
-   state where the pill covered the active tab's icon. A new
-   non-overlapping treatment can be designed once the rest of the
-   dock is stable. */
 .dock-item {
   position: relative;
   flex: 1;
@@ -68,8 +99,7 @@
     width: 19px;
     height: 19px;
     stroke-width: 1.8;
-    transition: transform 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
-                filter 200ms ease;
+    transition: filter 200ms ease;
   }
 
   span {
@@ -77,35 +107,14 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: transform 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
-                color 200ms ease;
+    transition: color 200ms ease;
   }
 
   &.active {
-    color: #fff;
+    color: #d4af37;
 
     svg {
-      transform: translateY(-3px) scale(1.08);
-      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
-    }
-
-    span {
-      transform: translateY(-1px);
-      color: #d4af37;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 4px;
-      height: 4px;
-      background: #d4af37;
-      border-radius: 50%;
-      box-shadow: 0 0 10px #d4af37;
-      animation: dockDotIn 0.3s var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) forwards;
+      filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.45));
     }
   }
 }
