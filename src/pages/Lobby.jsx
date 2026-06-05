@@ -1,5 +1,5 @@
 // src/pages/Lobby.jsx
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAuthAnon from '../hooks/useAuthAnon.js';
 import useTd3 from '../hooks/useTd3.js';
