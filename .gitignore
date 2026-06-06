@@ -32,6 +32,7 @@ dev-dist
 # Tool caches y plugins externos
 .firebase/
 claude-seo/
+.agents/skills/
 
 # Notas y artefactos de trabajo
 *.SNIPPET.txt
