@@ -7,8 +7,10 @@
    =========================== */
 
 /* — Visibilidad por vista — */
-body.is-table   .side-panel,
-body.is-table   #panel-fab { display: block; }
+body.is-table .side-panel,
+body.is-table #panel-fab,
+body.is-table-waiting .side-panel,
+body.is-table-waiting #panel-fab { display: block; }
 
 body.is-manager .side-panel,
 body.is-manager #panel-fab,
